@@ -1,9 +1,23 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-)
+import ReactDOM from "react-dom/client";
+import { RouterProvider } from "react-router-dom";
+import router from "./routes/routes";
+import { PrimeReactProvider } from "primereact/api";
+import { Provider } from "react-redux";
+import { stores } from "./stores/stores";
+
+import "primereact/resources/themes/lara-light-green/theme.css";
+// import "primeicons/primeicons.css";
+import "./styles/resets.css";
+import "./styles/index.css";
+
+const rootElement = document.getElementById("root");
+const root = ReactDOM.createRoot(rootElement || document.createElement("div"));
+
+root.render(
+  <PrimeReactProvider>
+    <Provider store={stores}>
+      <RouterProvider router={router} />
+    </Provider>
+  </PrimeReactProvider>
+);
