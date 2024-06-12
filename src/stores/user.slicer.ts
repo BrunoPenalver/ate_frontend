@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import api from "../utils/api";
+import User from "../interfaces/user";
 
 const getInitialUser = () =>
 {
@@ -16,7 +17,7 @@ const counterSlice = createSlice({
     initialState: 
     { 
         user: getInitialUser(),
-    },
+    } as { user: User | null },
     reducers: 
     {
         setUser: (state, action) => 
@@ -38,11 +39,7 @@ const counterSlice = createSlice({
         removeUser: (state) => 
         {
             localStorage.removeItem("user");
-            state.user =
-            {
-                firstname: "",
-                lastname: "",
-            }
+            state.user = null;
         }
     },
 });

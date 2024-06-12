@@ -4,14 +4,15 @@ import { useNavigate } from "react-router-dom";
 const useAuth = () => 
 {   
     const Navigate = useNavigate();
-    const user = localStorage.getItem('user');
-    
-    useEffect(() => {
-        if(user === null)
+   
+    useEffect(() => 
+    {
+        const user = JSON.parse(localStorage.getItem('user') as string);
+
+        if(!user)
             Navigate('/login');
     }, []);    
     
-    return user;
 }
 
 export default useAuth;
