@@ -26,6 +26,14 @@ const HeaderComp = () =>
 
     const items = 
     [
+      {
+        label: `Ordenes de pago`,
+        items:
+        [
+          { label: "Listado" , command: () => navigate("/ordenes/lista"), },
+          { label: "Agregar orden" , command: () => navigate("/ordenes/agregar"), }
+        ], 
+      },
         {
           label: "Panel de control",
           command: () => navigate("/admin"),
