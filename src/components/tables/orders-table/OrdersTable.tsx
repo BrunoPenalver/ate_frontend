@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { OrdersTableFilter } from "./OrdersTableFilter";
 import { Group } from "../../Group";
 import {
@@ -11,21 +11,32 @@ import {
 import { Column } from "primereact/column";
 import { formatDate } from "../../../utils/dates";
 import { getTranslate } from "../../../utils/tablesTranslates";
-import useOrders from "../../../hooks/orders";
+
 import { Loader } from "../../Loader";
+import { AppDispatch, RootState } from "../../../stores/stores";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchOrders } from "../../../stores/orders.slice";
+import { setSpanishLocale } from "../../../utils/locale";
+import { locale } from "primereact/api";
 
 
 
 export const StyledTable = () => {
   const [globalFilter, setGlobalFilter] = useState("");
-  const { LoadingOrders, Orders } = useOrders();
-  
+  const dispatch = useDispatch<AppDispatch>();
+  const { orders, loading } = useSelector((state: RootState) => state.orders);
 
+  useEffect(() => {
+    setSpanishLocale()
+    locale("es")
+    dispatch(fetchOrders(""));
+  }, [dispatch]);
 
-  if (LoadingOrders) {
+  if (loading) {
     return <Loader text="Cargando ordenes de pago" />;
   }
-  if (Orders?.length === 0) {
+
+  if (!orders || orders.length === 0) {
     return (
       <TableContainer>
         <TitleGroup>
@@ -48,6 +59,12 @@ export const StyledTable = () => {
     );
   }
 
+  // Hacer una copia profunda del array antes de ordenarlo
+  const sortedOrders = orders.map(order => ({ ...order })).sort((a, b) => a.id - b.id);
+
+  // Obtener las claves del primer objeto en el array
+  const orderKeys = Object.keys(orders[0]);
+
   return (
     <TableContainer>
       <TitleGroup>
@@ -64,7 +81,7 @@ export const StyledTable = () => {
         /> */}
       </TitleGroup>
       <StyledDataTable
-        value={Orders && Orders?.sort((a, b) => a.id - b.id)}
+        value={sortedOrders}
         paginator
         rows={10}
         rowsPerPageOptions={[1, 2, 5, 10]}
@@ -73,40 +90,50 @@ export const StyledTable = () => {
         removableSort
         globalFilter={globalFilter}
       >
-        {Object.keys(Orders[0])?.filter(tkey => tkey !== "createdAt" && tkey !== "updatedAt").map((key) =>
-          key === "date" ? (
-            <Column
-              key={key}
-              field={key}
-              header={getTranslate(key)}
-              body={(rowData) => formatDate(rowData[key])}
-              sortable
-              filter 
-              filterPlaceholder="Filtrar..."
-              
-            />
-          ) : key === "active" ? (
-            <Column
-              key={key}
-              field={key}
-              header={getTranslate(key)}
-              body={(rowData) => (rowData[key] ? "Si" : "No")}
-              sortable
-              filter filterPlaceholder="Filtrar..."
-            />
-          ):  key === "total" ? (
-            <Column
-              key={key}
-              field={key}
-              header={getTranslate(key)}
-              body={(rowData) => `$${rowData[key]}`}
-              sortable
-              filter filterPlaceholder="Filtrar..."
-            />
-          ) :  (
-            <Column key={key} field={key} header={getTranslate(key)} sortable filter filterPlaceholder="Filtrar..." />
-          )
-        )}
+        {orderKeys
+          .filter((tkey) => tkey !== "createdAt" && tkey !== "updatedAt")
+          .map((key) =>
+            key === "date" ? (
+              <Column
+                key={key}
+                field={key}
+                header={getTranslate(key)}
+                body={(rowData) => formatDate(rowData[key])}
+                sortable
+                filter
+                filterPlaceholder="Filtrar..."
+              />
+            ) : key === "active" ? (
+              <Column
+                key={key}
+                field={key}
+                header={getTranslate(key)}
+                body={(rowData) => (rowData[key] ? "Si" : "No")}
+                sortable
+                filter
+                filterPlaceholder="Filtrar..."
+              />
+            ) : key === "total" ? (
+              <Column
+                key={key}
+                field={key}
+                header={getTranslate(key)}
+                body={(rowData) => `$${rowData[key]}`}
+                sortable
+                filter
+                filterPlaceholder="Filtrar..."
+              />
+            ) : (
+              <Column
+                key={key}
+                field={key}
+                header={getTranslate(key)}
+                sortable
+                filter
+                filterPlaceholder="Filtrar..."
+              />
+            )
+          )}
       </StyledDataTable>
     </TableContainer>
   );
