@@ -11,11 +11,14 @@ const translates = {
   },
 };
 
-export const getTranslate = (key: string) => {
-  if (!translates["es"].hasOwnProperty(key)) {
+export const getTranslate = (key: string) => 
+{
+  if (!translates["es"].hasOwnProperty(key)) 
+  {
     console.log(key);
     return "unknown";
   }
-
+  
+  // @ts-ignore
   return translates["es"][key];
 };

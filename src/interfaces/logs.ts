@@ -12,7 +12,7 @@ interface Log
         text: string;
         to: string | null;        
     },
-    createdAt?: string;
+    createdAt: string;
 }
 
 export default Log;
