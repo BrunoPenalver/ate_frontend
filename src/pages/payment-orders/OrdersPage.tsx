@@ -5,11 +5,7 @@ export const OrdersPage = () => {
   return (
     <>
     <AdminLayout>
-<<<<<<< HEAD
-        <StyledTable />
-=======
         <StyledTable/>
->>>>>>> c88235e15bfef67a97f8dbdc421bc6b42c35d653
     </AdminLayout>
     </>
   )

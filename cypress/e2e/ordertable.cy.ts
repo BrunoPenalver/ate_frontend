@@ -1,8 +1,7 @@
 describe('StyledTable', () => {
     beforeEach(() => {
-        cy.intercept('GET', 'http://localhost:5001/orders').as('getOrders'); // Ajusta la URL según sea necesario
-        cy.visit('/ordenes/lista'); // Reemplaza con la ruta correcta para acceder al componente
-        cy.wait('@getOrders');
+        cy.visit('/ordenes/lista');
+
     });
 
     it('debe verificar el formato del ID de la orden', () => {
@@ -17,7 +16,7 @@ describe('StyledTable', () => {
     it('debe verificar el formato de la fecha', () => {
         cy.get('.p-datatable-tbody tr').each(($row) => {
             cy.wrap($row).find('td').eq(1).invoke('text').then((text) => {
-                const datePattern = /^\d{2}\/\d{2}\/\d{4}$/;
+                const datePattern = /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/;
                 expect(text.trim()).to.match(datePattern);
             });
         });
