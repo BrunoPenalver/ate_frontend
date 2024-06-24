@@ -5,7 +5,7 @@ export const OrdersPage = () => {
   return (
     <>
     <AdminLayout>
-        <StyledTable>OrdersPage</StyledTable>
+        <StyledTable />
     </AdminLayout>
     </>
   )
