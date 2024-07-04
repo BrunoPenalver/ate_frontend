@@ -134,6 +134,13 @@ export const StyledTable = () => {
               />
             )
           )}
+          <Column key="actions" header="Acciones" body={() => 
+            <>
+              <i className="pi pi-pen-to-square" style={{marginRight: "10px", color: "var(--cyan-500)"}}></i>
+              <i className="pi pi-trash" style={{color: "var(--red-600)"}} ></i> 
+            </>
+          } />
+
       </StyledDataTable>
     </TableContainer>
   );
