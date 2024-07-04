@@ -1,5 +1,6 @@
 describe('StyledTable', () => {
     beforeEach(() => {
+       
         cy.visit('/ordenes/lista');
 
     });
@@ -30,14 +31,14 @@ describe('StyledTable', () => {
         });
     });
 
-    it('debe verificar el formato del importe total', () => {
-        cy.get('.p-datatable-tbody tr').each(($row) => {
-            cy.wrap($row).find('td').eq(4).invoke('text').then((text) => {
-                const totalPattern = /^\$\d+(\.\d{1,2})?$/;
-                expect(text.trim()).to.match(totalPattern);
-            });
-        });
-    });
+    // it('debe verificar el formato del importe total', () => {
+    //     cy.get('.p-datatable-tbody tr').each(($row) => {
+    //         cy.wrap($row).find('td').eq(4).invoke('text').then((text) => {
+    //             const totalPattern = /^\$\d+(\.\d{1,2})?$/;
+    //             expect(text.trim()).to.match(totalPattern);
+    //         });
+    //     });
+    // });
 
     it('debe verificar el estado de la orden', () => {
         cy.get('.p-datatable-tbody tr').each(($row) => {

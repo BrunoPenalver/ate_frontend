@@ -9,7 +9,7 @@ import 'primeicons/primeicons.css';
 import "primereact/resources/themes/lara-light-green/theme.css";
 import "./styles/resets.css";
 import "./styles/index.css";
-
+import 'primeicons/primeicons.css';
 
 const rootElement = document.getElementById("root");
 const root = ReactDOM.createRoot(rootElement || document.createElement("div"));
