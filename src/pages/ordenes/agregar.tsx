@@ -162,10 +162,10 @@ const AgregarPage = () =>
             
             console.log(Payload);
             
-            setTimeout(() =>
-            {
-                navigate("/ordenes/lista"); 
-            }, 2500);
+            // setTimeout(() =>
+            // {
+            //     navigate("/ordenes/lista"); 
+            // }, 2500);
         }
     }
     
