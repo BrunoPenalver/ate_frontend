@@ -17,6 +17,7 @@ import { formatPrice } from "../../utils/prices";
 import { Button } from "primereact/button";
 import { createAlert } from "../../stores/alerts.slicer";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 
 const options_state = [ "Abierta", "Cerrada" ];
@@ -79,6 +80,7 @@ const AgregarPage = () =>
     });
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const getFormErrorMessage = (key: string) => 
     {
@@ -155,8 +157,15 @@ const AgregarPage = () =>
                 state: values.state,
                 movements: Movimientos,
             };
+
+            dispatch(createAlert({severity: "success", summary: "Movimiento creada", detail: `La orden fue creada correctamente`}));
             
             console.log(Payload);
+            
+            setTimeout(() =>
+            {
+                navigate("/ordenes/lista"); 
+            }, 2500);
         }
     }
     
@@ -210,12 +219,12 @@ const AgregarPage = () =>
             </Panel>}
         
             <ConfirmDialog/>
-            
+
             <Dialog visible={ShowUpdate} header="Actualizar movimiento" onHide={switchShowUpdate} style={{maxWidth: "80vw"}}>
                 <Movimiento callBackDialogAdd={callBackDialogAdd} defaultValue={SelectedToUpdate} callBackUpdate={callBackDialogUpdate}/>
             </Dialog>
 
-            <Button label="Guardar" className="p-button-success" type="submit"/>
+            <Button label="Guardar" id="save-order" className="p-button-success" type="submit"/>
         </form>
 
     </HeaderLayout>

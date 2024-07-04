@@ -15,7 +15,6 @@ import { Calendar } from "primereact/calendar";
 import { FileUpload } from "primereact/fileupload";
 import { Button } from "primereact/button";
 import Movement from "../../../interfaces/orders/movement";
-import api from "../../../utils/api";
 
 const States = [ "Abierta !", "Cerrada !" ];
 const Types = [ "Debe", "Haber" ];
@@ -170,33 +169,6 @@ interface Props
 const CreateOrUpdateMovimiento = (props: Props) => 
 {
     const dispatch = useDispatch();
-
-    const [isLoading, setIsLoading] = useState(false);
-
-    useEffect(() => 
-    {
-        const load = async () =>
-        {
-            setIsLoading(true);
-
-            try 
-            {
-                const { data } = await api.get<Concept[]>("/concepts");
-                console.log(data)
-            } 
-            catch (error) 
-            {
-
-            }
-            finally
-            {
-                setIsLoading(false);
-            }
-        }
-
-        load();
-    },[]);
-
 
     const FormMovimiento = useFormik({
         initialValues: getInitialValue(),
@@ -440,6 +412,8 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         props.callBackDialogAdd(newMovimiento);
     }
 
+
+
     const cleanForm = () => FormMovimiento.setValues(getInitialValue());
 
     return <Form onSubmit={FormMovimiento.handleSubmit}>
@@ -557,6 +531,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
                 </FloatLabel>
             </ContainerInput>
         </ThridRow>
+
 
         
         <FileUpload mode="basic" name="demo[]"  accept="application/pdf" chooseLabel="Adjuntar documento" disabled/>
