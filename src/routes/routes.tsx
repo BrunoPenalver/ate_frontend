@@ -3,7 +3,7 @@ import LoginPage from "../pages/login";
 import AdminPage from "../pages/admin";
 import AuditoriaPage from "../pages/admin/Auditoria";
 import { OrdersPage } from "../pages/payment-orders/OrdersPage";
-import { AddOrderPage } from "../pages/add-order/AddOrder";
+import AgregarPage from "../pages/ordenes/agregar";
 
 const router = createBrowserRouter([
     {
@@ -28,7 +28,7 @@ const router = createBrowserRouter([
     },
     {
         path: "/ordenes/agregar",
-        element: <AddOrderPage/>
+        element: <AgregarPage/>
     }
 ]);
 

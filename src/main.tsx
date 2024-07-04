@@ -5,10 +5,10 @@ import router from "./routes/routes";
 import { PrimeReactProvider} from 'primereact/api';
 import { Provider } from "react-redux";
 import { stores } from "./stores/stores";
+import 'primeicons/primeicons.css';
 import "primereact/resources/themes/lara-light-green/theme.css";
 import "./styles/resets.css";
 import "./styles/index.css";
-
 
 
 const rootElement = document.getElementById("root");
