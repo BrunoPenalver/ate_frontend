@@ -64,7 +64,7 @@ export const StyledTable = () => {
 
   // Obtener las claves del primer objeto en el array
   const orderKeys = Object.keys(orders[0]);
-
+  console.log(orderKeys)
   return (
     <TableContainer>
       <TitleGroup>
@@ -123,6 +123,19 @@ export const StyledTable = () => {
                 filter
                 filterPlaceholder="Filtrar..."
               />
+              
+            ): key === "movements" ? (
+              
+              <Column
+              key={key}
+              field={key}
+              header={"Total"}
+              body= "$100"
+              sortable
+              filter
+              filterPlaceholder="Filtrar..."
+            />
+              
             ) : (
               <Column
                 key={key}

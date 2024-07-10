@@ -8,6 +8,7 @@ const translates = {
     createdAt: "Creada",
     updatedAt: "Actualizada",
     id: "ID",
+    orderNumber: "Nº de orden"
   },
 };
 
