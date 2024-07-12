@@ -1,9 +1,9 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import LoginPage from "../pages/login";
-import AdminPage from "../pages/admin";
 import AuditoriaPage from "../pages/admin/Auditoria";
-import { OrdersPage } from "../pages/payment-orders/OrdersPage";
-import AgregarPage from "../pages/ordenes/agregar";
+import AgregarPage from "../pages/admin/ordenes/agregar";
+import OrdenesActivaPages from "../pages/admin/ordenes";
+import OrdenesEliminadasPages from "../pages/admin/ordenes/eliminadas";
 
 const router = createBrowserRouter([
     {
@@ -16,18 +16,22 @@ const router = createBrowserRouter([
     },
     {
         path: "/admin",
-        element: <AdminPage/>
+        element: <Navigate to="/admin/ordenes"/>
     },
     {
         path: "/admin/auditoria",
         element: <AuditoriaPage/>
     },
     {
-        path: "/ordenes/lista",
-        element: <OrdersPage/>
+        path: "/admin/ordenes/",
+        element: <OrdenesActivaPages/>
     },
     {
-        path: "/ordenes/agregar",
+        path: "/admin/ordenes/eliminadas",
+        element: <OrdenesEliminadasPages/>
+    },
+    {
+        path: "/admin/ordenes/agregar",
         element: <AgregarPage/>
     }
 ]);

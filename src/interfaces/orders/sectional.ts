@@ -1,7 +1,9 @@
 
 export default interface Sectional
 {
-    id: number,
-    code: string | number;
+    id: number;
     name: string;
+    description: string;
+    createdAt: string;
+    updatedAt: string;
 }

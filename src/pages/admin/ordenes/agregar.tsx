@@ -1,22 +1,23 @@
 
 import { useMemo, useState } from "react";
-import HeaderLayout  from "../../layouts/Admin"
-import Movimiento from "../../components/admin/agregar/Movimiento";
+import HeaderLayout  from "../../../layouts/Admin"
+import Movimiento from "../../../components/admin/agregar/Movimiento";
 import { Dialog } from "primereact/dialog";
-import { AddText, ContainerInfo, ContainerTables, Panel, PanelContent, PanelHeader } from "../../styles/admin/ordenes/agregar";
-import TableMovimientos from "../../components/admin/agregar/TableMovimientos";
-import Movement from "../../interfaces/orders/movement";
+import { AddText, ContainerInfo, ContainerTables, Panel, PanelContent, PanelHeader } from "../../../styles/admin/ordenes/agregar";
+import TableMovimientos from "../../../components/admin/agregar/TableMovimientos";
+import Movement from "../../../interfaces/orders/movement";
 import { ConfirmDialog } from "primereact/confirmdialog";
-import { ContainerInput } from "../../styles/admin/ordenes/agregar/crearMovimiento";
+import { ContainerInput } from "../../../styles/admin/ordenes/agregar/crearMovimiento";
 import { useFormik } from "formik";
 import { FloatLabel } from "primereact/floatlabel";
 import { Calendar } from "primereact/calendar";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
-import { formatPrice } from "../../utils/prices";
+import { formatPrice } from "../../../utils/prices";
 import { Button } from "primereact/button";
-import { createAlert } from "../../stores/alerts.slicer";
+import { createAlert } from "../../../stores/alerts.slicer";
 import { useDispatch } from "react-redux";
+import api from "../../../utils/api";
 import { useNavigate } from "react-router-dom";
 
 
@@ -135,37 +136,48 @@ const AgregarPage = () =>
 
     const callBackDialogUpdate = (movimiento: Movement) =>
     {
+        console.log(movimiento, "toUpdate")
         setMovimientos(prev => prev.map(mov => mov.tempId === movimiento.tempId ? movimiento : mov));
         switchShowUpdate();
     }
 
-    const handleSubmit = (values:any) =>
+    const handleSubmit = async (values:any) =>
     {
-
-        if(Movimientos.length === 0)
+        const Payload =  
         {
-            dispatch(createAlert({severity: "error", summary: "Error", detail: `Se debe ingresar al menos un movimiento`}));
-        }
-        else
-        {
-            //Tengo que poner else porque si pongo return se rompe el handle submit
-
-            const Payload =  
+            date: values.date,
+            description: values.description,
+            state: values.state,
+            movements: Movimientos.map(movimiento => 
             {
-                date: values.date,
-                description: values.description,
-                state: values.state,
-                movements: Movimientos,
-            };
+                return {
+                    type: movimiento.type,
+                    amount: movimiento.amount,
+                    conceptId: movimiento.concept.id,
+                    sectionalId: movimiento.sectional.id,
+                    originId: movimiento.origin.id,
+                    destinyId: movimiento.origin.id,
+                    numberCheck: movimiento.numberCheck,
+                    paymentDate: movimiento.paymentDate,
+                    details: movimiento.details,
+                    extraDetails: movimiento.extraDetails,
+                }
+            }),
+        };
 
+        
+        try 
+        {
+            await api.post("/orders", Payload);    
             dispatch(createAlert({severity: "success", summary: "Movimiento creada", detail: `La orden fue creada correctamente`}));
-            
-            console.log(Payload);
-            
-            // setTimeout(() =>
-            // {
-            //     navigate("/ordenes/lista"); 
-            // }, 2500);
+
+            setTimeout(() => {
+                navigate("/admin/ordenes");
+            }, 250);
+        } 
+        catch (error:any) 
+        {
+            dispatch(createAlert({severity: "error", summary: "Error al crear la orden", detail: error.response.data.message || "Error al crear la orden"}));
         }
     }
     

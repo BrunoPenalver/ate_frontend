@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../utils/api';
-import { Order } from '../interfaces/orders';
+import Order from '../interfaces/orders/order';
 
 interface OrdersState {
     loading: boolean;
@@ -30,7 +30,22 @@ export const fetchOrders = createAsyncThunk(
 const ordersSlice = createSlice({
     name: 'orders',
     initialState,
-    reducers: {},
+    reducers: 
+    {
+        deleteById(state, action)
+        {   
+            state.orders = state.orders.map(order => 
+            {
+                if (order.id === action.payload) 
+                    order.active = !order.active;
+                return order;
+            });
+        },
+        deleteByIdForce(state, action)
+        {
+            state.orders = state.orders.filter(order => order.id !== action.payload);
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchOrders.pending, (state) => {
@@ -48,4 +63,5 @@ const ordersSlice = createSlice({
     },
 });
 
+export const { deleteById, deleteByIdForce } = ordersSlice.actions;
 export default ordersSlice.reducer;

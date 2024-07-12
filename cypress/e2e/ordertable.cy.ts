@@ -1,7 +1,7 @@
 describe('StyledTable', () => {
     beforeEach(() => {
        
-        cy.visit('/ordenes/lista');
+        cy.visit('/admin/ordenes/');
 
     });
 

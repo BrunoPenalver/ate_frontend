@@ -1,7 +1,6 @@
 import Movement from "../../../interfaces/orders/movement";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { Button } from "primereact/button";
 import { confirmDialog } from "primereact/confirmdialog";
 
 interface Props
@@ -34,13 +33,13 @@ const TableMovimientos = (props: Props) =>
         <h4>{title}</h4>
         <DataTable value={movimientos} emptyMessage="No hay movimientos cargados" stripedRows tableStyle={{ minWidth: 'auto' }}>
             <Column field="amount" header="Importe"/>
-            {title === "Debe" ? <Column field="destinyBank.account" header="Cuenta contable"/> : <Column field="originBank.account" header="Cuenta contable"/>}
-            {title === "Debe" ? <Column field="destiny.name" header="Nombre proveedor"/> : <Column field="origin.name" header="Nombre proveedor"/>}
+            {title === "Debe" ? <Column field="destiny.bankAccount.bank" header="Cuenta contable"/> : <Column field="origin.bankAccount.bank" header="Cuenta contable"/>}
+            {title === "Debe" ? <Column field="destiny.name" header="Descripción"/> : <Column field="origin.name" header="Descripción"/>}
             <Column header="Acciones" body={(row) => 
             {
                 return <div style={{ display: "flex", gap: "10px", justifyContent: "center", textDecoration: "none",}}>
-                    <Button label="Editar"   className="p-button-info"  onClick={() =>  props.onUpdate(row)}/> 
-                    <Button label="Eliminar" className="p-button-danger" onClick={() =>  onClickDelete(row.tempId)}/> 
+                    <i className="pi pi-pen-to-square" style={{marginRight: "10px", color: "var(--cyan-500)", cursor: "pointer"}} onClick={() =>  props.onUpdate(row)}/>
+                    <i className="pi pi-trash" style={{color: "var(--red-600)", cursor: "pointer"}} onClick={() =>  onClickDelete(row.tempId)}/> 
                 </div>
             }}/>
         </DataTable>

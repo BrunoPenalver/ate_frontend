@@ -30,8 +30,9 @@ const HeaderComp = () =>
         label: `Ordenes de pago`,
         items:
         [
-          { label: "Listado" , command: () => navigate("/ordenes/lista"), },
-          { label: "Agregar orden" , command: () => navigate("/ordenes/agregar"), }
+          { label: "Listado" , command: () => navigate("/admin/ordenes"), },
+          { label: "Agregar orden" , command: () => navigate("/admin/ordenes/agregar"), },
+          { label: "Eliminadas" , command: () => navigate("/admin/ordenes/eliminadas"), },
         ], 
       },
         {

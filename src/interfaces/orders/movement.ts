@@ -1,4 +1,4 @@
-import Beneficiary, { Bank } from "./beneficiary";
+import Account from "./account"
 import Concept from "./concept";
 import Sectional from "./sectional";
 
@@ -9,10 +9,8 @@ export default interface Movement
     amount: number;
     concept: Concept;
     sectional: Sectional;
-    origin: Beneficiary;
-    destiny: Beneficiary;
-    originBank: Bank;
-    destinyBank: Bank;
+    origin: Account;
+    destiny: Account;
     numberCheck: number;
     paymentDate: number;
     details: string;
