@@ -19,6 +19,7 @@ import { createAlert } from "../../../stores/alerts.slicer";
 import { useDispatch } from "react-redux";
 import api from "../../../utils/api";
 import { useNavigate } from "react-router-dom";
+import useAuth from "../../../hooks/auth";
 
 
 const options_state = [ "Abierta", "Cerrada" ];
@@ -74,6 +75,8 @@ const getInitialValues = () =>
 
 const AgregarPage = () => 
 {
+    useAuth();
+
     const FormAdd = useFormik({
         initialValues: getInitialValues(),
         validate: values => getErrors(values),

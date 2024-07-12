@@ -35,21 +35,17 @@ const HeaderComp = () =>
           { label: "Eliminadas" , command: () => navigate("/admin/ordenes/eliminadas"), },
         ], 
       },
-        {
-          label: "Panel de control",
-          command: () => navigate("/admin"),
-        },
-        {
-            label: "Auditoria",
-            command: () => navigate("/admin/auditoria"),
-          },
-        {
-          label: `${user.firstname} ${user.lastname}`,
-          items:
-          [
-            { label: "Cerrar sesión" , command: async () =>  await logOut() }
-          ], 
-        },
+      {
+        label: "Auditoria",
+        command: () => navigate("/admin/auditoria"),
+      },
+      {
+        label: `${user.firstname} ${user.lastname}`,
+        items:
+        [
+          { label: "Cerrar sesión" , command: async () =>  await logOut() }
+        ], 
+      },
     ];
     
     return <Header>
