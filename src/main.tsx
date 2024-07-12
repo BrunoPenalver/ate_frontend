@@ -2,14 +2,14 @@
 import ReactDOM from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
 import router from "./routes/routes";
-import { PrimeReactProvider } from "primereact/api";
+import { PrimeReactProvider} from 'primereact/api';
 import { Provider } from "react-redux";
 import { stores } from "./stores/stores";
-
+import 'primeicons/primeicons.css';
 import "primereact/resources/themes/lara-light-green/theme.css";
-// import "primeicons/primeicons.css";
 import "./styles/resets.css";
 import "./styles/index.css";
+import 'primeicons/primeicons.css';
 
 const rootElement = document.getElementById("root");
 const root = ReactDOM.createRoot(rootElement || document.createElement("div"));

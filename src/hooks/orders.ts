@@ -1,14 +1,12 @@
 import { useState , useEffect } from "react";
 import api from "../utils/api";
-import { Order } from "../interfaces/orders";
+import Order from "../interfaces/orders/order";
 
 
 export default function useOrders(filters: string = "")
 {
     const [LoadingOrders, setLoadingOrders] = useState(true);
     const [Orders, setOrders] = useState<Order[]>([]);
-
-
 
     const fetchOrders = async () => 
     {

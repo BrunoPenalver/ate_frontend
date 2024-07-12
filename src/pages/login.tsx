@@ -30,7 +30,7 @@ const LoginPage = () =>
             setCookie("token", token, 1);
 
             dispatch(setUser({user}));
-            Navigate("/admin");
+            Navigate("/admin/ordenes");
         } 
         catch (error: any ) 
         {
