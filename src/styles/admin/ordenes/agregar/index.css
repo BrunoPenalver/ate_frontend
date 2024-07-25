@@ -1,0 +1,23 @@
+.p-dialog-content
+{
+    padding: 0;
+}
+
+::-webkit-file-upload-button {
+    display: none;
+ }
+
+input
+{
+    color: transparent;
+}
+
+input[type="file"]::file-selector-button 
+{
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}

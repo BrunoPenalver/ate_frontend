@@ -94,3 +94,31 @@ display: grid;
 gap: 10px;
 grid-template-columns: 1fr 1fr 1fr;
 `;
+
+export const FourthRow = styled.div`
+display: grid;
+gap: 10px;
+grid-template-columns:  1fr 2fr;
+`;
+
+export const Dropzone = styled.input`
+width: 100%;
+border: 2px dashed #ccc;
+display: flex;
+justify-content: center;
+align-items: center;
+gap: 10px;
+background-color: #f9f9f9;
+
+display: inline-block;
+width: 100%;
+padding: 120px 0 0 0;
+height: 100px;
+overflow: hidden;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+background: url('https://cdn0.iconfinder.com/data/icons/phosphor-thin-vol-2/256/export-thin-128.png') center center no-repeat #f9f9f9;
+border-radius: 20px;
+background-size: 60px 60px;
+`;

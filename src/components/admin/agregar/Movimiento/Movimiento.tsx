@@ -1,22 +1,24 @@
 import { SelectButton } from "primereact/selectbutton";
-import { Container5050, ContainerInput, FirstRow, Form, SecondRow, ThridRow } from "../../../styles/admin/ordenes/agregar/crearMovimiento";
+import { ContainerInput, Dropzone, FirstRow, Form, FourthRow, SecondRow, ThridRow } from "../../../../styles/admin/ordenes/agregar/crearMovimiento";
 import { FloatLabel } from "primereact/floatlabel";
 import { InputNumber } from "primereact/inputnumber";
+import { InputTextarea } from 'primereact/inputtextarea';
 import { useFormik } from "formik";
 import { AutoComplete, AutoCompleteChangeEvent, AutoCompleteCompleteEvent } from "primereact/autocomplete";
-import { useEffect, useState } from "react";
-import Concept from "../../../interfaces/orders/concept";
-import Sectional from "../../../interfaces/orders/sectional";
+import { useEffect, useMemo, useState } from "react";
+import Concept from "../../../../interfaces/orders/concept";
+import Sectional from "../../../../interfaces/orders/sectional";
 import { useDispatch } from "react-redux";
-import { createAlert } from "../../../stores/alerts.slicer";
+import { createAlert } from "../../../../stores/alerts.slicer";
 import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
-import Movement from "../../../interfaces/orders/movement";
-import api from "../../../utils/api";
-import Loading from "../../Loading";
-import Account from "../../../interfaces/orders/account";
-import BankAccount from "../../../interfaces/orders/bankAccount";
+import Movement, { Attachment as AttachmentType } from "../../../../interfaces/orders/movement";
+import api from "../../../../utils/api";
+import Loading from "../../../Loading";
+import Account from "../../../../interfaces/orders/account";
+import BankAccount from "../../../../interfaces/orders/bankAccount";
+import Attachment from "./Attachment";
 
 const States = [ "Abierta !", "Cerrada !" ];
 const Types = [ "Debe", "Haber" ];
@@ -61,16 +63,14 @@ const getInitialValue = () =>
         },
         destinyBankAccount: undefined,
         destinyBankCBU: undefined,
-        numberCheck: null,
         paymentDate: null,
         details: "",
-        extraDetails: ""
+        attachments:[]
     }
 }
 
 const generateFromDefaultValue = (movement: Movement) =>
 {
-
     return {
         tempId: movement.tempId,
         type: movement.type,
@@ -81,10 +81,9 @@ const generateFromDefaultValue = (movement: Movement) =>
         originBank: movement.origin.bankAccount,
         destinyBank: movement.destiny.bankAccount,
         destiny:movement.destiny,
-        numberCheck: movement.numberCheck,
         paymentDate: movement.paymentDate,
         details: movement.details,
-        extraDetails: movement.extraDetails
+        attachments: movement.attachments
     }
 }
 
@@ -116,7 +115,7 @@ const getErrors = (values: any) =>
 
     var errors : any = {};
 
-    const requireds = ["amount","concept","sectional","origin","originBank","destiny","destinyBank","numberCheck","paymentDate","details"];
+    const requireds = ["amount","concept","sectional","origin","originBank","destiny","destinyBank","paymentDate","details"];
 
     requireds.forEach(required => 
     {
@@ -352,10 +351,9 @@ const CreateOrUpdateMovimiento = (props: Props) =>
             sectional: values.sectional,
             origin: values.origin,
             destiny: values.destiny,
-            numberCheck: values.numberCheck,
             paymentDate: values.paymentDate,
             details: values.details,
-            extraDetails: values.extraDetails
+            attachments: values.attachments
         }
         
 
@@ -368,19 +366,54 @@ const CreateOrUpdateMovimiento = (props: Props) =>
             props.callBackDialogAdd(newMovimiento);
     }
 
-
-
     const cleanForm = () => FormMovimiento.setValues(getInitialValue());
 
     if(isLoading)
         return <Loading/>
 
-    return <Form onSubmit={FormMovimiento.handleSubmit}>    
+    const styleForm = useMemo(() => 
+    {  
+        // const color = FormMovimiento.values.type === "Haber" ? "#f96060" : "#6bc56b"; //TODO: preguntar grado del borde   
+        const color = FormMovimiento.values.type === "Haber" ? "red" : "green";
+
+        return { border: `10px solid ${color}`, padding: '1.5rem 2rem', transition: 'border 0.5s' }
+    },[FormMovimiento.values.type]);
+
+
+
+    const addFiles = (files: FileList) =>
+    {
+        var oldAttachments: AttachmentType[] = FormMovimiento.values.attachments;
+
+        for (let i = 0; i < files.length; i++) 
+        {
+            const attachment: AttachmentType = { id: Date.now(), file: files[i] };
+            oldAttachments.push(attachment);;
+        }
+        
+        FormMovimiento.setFieldValue("attachments",oldAttachments);
+    }
+
+    const onDrop = (event: React.DragEvent<HTMLDivElement>) =>
+    {
+        event.preventDefault();
+        addFiles(event.dataTransfer.files);
+    }
+    
+    const onSelectFile = (event: React.ChangeEvent<HTMLInputElement>) =>
+    {
+        event.preventDefault();
+        if(event.target.files)
+            addFiles(event.target.files);
+    }
+
+
+    return <Form onSubmit={FormMovimiento.handleSubmit} style={styleForm}>    
         <FirstRow>
                 <SelectButton id="select-type" value={FormMovimiento.values.type} onChange={(e) => FormMovimiento.setFieldValue("type",e.target.value)} options={Types}/>     
             <ContainerInput>
                 <FloatLabel>
-                    <InputNumber id="amount" useGrouping={false} value={FormMovimiento.values.amount} onChange={e => FormMovimiento.setFieldValue("amount",e.value)} locale="es-ES" maxFractionDigits={2}/>
+                    <InputNumber id="amount" locale="es" value={FormMovimiento.values.amount} onChange={e => FormMovimiento.setFieldValue("amount",e.value)} />
                     <label htmlFor="amount">Importe</label>    
                 </FloatLabel>  
                 {getFormErrorMessage("amount")}
@@ -431,7 +464,6 @@ const CreateOrUpdateMovimiento = (props: Props) =>
                 {getFormErrorMessage("destiny")}
             </ContainerInput>
         </SecondRow>
-
         
         <ThridRow>
                 <ContainerInput>
@@ -454,42 +486,28 @@ const CreateOrUpdateMovimiento = (props: Props) =>
             </ContainerInput>
         </ThridRow>
 
-        <ThridRow>
-            <Container5050>
-                <ContainerInput>
-                    <FloatLabel>
-                        <InputNumber id="numberCheck" value={FormMovimiento.values.numberCheck} onValueChange={e => FormMovimiento.setFieldValue("numberCheck", e.target.value)}/>
-                        <label htmlFor="numberCheck">Nro de cheque</label>
-                    </FloatLabel>
-                    {getFormErrorMessage("numberCheck")}
-                </ContainerInput>
-
-                <ContainerInput>
-                    <FloatLabel>
-                        <Calendar id="paymentDate" placeholder="Fecha de cobro" value={FormMovimiento.values.paymentDate} onChange={e => FormMovimiento.setFieldValue("paymentDate",e.target.value)}  dateFormat="dd/mm/yy"/>
-                        <label htmlFor="paymentDate">Fecha de cobro</label>
-                    </FloatLabel>
-                    {getFormErrorMessage("paymentDate")}
-                </ContainerInput>
-            </Container5050>
+        <FourthRow>
+            <ContainerInput>
+                <FloatLabel>
+                    <Calendar id="paymentDate" placeholder="Fecha de cobro" value={FormMovimiento.values.paymentDate} onChange={e => FormMovimiento.setFieldValue("paymentDate",e.target.value)}  dateFormat="dd/mm/yy"/>
+                    <label htmlFor="paymentDate">Fecha de cobro</label>
+                </FloatLabel>
+                {getFormErrorMessage("paymentDate")}
+            </ContainerInput>
 
             <ContainerInput>
                 <FloatLabel>
-                    <InputText id="details" value={FormMovimiento.values.details} onChange={e => FormMovimiento.setFieldValue("details",e.target.value)}/>
+                    <InputTextarea id="details"  rows={3} value={FormMovimiento.values.details} onChange={e => FormMovimiento.setFieldValue("details",e.target.value)}/>
                     <label htmlFor="details">Detalles</label>
                 </FloatLabel>
                 {getFormErrorMessage("details")}
-            </ContainerInput>
+            </ContainerInput> 
+        </FourthRow>
 
-            <ContainerInput>
-                <FloatLabel>
-                    <InputText id="extraDetails" value={FormMovimiento.values.extraDetails} onChange={e => FormMovimiento.setFieldValue("extraDetails",e.target.value)}/>
-                    <label htmlFor="extraDetails">Detalles extra</label>
-                </FloatLabel>
-            </ContainerInput>
-        </ThridRow>
-
-
+        <Dropzone id="imageUpload" onDrop={onDrop}  type="file" onChange={onSelectFile} value={""}  accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf,image/jpeg,image/png,image/jpg"></Dropzone>
+        <div>
+            {FormMovimiento.values.attachments.map((attachment:AttachmentType) => <Attachment attachment={attachment} key={attachment.id}/>)}
+        </div>
         <div>
             <Button label={props.defaultValue === null ? 'Agregar' : 'Actualizar' } type="submit" id="button_add"/>
             <Button label="Limpiar" type="button" text onClick={cleanForm}/>

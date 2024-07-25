@@ -1,10 +1,10 @@
 
 import { useMemo, useState } from "react";
 import HeaderLayout  from "../../../layouts/Admin"
-import Movimiento from "../../../components/admin/agregar/Movimiento";
+import Movimiento from "../../../components/admin/agregar/Movimiento/Movimiento";
 import { Dialog } from "primereact/dialog";
 import { AddText, ContainerInfo, ContainerTables, Panel, PanelContent, PanelHeader } from "../../../styles/admin/ordenes/agregar";
-import TableMovimientos from "../../../components/admin/agregar/TableMovimientos";
+import TableMovimientos from "../../../components/admin/agregar/Movimiento/Table";
 import Movement from "../../../interfaces/orders/movement";
 import { ConfirmDialog } from "primereact/confirmdialog";
 import { ContainerInput } from "../../../styles/admin/ordenes/agregar/crearMovimiento";
@@ -17,10 +17,10 @@ import { formatPrice } from "../../../utils/prices";
 import { Button } from "primereact/button";
 import { createAlert } from "../../../stores/alerts.slicer";
 import { useDispatch } from "react-redux";
-import api from "../../../utils/api";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../../hooks/auth";
-
+import api from "../../../utils/api";
+import "../../../styles/admin/ordenes/agregar/index.css";
 
 const options_state = [ "Abierta", "Cerrada" ];
 
@@ -146,41 +146,51 @@ const AgregarPage = () =>
 
     const handleSubmit = async (values:any) =>
     {
-        const Payload =  
-        {
-            date: values.date,
-            description: values.description,
-            state: values.state,
-            movements: Movimientos.map(movimiento => 
-            {
-                return {
-                    type: movimiento.type,
-                    amount: movimiento.amount,
-                    conceptId: movimiento.concept.id,
-                    sectionalId: movimiento.sectional.id,
-                    originId: movimiento.origin.id,
-                    destinyId: movimiento.origin.id,
-                    numberCheck: movimiento.numberCheck,
-                    paymentDate: movimiento.paymentDate,
-                    details: movimiento.details,
-                    extraDetails: movimiento.extraDetails,
-                }
-            }),
-        };
+        const Payload = new FormData();
 
-        
+        Payload.append("date", values.date);
+        Payload.append("description", values.description);
+        Payload.append("state", values.state);
+
+      
+
         try 
         {
-            await api.post("/orders", Payload);    
-            dispatch(createAlert({severity: "success", summary: "Movimiento creada", detail: `La orden fue creada correctamente`}));
+            for (let index = 0; index < Movimientos.length; index++)
+            {
+                const movimiento = Movimientos[index];
+                Payload.append(`movements[type]`, movimiento.type);
+                Payload.append(`movements[amount]`, movimiento.amount.toString());
+                Payload.append(`movements[conceptId]`, movimiento.concept.id.toString());
+                Payload.append(`movements[sectionalId]`, movimiento.sectional.id.toString());
+                Payload.append(`movements[originId]`, movimiento.origin.id.toString());
+                Payload.append(`movements[destinyId]`, movimiento.origin.id.toString());
+                Payload.append(`movements[paymentDate]`, movimiento.paymentDate.toString());
+                Payload.append(`movements[details]`, movimiento.details);
+    
+                movimiento.attachments.forEach((attachment, attachmentIndex) => Payload.append(`movements[${index}][attachments][${attachmentIndex}]`, attachment.file));
+            }
+
+            await api.post("/orders", Payload , {headers: { "Content-Type": "multipart/form-data" }} );
+            dispatch(
+                createAlert({
+                    severity: "success",
+                    summary: "Movimiento creada",
+                    detail: `La orden fue creada correctamente`,
+                })
+            );
 
             setTimeout(() => {
                 navigate("/admin/ordenes");
             }, 250);
-        } 
-        catch (error:any) 
-        {
-            dispatch(createAlert({severity: "error", summary: "Error al crear la orden", detail: error.response.data.message || "Error al crear la orden"}));
+        } catch (error: any) {
+            dispatch(
+                createAlert({
+                    severity: "error",
+                    summary: "Error al crear la orden",
+                    detail: error.response.data.message || "Error al crear la orden",
+                })
+            );
         }
     }
     
@@ -214,7 +224,7 @@ const AgregarPage = () =>
 
             <AddText id="add-text" onClick={switchShowAdd}>Ingresar movimiento</AddText>
 
-            <Dialog onHide={switchShowAdd} header="Agregar movimiento" visible={ShowAdd} style={{maxWidth: "80vw"}}>
+            <Dialog onHide={switchShowAdd} header="Agregar movimiento" visible={ShowAdd} style={{maxWidth: "80vw",padding: '0 !imporant;'}}>
                 <Movimiento callBackDialogAdd={callBackDialogAdd} defaultValue={null} callBackUpdate={callBackDialogUpdate}/>
             </Dialog>
 
