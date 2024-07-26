@@ -22,14 +22,13 @@ export const openAndFillMovimientoForm = (isHaber:boolean) =>
 
     cy.get("#destiny").type("99 -");
     cy.get("#destiny_list > li").first().click();
-
-    cy.get("#numberCheck").type("123456");
     
     cy.get("#paymentDate").click();
-    cy.get("#paymentDate_panel > div > div > div.p-datepicker-calendar-container > table > tbody > tr:nth-child(2) > td.p-datepicker-today").click();
+    cy.get(".p-datepicker-today").click();
 
-    cy.get("#details").type("Detalles de la orden");
-    cy.get("#extraDetails").type("Detalles de la orden extra");
+    cy.get("#details").type("Detalles \nde la \norden");
+
+    cy.get("#imageUpload").selectFile("cypress/fixtures/test.png");
 
     cy.get("#button_add").click();
 }

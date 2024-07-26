@@ -1,4 +1,4 @@
-import Movement from "../../../interfaces/orders/movement";
+import Movement from "../../../../interfaces/orders/movement";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { confirmDialog } from "primereact/confirmdialog";
