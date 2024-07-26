@@ -7,7 +7,7 @@
     display: none;
  }
 
-input
+input[type="file"] 
 {
     color: transparent;
 }

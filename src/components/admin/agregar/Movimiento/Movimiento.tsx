@@ -1,5 +1,5 @@
 import { SelectButton } from "primereact/selectbutton";
-import { ContainerInput, Dropzone, FirstRow, Form, FourthRow, SecondRow, ThridRow } from "../../../../styles/admin/ordenes/agregar/crearMovimiento";
+import { ContainerInput, Dropzone, FirstRow, Form, SecondRow } from "../../../../styles/admin/ordenes/agregar/crearMovimiento";
 import { FloatLabel } from "primereact/floatlabel";
 import { InputNumber } from "primereact/inputnumber";
 import { InputTextarea } from 'primereact/inputtextarea';
@@ -19,50 +19,31 @@ import Loading from "../../../Loading";
 import Account from "../../../../interfaces/orders/account";
 import BankAccount from "../../../../interfaces/orders/bankAccount";
 import Attachment from "./Attachment";
+import Beneficiary from "../../../../interfaces/orders/beneficiary";
+import PaymentType from "../../../../interfaces/orders/paymenttype";
+import { AttachmentsContainer } from "../../../../styles/admin/ordenes/agregar/Movimiento/Attachment";
 
-const States = [ "Abierta !", "Cerrada !" ];
 const Types = [ "Debe", "Haber" ];
-const Periods = [ 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016,2017 ,2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030];
+
 
 const getInitialValue = () =>
 {
     return {
         tempId: Date.now(),
-        period: Periods[0],
         type: Types[0],
-        state: States[0],
+        paymentType: null,
         amount: null,
         concept: null,
         sectional: null,
-        origin: null,
-        originBank:
-        {
-            bank: "",
-            holder: "",
-            number: "",
-            type: "",
-            CBU: "",
-            alias: "",
-            cuit: "",
-            createdAt: "",
-            updatedAt: ""
-        },
-        destiny:null,
-        destinyBank: 
-        {
-            bank: "",
-            holder: "",
-            number: "",
-            type: "",
-            CBU: "",
-            alias: "",
-            cuit: "",
-            createdAt: "",
-            updatedAt: ""
-        
-        },
-        destinyBankAccount: undefined,
-        destinyBankCBU: undefined,
+        account: null,
+        beneficiary: null,
+        beneficiaryCuit: "",
+        originBanks: [],
+        operation: "",
+        holder: "",
+        bankAccount: null,
+        originBankNumber: "",
+        originBankCBU: "",
         paymentDate: null,
         details: "",
         attachments:[]
@@ -74,16 +55,24 @@ const generateFromDefaultValue = (movement: Movement) =>
     return {
         tempId: movement.tempId,
         type: movement.type,
+        paymentType: movement.paymentType,
+        beneficiary: movement.beneficiary,
         amount: movement.amount,
         concept: movement.concept,
         sectional: movement.sectional,
-        origin: movement.origin,
-        originBank: movement.origin.bankAccount,
-        destinyBank: movement.destiny.bankAccount,
-        destiny:movement.destiny,
+        origin: movement.account,
+        originBank: movement.bankAccount,
         paymentDate: movement.paymentDate,
         details: movement.details,
-        attachments: movement.attachments
+        attachments: movement.attachments,
+        operation: movement.operation,
+        holder: movement.holder,
+        account: movement.account,
+        beneficiaryCuit: movement.beneficiary.cuit,
+        originBanks: movement.beneficiary.bankAccounts,
+        bankAccount: movement.bankAccount,
+        originBankNumber:  movement.bankAccount.number,
+        originBankCBU: movement.bankAccount.CBU,
     }
 }
 
@@ -115,14 +104,13 @@ const getErrors = (values: any) =>
 
     var errors : any = {};
 
-    const requireds = ["amount","concept","sectional","origin","originBank","destiny","destinyBank","paymentDate","details"];
+    const requireds = ["amount","concept","account","beneficiary","paymentType","bankAccount","paymentDate","sectional"];
 
     requireds.forEach(required => 
     {
         if(!values[required] || values[required] === "" || values[required] === null || values[required] === undefined)
             errors[required] = "Campo requerido"
     });
-    
     
     return formatJsonError(errors);
 }
@@ -143,7 +131,10 @@ const CreateOrUpdateMovimiento = (props: Props) =>
     const [Sectionals, setSectionals] = useState<Sectional[]>([]);
     const [Concepts, setConcepts] = useState<Concept[]>([]);
     const [Accounts, setAccounts] = useState<Account[]>([]);
+    const [Beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
+    const [PaymentTypes, setPaymentTypes] = useState<PaymentType[]>([]);
 
+  
     useEffect(() => 
     {
         const getData = async () =>
@@ -153,11 +144,16 @@ const CreateOrUpdateMovimiento = (props: Props) =>
                 const { data: sectionals } = await api.get<Sectional[]>("/sectionalnames");
                 const { data: concepts } = await api.get<Concept[]>("/concepts");
 
+                const { data: beneficiaries } = await api.get<Beneficiary[]>("/beneficiaries");
                 const { data: accounts } = await api.get<Account[]>("/accounts");
+
+                const { data: paymenttypes } = await api.get<PaymentType[]>("/paymenttypes");
                 
                 setSectionals(sectionals);
                 setConcepts(concepts);
                 setAccounts(accounts);
+                setBeneficiaries(beneficiaries);    
+                setPaymentTypes(paymenttypes);
             } 
             catch (error) 
             {
@@ -178,6 +174,9 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         validate: (values) => getErrors(values),
         onSubmit: (values) => onsubmit(values)
     });
+
+    const AttachmentsSorted = useMemo(() => FormMovimiento.values.attachments.sort((a:AttachmentType,b:AttachmentType) => b.file.name.localeCompare(a.file.name)),[FormMovimiento.values.attachments]);
+
 
     useEffect(() => 
     {
@@ -206,6 +205,34 @@ const CreateOrUpdateMovimiento = (props: Props) =>
     
         return error && touched ? <small className="p-error">{error}</small> : <></>;
     };
+
+    // Tipo de pago
+
+    const [FilteredPaymentTypes, setFilteredPaymentTypes] = useState<PaymentType[]>(PaymentTypes);
+
+
+
+    const searchMethodPaymentTypes = (event:AutoCompleteCompleteEvent) =>
+    {
+        const { query } = event;
+
+        if(query.trim() === "")
+            setFilteredPaymentTypes(PaymentTypes);
+
+        const filteredPaymentTypes = PaymentTypes.filter((paymentType:PaymentType) => paymentType.type.toLowerCase().includes(query.toLowerCase()));
+        setFilteredPaymentTypes(filteredPaymentTypes);
+    }
+
+    const templateOptionPaymentTypes = (paymentType: PaymentType) =>
+    {
+        return <p>{paymentType.type}</p>
+    }
+
+    const onChangePaymentType = (event:AutoCompleteChangeEvent) =>
+    {
+        const { value } = event;
+        FormMovimiento.setFieldValue("paymentType",value);
+    }
 
     // Conceptos 
 
@@ -265,7 +292,51 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         FormMovimiento.setFieldValue("sectional",value);
     }
 
-    // Beneficiarios: Origen
+    // Beneficiario 
+
+    const [FilteredBeneficiaries, setFilteredBeneficiaries] = useState<Beneficiary[]>(Beneficiaries);
+
+    const searchMethodBeneficiaries = (event:AutoCompleteCompleteEvent) =>
+    {
+        const { query } = event;
+
+        if(query.trim() === "")
+            setFilteredBeneficiaries(Beneficiaries);
+
+        const inputSearch = query.trim().toLowerCase();
+
+        const filteredBeneficiaries = Beneficiaries.filter(beneficiary => 
+        {
+            const textSearchObject = `${beneficiary.code} - ${beneficiary.businessName}`.toLowerCase();
+            return textSearchObject.includes(inputSearch);
+        });
+
+        setFilteredBeneficiaries(filteredBeneficiaries);
+    }
+
+    const templateOptionBeneficiary = (beneficiary: Beneficiary) =>
+    {
+        return <p>{beneficiary.code} - {beneficiary.businessName}</p>
+    }
+
+    const onChangeBeneficiary = (event:AutoCompleteChangeEvent) =>
+    {
+        const { value } = event;
+        FormMovimiento.setFieldValue("beneficiary",value);
+
+        if (typeof value === "string" || value === null)
+        {
+            FormMovimiento.setFieldValue("beneficiaryCuit",null);
+            return;
+        }
+
+        const { bankAccounts , cuit } = value as Beneficiary;
+        
+        FormMovimiento.setFieldValue("originBanks",bankAccounts);
+        FormMovimiento.setFieldValue("beneficiaryCuit",cuit);
+    }
+
+    // Cuenta contable  : Origen
 
     const [FilteredOrigins, setFilteredOrigins] = useState<Account[]>(Accounts);
 
@@ -287,7 +358,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         setFilteredOrigins(filteredOrigins);
     }
 
-    const templateOptionBeneficiary = (account: Account) =>
+    const templateOptionLedgerAccount = (account: Account) =>
     {
         return <p>{account.code} - {account.number} - {account.name}</p>
     }
@@ -295,50 +366,57 @@ const CreateOrUpdateMovimiento = (props: Props) =>
     const onChangeOrigin = (event:AutoCompleteChangeEvent) =>
     {
         const { value } = event;
-        FormMovimiento.setFieldValue("origin",value);
+        FormMovimiento.setFieldValue("account",value);
 
         if(typeof value === "string" || value === null)
             return;
-
-        const { bankAccount } = value as { bankAccount: BankAccount } ;
-
-        FormMovimiento.setFieldValue("originBank",bankAccount);
     }
 
-    // Beneficiarios: Destino
+    // Banco de origen
 
-    const [FilteredDestinations, setFilteredDestinations] = useState<Account[]>(Accounts);
+    const [FilteredOriginBanks, setFilteredOriginBanks] = useState<BankAccount[]>([]);
 
-    const searchMethodDestinations = (event:AutoCompleteCompleteEvent) =>
+    const searchMethodBankAccount = (event:AutoCompleteCompleteEvent) =>
     {
         const { query } = event;
 
         if(query.trim() === "")
-            setFilteredDestinations(Accounts);
+            setFilteredOriginBanks(FormMovimiento.values.originBanks);
 
         const inputSearch = query.trim().toLowerCase();
 
-        const filteredDestinations = Accounts.filter(account => 
+        const filteredOriginBanks = FormMovimiento.values.originBanks.filter((bankAccount:BankAccount) => 
         {
-            const textSearchObject = `${account.code} - ${account.number} - ${account.name}`.toLowerCase();
+            const textSearchObject = `${bankAccount.CBU} - ${bankAccount.bank}`.toLowerCase();
             return textSearchObject.includes(inputSearch);
         });
 
-        setFilteredDestinations(filteredDestinations);
+        setFilteredOriginBanks(filteredOriginBanks);
     }
 
-    const onChangeDestiny = (event:AutoCompleteChangeEvent) =>
+    const templateOptionOriginBank = (bankAccount: BankAccount) =>
+    {
+        return <p>{bankAccount.CBU} - {bankAccount.bank}</p>
+    }
+
+    const onChangeOriginBank = (event:AutoCompleteChangeEvent) =>
     {
         const { value } = event;
-        FormMovimiento.setFieldValue("destiny",value);
+        FormMovimiento.setFieldValue("bankAccount",value);
 
         if(typeof value === "string" || value === null)
+        {
+            FormMovimiento.setFieldValue("originBankNumber","");
+            FormMovimiento.setFieldValue("originBankCBU","");
             return;
+        }
 
-        const { bankAccount } = value as { bankAccount: BankAccount } ;
-
-        FormMovimiento.setFieldValue("destinyBank",bankAccount);
+        const { number , CBU } = value as BankAccount;
+        FormMovimiento.setFieldValue("originBankNumber",number);
+        FormMovimiento.setFieldValue("originBankCBU",CBU);
     }
+
+    ////
    
     const onsubmit = (values: any) =>
     {
@@ -347,11 +425,15 @@ const CreateOrUpdateMovimiento = (props: Props) =>
             tempId: values.tempId,
             type: values.type,
             amount: values.amount,
+            beneficiary: values.beneficiary,
             concept: values.concept,
             sectional: values.sectional,
-            origin: values.origin,
-            destiny: values.destiny,
+            account: values.account,
+            bankAccount: values.bankAccount,
             paymentDate: values.paymentDate,
+            holder: values.holder,
+            operation: values.operation,
+            paymentType: values.paymentType,
             details: values.details,
             attachments: values.attachments
         }
@@ -383,21 +465,40 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
     const addFiles = (files: FileList) =>
     {
+        const allowedFormats = [".doc", ".docx", ".xml", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/pdf", "image/jpeg", "image/png", "image/jpg"];
+      
         var oldAttachments: AttachmentType[] = FormMovimiento.values.attachments;
 
         for (let i = 0; i < files.length; i++) 
         {
-            const attachment: AttachmentType = { id: Date.now(), file: files[i] };
-            oldAttachments.push(attachment);;
+            const attachmentId = String(Date.now()) + i;
+
+            const attachment: AttachmentType = { id: attachmentId, file: files[i] };
+
+            if(allowedFormats.includes(attachment.file.type))
+                oldAttachments.push(attachment)
+            else    
+            {
+                dispatch(createAlert({severity: "error", summary: "Error", detail: "Formato de archivo no permitido"}))
+            }
         }
         
         FormMovimiento.setFieldValue("attachments",oldAttachments);
     }
 
+    const removeFile = (id: string) =>
+    {
+        const oldAttachments: AttachmentType[] = FormMovimiento.values.attachments;
+        const newAttachments = oldAttachments.filter(attachment => attachment.id !== id);
+        FormMovimiento.setFieldValue("attachments",newAttachments);
+    }
+
     const onDrop = (event: React.DragEvent<HTMLDivElement>) =>
     {
         event.preventDefault();
-        addFiles(event.dataTransfer.files);
+        const files = event.dataTransfer.files;
+      
+        addFiles(files);
     }
     
     const onSelectFile = (event: React.ChangeEvent<HTMLInputElement>) =>
@@ -410,7 +511,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
     return <Form onSubmit={FormMovimiento.handleSubmit} style={styleForm}>    
         <FirstRow>
-                <SelectButton id="select-type" value={FormMovimiento.values.type} onChange={(e) => FormMovimiento.setFieldValue("type",e.target.value)} options={Types}/>     
+            <SelectButton id="select-type" value={FormMovimiento.values.type} onChange={(e) => FormMovimiento.setFieldValue("type",e.target.value)} options={Types}/>     
             <ContainerInput>
                 <FloatLabel>
                     <InputNumber id="amount" locale="es" value={FormMovimiento.values.amount} onChange={e => FormMovimiento.setFieldValue("amount",e.value)} />
@@ -431,6 +532,60 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         <SecondRow>
             <ContainerInput>
                 <FloatLabel>
+                    <AutoComplete dropdown forceSelection id="origin" value={FormMovimiento.values.account} suggestions={FilteredOrigins} 
+                    completeMethod={searchMethodOrigins} itemTemplate={templateOptionLedgerAccount} field="name" onChange={onChangeOrigin}/>
+                    <label htmlFor="account">Cuenta Contable</label>
+                </FloatLabel>
+                {getFormErrorMessage("account")}
+            </ContainerInput>
+
+            <ContainerInput>
+                <FloatLabel>
+                    <AutoComplete dropdown forceSelection id="beneficiary" value={FormMovimiento.values.beneficiary} field="businessName" suggestions={FilteredBeneficiaries}
+                    completeMethod={searchMethodBeneficiaries} itemTemplate={templateOptionBeneficiary} onChange={onChangeBeneficiary}/>
+                    <label htmlFor="beneficiary">Beneficiario a cobrar</label>
+                </FloatLabel>
+                {getFormErrorMessage("beneficiary")}
+            </ContainerInput>
+        </SecondRow>
+
+        <SecondRow>
+            <ContainerInput>
+                <FloatLabel>
+                    <AutoComplete dropdown forceSelection id="paymentType" value={FormMovimiento.values.paymentType} field="type" suggestions={FilteredPaymentTypes}
+                    completeMethod={searchMethodPaymentTypes}  onChange={onChangePaymentType} itemTemplate={templateOptionPaymentTypes}/>
+                    <label htmlFor="paymentType">Metodo de Pago</label>
+                </FloatLabel>
+                {getFormErrorMessage("paymentType")}
+            </ContainerInput>
+            <ContainerInput>
+                <FloatLabel>
+                    <AutoComplete emptyMessage="El beneficiario no tiene bancos" dropdown forceSelection id="bankAccount" value={FormMovimiento.values.bankAccount} field="bank" suggestions={FilteredOriginBanks}
+                    completeMethod={searchMethodBankAccount} itemTemplate={templateOptionOriginBank}  onChange={onChangeOriginBank}/>
+                    <label htmlFor="bankAccount">Banco</label>
+                </FloatLabel>
+                {getFormErrorMessage("bankAccount")}
+            </ContainerInput>
+        </SecondRow>
+
+        <SecondRow>
+            <ContainerInput>
+                <FloatLabel>
+                    <InputText id="beneficiaryCuit" disabled value={FormMovimiento.values.beneficiaryCuit}/>
+                    <label htmlFor="beneficiaryCuit">CUIT</label>
+                </FloatLabel>
+            </ContainerInput>
+            <ContainerInput>
+                <FloatLabel>
+                    <InputText id="operation" value={FormMovimiento.values.operation} onChange={e => FormMovimiento.setFieldValue("operation",e.target.value)}/>
+                    <label htmlFor="operation">Operación</label>
+                </FloatLabel>
+            </ContainerInput>
+        </SecondRow>
+
+        <SecondRow>
+            <ContainerInput>
+                <FloatLabel>
                     <AutoComplete id="sectional" value={FormMovimiento.values.sectional} dropdown forceSelection suggestions={FilteredSectionals} 
                     completeMethod={searchMethodSectionals} itemTemplate={templateOptionSectionals} field="name" onChange={onChangeSectional}/>
                     <label htmlFor="sectional">Seccional</label>
@@ -439,54 +594,13 @@ const CreateOrUpdateMovimiento = (props: Props) =>
             </ContainerInput>
             <ContainerInput>
                 <FloatLabel>
-                    <AutoComplete dropdown forceSelection id="origin" value={FormMovimiento.values.origin} suggestions={FilteredOrigins} 
-                    completeMethod={searchMethodOrigins} itemTemplate={templateOptionBeneficiary} field="name" onChange={onChangeOrigin}/>
-                    <label htmlFor="origin">Subcuenta</label>
+                    <InputText id="holder" value={FormMovimiento.values.holder} onChange={e => FormMovimiento.setFieldValue("holder",e.target.value)}/>
+                    <label htmlFor="holder">Titular</label>
                 </FloatLabel>
-                {getFormErrorMessage("origin")}
             </ContainerInput>
         </SecondRow>
 
         <SecondRow>
-            <ContainerInput>
-                <FloatLabel>
-                    <InputText id="originBank" value={FormMovimiento.values.originBank.bank} disabled/> 
-                    <label htmlFor="originBank">Banco</label>
-                </FloatLabel>
-                {getFormErrorMessage("originBank")}
-            </ContainerInput>
-            <ContainerInput>
-                <FloatLabel>
-                    <AutoComplete dropdown forceSelection id="destiny" value={FormMovimiento.values.destiny} field="name" suggestions={FilteredDestinations}
-                    completeMethod={searchMethodDestinations} itemTemplate={templateOptionBeneficiary} onChange={onChangeDestiny}/>
-                    <label htmlFor="destiny">Beneficiario a cobrar</label>
-                </FloatLabel>
-                {getFormErrorMessage("destiny")}
-            </ContainerInput>
-        </SecondRow>
-        
-        <ThridRow>
-                <ContainerInput>
-                <FloatLabel>
-                    <InputText id="destinyBanks" disabled value={FormMovimiento.values.destinyBank.bank}/>
-                    <label htmlFor="destinyBanks">Banco</label>
-                </FloatLabel>
-            </ContainerInput>
-            <ContainerInput>
-                <FloatLabel>
-                    <InputText id="destinyNumberAccount" disabled value={FormMovimiento.values.destinyBank.number}/>
-                    <label htmlFor="destinyNumberAccount">Nro. de Cuenta</label>
-                </FloatLabel>
-            </ContainerInput>
-            <ContainerInput>
-                <FloatLabel>
-                    <InputText placeholder="C.B.U" id="destinyCBU" disabled value={FormMovimiento.values.destinyBank.CBU}/>
-                    <label htmlFor="destinyCBU">C.B.U</label>
-                </FloatLabel>
-            </ContainerInput>
-        </ThridRow>
-
-        <FourthRow>
             <ContainerInput>
                 <FloatLabel>
                     <Calendar id="paymentDate" placeholder="Fecha de cobro" value={FormMovimiento.values.paymentDate} onChange={e => FormMovimiento.setFieldValue("paymentDate",e.target.value)}  dateFormat="dd/mm/yy"/>
@@ -502,12 +616,12 @@ const CreateOrUpdateMovimiento = (props: Props) =>
                 </FloatLabel>
                 {getFormErrorMessage("details")}
             </ContainerInput> 
-        </FourthRow>
+        </SecondRow>
 
-        <Dropzone id="imageUpload" onDrop={onDrop}  type="file" onChange={onSelectFile} value={""}  accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf,image/jpeg,image/png,image/jpg"></Dropzone>
-        <div>
-            {FormMovimiento.values.attachments.map((attachment:AttachmentType) => <Attachment attachment={attachment} key={attachment.id}/>)}
-        </div>
+        <Dropzone  multiple id="imageUpload" onDrop={onDrop}  type="file" onChange={onSelectFile} value={""}  accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf,image/jpeg,image/png,image/jpg"></Dropzone>
+        <AttachmentsContainer>
+            {AttachmentsSorted.map((attachment:AttachmentType) => <Attachment attachment={attachment} key={attachment.id} removeFile={removeFile}/>)}
+        </AttachmentsContainer>
         <div>
             <Button label={props.defaultValue === null ? 'Agregar' : 'Actualizar' } type="submit" id="button_add"/>
             <Button label="Limpiar" type="button" text onClick={cleanForm}/>

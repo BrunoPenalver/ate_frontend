@@ -139,60 +139,56 @@ const AgregarPage = () =>
 
     const callBackDialogUpdate = (movimiento: Movement) =>
     {
-        console.log(movimiento, "toUpdate")
         setMovimientos(prev => prev.map(mov => mov.tempId === movimiento.tempId ? movimiento : mov));
         switchShowUpdate();
     }
 
-    const handleSubmit = async (values:any) =>
+    const handleSubmit = async (values: any) => 
     {
         const Payload = new FormData();
-
+      
         Payload.append("date", values.date);
         Payload.append("description", values.description);
         Payload.append("state", values.state);
-
       
-
         try 
         {
-            for (let index = 0; index < Movimientos.length; index++)
+            for (let index = 0; index < Movimientos.length; index++) 
             {
                 const movimiento = Movimientos[index];
-                Payload.append(`movements[type]`, movimiento.type);
-                Payload.append(`movements[amount]`, movimiento.amount.toString());
-                Payload.append(`movements[conceptId]`, movimiento.concept.id.toString());
-                Payload.append(`movements[sectionalId]`, movimiento.sectional.id.toString());
-                Payload.append(`movements[originId]`, movimiento.origin.id.toString());
-                Payload.append(`movements[destinyId]`, movimiento.origin.id.toString());
-                Payload.append(`movements[paymentDate]`, movimiento.paymentDate.toString());
-                Payload.append(`movements[details]`, movimiento.details);
-    
-                movimiento.attachments.forEach((attachment, attachmentIndex) => Payload.append(`movements[${index}][attachments][${attachmentIndex}]`, attachment.file));
+            
+                console.log(movimiento);
+
+                Payload.append(`movements[${index}][type]`, movimiento.type);
+                Payload.append(`movements[${index}][amount]`, movimiento.amount.toString());
+                Payload.append(`movements[${index}][conceptId]`, movimiento.concept.id.toString());
+                Payload.append(`movements[${index}][sectionalId]`, movimiento.sectional.id.toString());
+                Payload.append(`movements[${index}][accountId]`, movimiento.account.id.toString());
+                Payload.append(`movements[${index}][beneficiaryId]`, movimiento.beneficiary.id.toString());
+                Payload.append(`movements[${index}][bankAccountId]`, movimiento.bankAccount.id.toString());
+                Payload.append(`movements[${index}][paymentTypeId]`, movimiento.paymentType.id.toString());
+                Payload.append(`movements[${index}][paymentDate]`, movimiento.paymentDate.toString());
+                Payload.append(`movements[${index}][holder]`, movimiento.holder);
+                Payload.append(`movements[${index}][operation]`, movimiento.operation);
+                Payload.append(`movements[${index}][details]`, movimiento.details);
+        
+                movimiento.attachments.forEach((attachment, attachmentIndex) => {
+                Payload.append(`movements[${index}][attachments][${attachmentIndex}]`, attachment.file);
+                });
             }
-
-            await api.post("/orders", Payload , {headers: { "Content-Type": "multipart/form-data" }} );
-            dispatch(
-                createAlert({
-                    severity: "success",
-                    summary: "Movimiento creada",
-                    detail: `La orden fue creada correctamente`,
-                })
-            );
-
-            setTimeout(() => {
-                navigate("/admin/ordenes");
-            }, 250);
-        } catch (error: any) {
-            dispatch(
-                createAlert({
-                    severity: "error",
-                    summary: "Error al crear la orden",
-                    detail: error.response.data.message || "Error al crear la orden",
-                })
-            );
+      
+            await api.post("/orders", Payload, { headers: { "Content-Type": "multipart/form-data" } });
+          
+            dispatch( createAlert({ severity: "success", summary: "Movimiento creada", detail: `La orden fue creada correctamente`}));
+      
+            setTimeout(() => navigate("/admin/ordenes"), 250);
+        } 
+        catch (error: any) 
+        {
+            console.log(error);
+            dispatch(createAlert({ severity: "error", summary: "Error al crear la orden", detail: error.response.data.message || "Error al crear la orden" }));
         }
-    }
+      };
     
     return <HeaderLayout>
         <form onSubmit={FormAdd.handleSubmit}>

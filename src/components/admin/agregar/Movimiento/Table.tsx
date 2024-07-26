@@ -33,8 +33,7 @@ const TableMovimientos = (props: Props) =>
         <h4>{title}</h4>
         <DataTable value={movimientos} emptyMessage="No hay movimientos cargados" stripedRows tableStyle={{ minWidth: 'auto' }}>
             <Column field="amount" header="Importe"/>
-            {title === "Debe" ? <Column field="destiny.bankAccount.bank" header="Cuenta contable"/> : <Column field="origin.bankAccount.bank" header="Cuenta contable"/>}
-            {title === "Debe" ? <Column field="destiny.name" header="Descripción"/> : <Column field="origin.name" header="Descripción"/>}
+            <Column field="account.name" header="Cuenta contable"/>
             <Column header="Acciones" body={(row) => 
             {
                 return <div style={{ display: "flex", gap: "10px", justifyContent: "center", textDecoration: "none",}}>
