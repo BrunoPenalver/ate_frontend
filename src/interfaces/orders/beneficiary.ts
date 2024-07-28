@@ -30,8 +30,6 @@ export default interface Beneficiary
     code: string;
     businessName: string;
     cuit: string;
-    account: string;
-    subAccount: string;
     phone: string;
     email: string;
     address: string;
@@ -41,9 +39,11 @@ export default interface Beneficiary
     cityId: number;
     provinceId: number;
     beneficiaryTypeId: number;
+    contact: string;
     createdAt: string;
     updatedAt: string;
     city: City;
     province: Province;
     beneficiaryType: BeneficiaryType;
+    bankAccounts: any[];
 }
