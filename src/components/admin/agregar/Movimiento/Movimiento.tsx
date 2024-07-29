@@ -254,9 +254,12 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         setFilteredConcepts(filteredConcepts);
     }
 
-    const templateOptionConcepts = (concept: Concept) =>
+    const templateOptionConcepts = (concept: Concept) => `${concept.code} - ${concept.description}`
+
+    const onLeaveConcept = () => 
     {
-        return <p>{concept.code} - {concept.description}</p>
+        if(typeof FormMovimiento.values.concept === "string" || FormMovimiento.values.concept === null)
+            FormMovimiento.setFieldValue("concept",null);
     }
 
     const onChangeConcept = (event:AutoCompleteChangeEvent) =>
@@ -276,14 +279,23 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         if(query.trim() === "")
             setFilteredSectionals(Sectionals);
 
-        const filteredSectionals = Sectionals.filter(sectional => sectional.name.toLowerCase().includes(query.toLowerCase()));
+        const filteredSectionals = Sectionals.filter(sectional => 
+        {
+            const optionText = `${sectional.id} - ${sectional.name}`.toLowerCase();
+
+            return optionText.includes(query.trim().toLowerCase());
+        });
         setFilteredSectionals(filteredSectionals);
     }
 
-    const templateOptionSectionals = (sectional: Sectional) =>
+    const onLeaveSectional = () =>
     {
-        return <p>{sectional.name}</p>
+        if(typeof FormMovimiento.values.sectional === "string" || FormMovimiento.values.sectional === null)
+            FormMovimiento.setFieldValue("sectional",null);
     }
+
+    const templateOptionSectionals = (sectional: Sectional) => `${sectional.id} - ${sectional.name}`
+    
 
     const onChangeSectional = (event:AutoCompleteChangeEvent) =>
     {
@@ -313,9 +325,12 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         setFilteredBeneficiaries(filteredBeneficiaries);
     }
 
-    const templateOptionBeneficiary = (beneficiary: Beneficiary) =>
+    const templateOptionBeneficiary = (beneficiary: Beneficiary) => `${beneficiary.code} - ${beneficiary.businessName}`
+
+    const onLeaveBeneficiary = () =>
     {
-        return <p>{beneficiary.code} - {beneficiary.businessName}</p>
+        if(typeof FormMovimiento.values.beneficiary === "string" || FormMovimiento.values.beneficiary === null)
+            FormMovimiento.setFieldValue("beneficiary",null);
     }
 
     const onChangeBeneficiary = (event:AutoCompleteChangeEvent) =>
@@ -373,8 +388,15 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
     const templateOptionLedgerAccount = (account: Account) =>
     {
-        return <p>{account.code} - {account.number} - {account.name}</p>
+        return `${account.code} - ${account.number} - ${account.name}`
     }
+
+    const onLeaveLedgerAccount = () =>
+    {
+        if(typeof FormMovimiento.values.account === "string" || FormMovimiento.values.account === null)
+            FormMovimiento.setFieldValue("account",null);
+    }
+
 
     const onChangeOrigin = (event:AutoCompleteChangeEvent) =>
     {
@@ -407,9 +429,13 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         setFilteredOriginBanks(filteredOriginBanks);
     }
 
-    const templateOptionOriginBank = (bankAccount: BankAccount) =>
+    const templateOptionOriginBank = (bankAccount: BankAccount) => `${bankAccount.CBU} - ${bankAccount.bank}`;
+
+    const onLeaveBank = () =>
     {
-        return <p>{bankAccount.CBU} - {bankAccount.bank}</p>
+        console.log(FormMovimiento.values.bankAccount)
+        if(typeof FormMovimiento.values.bankAccount === "string" || FormMovimiento.values.bankAccount === null)
+            FormMovimiento.setFieldValue("bankAccount",null);
     }
 
     const onChangeOriginBank = (event:AutoCompleteChangeEvent) =>
@@ -544,9 +570,9 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
         <ContainerInput>
             <FloatLabel>
-                <AutoComplete dropdown forceSelection id="origin" value={FormMovimiento.values.account} suggestions={FilteredOrigins} 
-                completeMethod={searchMethodOrigins} itemTemplate={templateOptionLedgerAccount} field="name" onChange={onChangeOrigin}/>
-                <label htmlFor="account">Cuenta Contable</label>
+                <AutoComplete dropdown id="origin" value={FormMovimiento.values.account} suggestions={FilteredOrigins} onBlur={onLeaveLedgerAccount}
+                completeMethod={searchMethodOrigins} itemTemplate={templateOptionLedgerAccount} selectedItemTemplate={templateOptionLedgerAccount} onChange={onChangeOrigin}/>
+                <label htmlFor="account">Cuenta Contable (Número - Código Abr - Nombre)</label>
             </FloatLabel>
             {getFormErrorMessage("account")}
         </ContainerInput>
@@ -554,9 +580,9 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
         <ContainerInput>
             <FloatLabel>
-                <AutoComplete dropdown forceSelection id="beneficiary" value={FormMovimiento.values.beneficiary} field="businessName" suggestions={FilteredBeneficiaries}
-                completeMethod={searchMethodBeneficiaries} itemTemplate={templateOptionBeneficiary} onChange={onChangeBeneficiary}/>
-                <label htmlFor="beneficiary">Beneficiario a cobrar</label>
+                <AutoComplete dropdown id="beneficiary" value={FormMovimiento.values.beneficiary} suggestions={FilteredBeneficiaries} onBlur={onLeaveBeneficiary}
+                completeMethod={searchMethodBeneficiaries} itemTemplate={templateOptionBeneficiary} selectedItemTemplate={templateOptionBeneficiary} onChange={onChangeBeneficiary}/>
+                <label htmlFor="beneficiary">Beneficiario a cobrar (Número - Nombre)</label>
             </FloatLabel>
             {getFormErrorMessage("beneficiary")}
         </ContainerInput>
@@ -572,9 +598,9 @@ const CreateOrUpdateMovimiento = (props: Props) =>
             </ContainerInput>
             <ContainerInput>
                 <FloatLabel>
-                    <AutoComplete emptyMessage="El beneficiario no tiene bancos" dropdown forceSelection id="bankAccount" value={FormMovimiento.values.bankAccount} field="bank" suggestions={FilteredOriginBanks}
-                    completeMethod={searchMethodBankAccount} itemTemplate={templateOptionOriginBank}  onChange={onChangeOriginBank}/>
-                    <label htmlFor="bankAccount">Banco</label>
+                    <AutoComplete emptyMessage="El beneficiario no tiene bancos" dropdown id="bankAccount" value={FormMovimiento.values.bankAccount} onBlur={onLeaveBank}
+                    suggestions={FilteredOriginBanks} completeMethod={searchMethodBankAccount} itemTemplate={templateOptionOriginBank} selectedItemTemplate={templateOptionOriginBank}  onChange={onChangeOriginBank}/>
+                    <label htmlFor="bankAccount">Banco (CBU de beneficiario y banco)</label>
                 </FloatLabel>
                 {getFormErrorMessage("bankAccount")}
             </ContainerInput>
@@ -598,9 +624,9 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         <SecondRow>
             <ContainerInput>
                 <FloatLabel>
-                    <AutoComplete id="sectional" value={FormMovimiento.values.sectional} dropdown forceSelection suggestions={FilteredSectionals} 
-                    completeMethod={searchMethodSectionals} itemTemplate={templateOptionSectionals} field="name" onChange={onChangeSectional}/>
-                    <label htmlFor="sectional">Seccional</label>
+                    <AutoComplete id="sectional" value={FormMovimiento.values.sectional} dropdown suggestions={FilteredSectionals} onBlur={onLeaveSectional}  completeMethod={searchMethodSectionals} 
+                    itemTemplate={templateOptionSectionals} selectedItemTemplate={templateOptionSectionals} onChange={onChangeSectional}/>
+                    <label htmlFor="sectional">Seccional (Número - Nombre)</label>
                 </FloatLabel>
                 {getFormErrorMessage("sectional")}
             </ContainerInput>
@@ -616,9 +642,9 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
             <ContainerInput>
                 <FloatLabel>
-                    <AutoComplete id="concept" value={FormMovimiento.values.concept} dropdown forceSelection suggestions={FilteredConcepts} 
-                    completeMethod={searchMethodConcepts} itemTemplate={templateOptionConcepts} field="description" onChange={onChangeConcept}/>
-                    <label htmlFor="concept">Concepto</label>
+                    <AutoComplete id="concept" value={FormMovimiento.values.concept} dropdown suggestions={FilteredConcepts} onBlur={onLeaveConcept}
+                    completeMethod={searchMethodConcepts} itemTemplate={templateOptionConcepts} selectedItemTemplate={templateOptionConcepts} onChange={onChangeConcept}/>
+                    <label htmlFor="concept">Concepto (Número - Nombre)</label>
                 </FloatLabel>
                 {getFormErrorMessage("concept")}
             </ContainerInput>
