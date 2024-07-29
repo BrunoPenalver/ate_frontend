@@ -160,6 +160,7 @@ const AgregarPage = () =>
                 console.log(movimiento);
 
                 Payload.append(`movements[${index}][type]`, movimiento.type);
+                Payload.append(`movements[${index}][description]`, movimiento.description);
                 Payload.append(`movements[${index}][amount]`, movimiento.amount.toString());
                 Payload.append(`movements[${index}][conceptId]`, movimiento.concept.id.toString());
                 Payload.append(`movements[${index}][sectionalId]`, movimiento.sectional.id.toString());
@@ -167,7 +168,6 @@ const AgregarPage = () =>
                 Payload.append(`movements[${index}][beneficiaryId]`, movimiento.beneficiary.id.toString());
                 Payload.append(`movements[${index}][bankAccountId]`, movimiento.bankAccount.id.toString());
                 Payload.append(`movements[${index}][paymentTypeId]`, movimiento.paymentType.id.toString());
-                Payload.append(`movements[${index}][paymentDate]`, movimiento.paymentDate.toString());
                 Payload.append(`movements[${index}][holder]`, movimiento.holder);
                 Payload.append(`movements[${index}][operation]`, movimiento.operation);
                 Payload.append(`movements[${index}][details]`, movimiento.details);
