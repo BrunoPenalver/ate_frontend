@@ -11,7 +11,6 @@ import Sectional from "../../../../interfaces/orders/sectional";
 import { useDispatch } from "react-redux";
 import { createAlert } from "../../../../stores/alerts.slicer";
 import { InputText } from "primereact/inputtext";
-import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
 import Movement, { Attachment as AttachmentType } from "../../../../interfaces/orders/movement";
 import api from "../../../../utils/api";
@@ -31,6 +30,7 @@ const getInitialValue = () =>
     return {
         tempId: Date.now(),
         type: Types[0],
+        description: "",
         paymentType: null,
         amount: null,
         concept: null,
@@ -44,7 +44,6 @@ const getInitialValue = () =>
         bankAccount: null,
         originBankNumber: "",
         originBankCBU: "",
-        paymentDate: null,
         details: "",
         attachments:[]
     }
@@ -54,6 +53,7 @@ const generateFromDefaultValue = (movement: Movement) =>
 {
     return {
         tempId: movement.tempId,
+        description: movement.description,
         type: movement.type,
         paymentType: movement.paymentType,
         beneficiary: movement.beneficiary,
@@ -62,7 +62,6 @@ const generateFromDefaultValue = (movement: Movement) =>
         sectional: movement.sectional,
         origin: movement.account,
         originBank: movement.bankAccount,
-        paymentDate: movement.paymentDate,
         details: movement.details,
         attachments: movement.attachments,
         operation: movement.operation,
@@ -104,7 +103,7 @@ const getErrors = (values: any) =>
 
     var errors : any = {};
 
-    const requireds = ["amount","concept","account","beneficiary","paymentType","bankAccount","paymentDate","sectional"];
+    const requireds = ["amount","concept","account","beneficiary","paymentType","bankAccount","sectional"];
 
     requireds.forEach(required => 
     {
@@ -332,8 +331,22 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
         const { bankAccounts , cuit } = value as Beneficiary;
         
+
         FormMovimiento.setFieldValue("originBanks",bankAccounts);
         FormMovimiento.setFieldValue("beneficiaryCuit",cuit);
+    
+
+
+        if(bankAccounts.length === 0 && FormMovimiento.values.originBanks !== bankAccounts)
+        {
+            dispatch(createAlert({severity: "warn", summary: "Advertencia", detail: "El beneficiario no tiene bancos"}))
+
+
+        }
+
+        FormMovimiento.setFieldValue("bankAccount",null);
+        FormMovimiento.setFieldValue("originBankNumber","");
+        FormMovimiento.setFieldValue("originBankCBU","");
     }
 
     // Cuenta contable  : Origen
@@ -423,6 +436,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         const newMovimiento: Movement =
         {
             tempId: values.tempId,
+            description: values.description,
             type: values.type,
             amount: values.amount,
             beneficiary: values.beneficiary,
@@ -430,7 +444,6 @@ const CreateOrUpdateMovimiento = (props: Props) =>
             sectional: values.sectional,
             account: values.account,
             bankAccount: values.bankAccount,
-            paymentDate: values.paymentDate,
             holder: values.holder,
             operation: values.operation,
             paymentType: values.paymentType,
@@ -455,9 +468,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
     const styleForm = useMemo(() => 
     {  
-        // const color = FormMovimiento.values.type === "Haber" ? "#f96060" : "#6bc56b"; //TODO: preguntar grado del borde   
         const color = FormMovimiento.values.type === "Haber" ? "red" : "green";
-
         return { border: `10px solid ${color}`, padding: '1.5rem 2rem', transition: 'border 0.5s' }
     },[FormMovimiento.values.type]);
 
@@ -519,36 +530,37 @@ const CreateOrUpdateMovimiento = (props: Props) =>
                 </FloatLabel>  
                 {getFormErrorMessage("amount")}
             </ContainerInput>
+
             <ContainerInput>
                 <FloatLabel>
-                    <AutoComplete id="concept" value={FormMovimiento.values.concept} dropdown forceSelection suggestions={FilteredConcepts} 
-                    completeMethod={searchMethodConcepts} itemTemplate={templateOptionConcepts} field="description" onChange={onChangeConcept}/>
-                    <label htmlFor="concept">Concepto</label>
+                    <InputText id="description" value={FormMovimiento.values.description} onChange={e => FormMovimiento.setFieldValue("description",e.target.value)}/>
+                    <label htmlFor="description">Descripción</label>
                 </FloatLabel>
-                {getFormErrorMessage("concept")}
-            </ContainerInput>
+                {getFormErrorMessage("description")}
+            </ContainerInput> 
+
+
         </FirstRow>
 
-        <SecondRow>
-            <ContainerInput>
-                <FloatLabel>
-                    <AutoComplete dropdown forceSelection id="origin" value={FormMovimiento.values.account} suggestions={FilteredOrigins} 
-                    completeMethod={searchMethodOrigins} itemTemplate={templateOptionLedgerAccount} field="name" onChange={onChangeOrigin}/>
-                    <label htmlFor="account">Cuenta Contable</label>
-                </FloatLabel>
-                {getFormErrorMessage("account")}
-            </ContainerInput>
+        <ContainerInput>
+            <FloatLabel>
+                <AutoComplete dropdown forceSelection id="origin" value={FormMovimiento.values.account} suggestions={FilteredOrigins} 
+                completeMethod={searchMethodOrigins} itemTemplate={templateOptionLedgerAccount} field="name" onChange={onChangeOrigin}/>
+                <label htmlFor="account">Cuenta Contable</label>
+            </FloatLabel>
+            {getFormErrorMessage("account")}
+        </ContainerInput>
 
-            <ContainerInput>
-                <FloatLabel>
-                    <AutoComplete dropdown forceSelection id="beneficiary" value={FormMovimiento.values.beneficiary} field="businessName" suggestions={FilteredBeneficiaries}
-                    completeMethod={searchMethodBeneficiaries} itemTemplate={templateOptionBeneficiary} onChange={onChangeBeneficiary}/>
-                    <label htmlFor="beneficiary">Beneficiario a cobrar</label>
-                </FloatLabel>
-                {getFormErrorMessage("beneficiary")}
-            </ContainerInput>
-        </SecondRow>
 
+        <ContainerInput>
+            <FloatLabel>
+                <AutoComplete dropdown forceSelection id="beneficiary" value={FormMovimiento.values.beneficiary} field="businessName" suggestions={FilteredBeneficiaries}
+                completeMethod={searchMethodBeneficiaries} itemTemplate={templateOptionBeneficiary} onChange={onChangeBeneficiary}/>
+                <label htmlFor="beneficiary">Beneficiario a cobrar</label>
+            </FloatLabel>
+            {getFormErrorMessage("beneficiary")}
+        </ContainerInput>
+        
         <SecondRow>
             <ContainerInput>
                 <FloatLabel>
@@ -601,14 +613,16 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         </SecondRow>
 
         <SecondRow>
+
             <ContainerInput>
                 <FloatLabel>
-                    <Calendar id="paymentDate" placeholder="Fecha de cobro" value={FormMovimiento.values.paymentDate} onChange={e => FormMovimiento.setFieldValue("paymentDate",e.target.value)}  dateFormat="dd/mm/yy"/>
-                    <label htmlFor="paymentDate">Fecha de cobro</label>
+                    <AutoComplete id="concept" value={FormMovimiento.values.concept} dropdown forceSelection suggestions={FilteredConcepts} 
+                    completeMethod={searchMethodConcepts} itemTemplate={templateOptionConcepts} field="description" onChange={onChangeConcept}/>
+                    <label htmlFor="concept">Concepto</label>
                 </FloatLabel>
-                {getFormErrorMessage("paymentDate")}
+                {getFormErrorMessage("concept")}
             </ContainerInput>
-
+           
             <ContainerInput>
                 <FloatLabel>
                     <InputTextarea id="details"  rows={3} value={FormMovimiento.values.details} onChange={e => FormMovimiento.setFieldValue("details",e.target.value)}/>

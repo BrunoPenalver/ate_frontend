@@ -14,6 +14,7 @@ export default interface Movement
 {
     tempId?: number;
     type: "Debe" | "Haber";
+    description: string;
     amount: number;
     paymentType: any;
     operation: string;
@@ -23,7 +24,6 @@ export default interface Movement
     bankAccount: BankAccount
     sectional: Sectional;
     account: Account;
-    paymentDate: number;
     details: string;
     attachments: Attachment[];
 
