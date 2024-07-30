@@ -1,5 +1,5 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import HeaderLayout  from "../../../layouts/Admin"
 import Movimiento from "../../../components/admin/agregar/Movimiento/Movimiento";
 import { Dialog } from "primereact/dialog";
@@ -21,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 import useAuth from "../../../hooks/auth";
 import api from "../../../utils/api";
 import "../../../styles/admin/ordenes/agregar/index.css";
+import socket from "../../../utils/socket";
 
 const options_state = [ "Abierta", "Cerrada" ];
 
@@ -77,6 +78,29 @@ const AgregarPage = () =>
 {
     useAuth();
 
+    const [LastId, setLastId] = useState(0);
+    const NewId = useMemo(() => String( LastId + 1).padStart(6,"0"), [LastId]);
+
+    useEffect(() => 
+    {
+        const getLastId = async () => 
+        {
+            try 
+            {
+                const response = await api.get("/orders/lastId");
+                setLastId(response.data.id);
+            } 
+            catch (error: any) 
+            {
+                console.log(error);
+            }
+
+            socket.on("new_lastId", (newId: number) => setLastId(newId));
+        }
+
+        getLastId();
+    },[]);
+
     const FormAdd = useFormik({
         initialValues: getInitialValues(),
         validate: values => getErrors(values),
@@ -111,6 +135,7 @@ const AgregarPage = () =>
     const [ShowUpdate, setShowUpdate] = useState(false);
     const switchShowUpdate = () => setShowUpdate(!ShowUpdate);
     const [SelectedToUpdate, setSelectedToUpdate] = useState<Movement | null>(null);
+    
 
 
     const [Movimientos, setMovimientos] = useState<Movement[]>([]);
@@ -176,7 +201,7 @@ const AgregarPage = () =>
                 Payload.append(`movements[${index}][attachments][${attachmentIndex}]`, attachment.file);
                 });
             }
-      
+
             await api.post("/orders", Payload, { headers: { "Content-Type": "multipart/form-data" } });
           
             dispatch( createAlert({ severity: "success", summary: "Movimiento creada", detail: `La orden fue creada correctamente`}));
@@ -188,11 +213,12 @@ const AgregarPage = () =>
             console.log(error);
             dispatch(createAlert({ severity: "error", summary: "Error al crear la orden", detail: error.response.data.message || "Error al crear la orden" }));
         }
-      };
+    };
     
     return <HeaderLayout>
+        <h2>Orden {NewId}</h2>
         <form onSubmit={FormAdd.handleSubmit}>
-            <PanelHeader>
+            <PanelHeader title="hola">
                 <PanelContent>
                     <ContainerInput>
                         <FloatLabel>  
