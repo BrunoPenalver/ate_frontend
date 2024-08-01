@@ -21,7 +21,6 @@ describe('Crear Orden', () =>
 
     it('Crear Orden', () => 
     {
-        cy.viewport(1920, 1080);
         correctLogin("admin", "ZwyiHTqljvRn");
         cy.visit("/admin/ordenes/agregar");
       

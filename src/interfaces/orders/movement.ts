@@ -12,7 +12,7 @@ export interface Attachment
 
 export default interface Movement
 {
-    tempId?: number;
+    id: number;
     type: "Debe" | "Haber";
     description: string;
     amount: number;

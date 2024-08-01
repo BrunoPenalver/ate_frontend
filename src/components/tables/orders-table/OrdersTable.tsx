@@ -163,7 +163,7 @@ export const StyledTable = (props:Props) =>
         <Column key="actions" header="Acciones" body={(row) => 
         {
           return <>
-            {useActiveOrders &&  <i className="pi pi-pen-to-square" style={{marginRight: "10px", color: "var(--cyan-500)"}}/>}
+            {useActiveOrders &&   <Link style={{textDecoration:"none"}} to={`/admin/ordenes/${row.id}`}> <i className="pi pi-pen-to-square" style={{marginRight: "10px", color: "var(--cyan-500)"}}/> </Link>}
             {!useActiveOrders &&  <i className="pi pi-undo" style={{marginRight: "10px", color: "var(--cyan-500)", cursor: "pointer"}} onClick={() => onClickUndo(row.id)}  />}
             <i className="pi pi-trash cursos" style={{color: "var(--red-600)", cursor: "pointer"}} onClick={() => onClickDelete(row.id)}/>    {/* TODO: Preguntar a Matias que es la clase cursos */}
           </>

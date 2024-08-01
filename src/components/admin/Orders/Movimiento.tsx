@@ -1,26 +1,26 @@
 import { SelectButton } from "primereact/selectbutton";
-import { ContainerInput, Dropzone, FirstRow, Form, SecondRow } from "../../../../styles/admin/ordenes/agregar/crearMovimiento";
+import { ContainerInput, Dropzone, FirstRow, Form, SecondRow } from "../../../styles/admin/ordenes/movimiento/crear";
 import { FloatLabel } from "primereact/floatlabel";
 import { InputNumber } from "primereact/inputnumber";
 import { InputTextarea } from 'primereact/inputtextarea';
 import { useFormik } from "formik";
 import { AutoComplete, AutoCompleteChangeEvent, AutoCompleteCompleteEvent } from "primereact/autocomplete";
 import { useEffect, useMemo, useState } from "react";
-import Concept from "../../../../interfaces/orders/concept";
-import Sectional from "../../../../interfaces/orders/sectional";
+import Concept from "../../../interfaces/orders/concept";
+import Sectional from "../../../interfaces/orders/sectional";
 import { useDispatch } from "react-redux";
-import { createAlert } from "../../../../stores/alerts.slicer";
+import { createAlert } from "../../../stores/alerts.slicer";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
-import Movement, { Attachment as AttachmentType } from "../../../../interfaces/orders/movement";
-import api from "../../../../utils/api";
-import Loading from "../../../Loading";
-import Account from "../../../../interfaces/orders/account";
-import BankAccount from "../../../../interfaces/orders/bankAccount";
+import Movement, { Attachment as AttachmentType } from "../../../interfaces/orders/movement";
+import api from "../../../utils/api";
+import Loading from "../../Loading";
+import Account from "../../../interfaces/orders/account";
+import BankAccount from "../../../interfaces/orders/bankAccount";
 import Attachment from "./Attachment";
-import Beneficiary from "../../../../interfaces/orders/beneficiary";
-import PaymentType from "../../../../interfaces/orders/paymenttype";
-import { AttachmentsContainer } from "../../../../styles/admin/ordenes/agregar/Movimiento/Attachment";
+import Beneficiary from "../../../interfaces/orders/beneficiary";
+import PaymentType from "../../../interfaces/orders/paymenttype";
+import { AttachmentsContainer } from "../../../styles/admin/ordenes/movimiento/attachment";
 
 const Types = [ "Debe", "Haber" ];
 
@@ -52,7 +52,7 @@ const getInitialValue = () =>
 const generateFromDefaultValue = (movement: Movement) =>
 {
     return {
-        tempId: movement.tempId,
+        id: movement.id,
         description: movement.description,
         type: movement.type,
         paymentType: movement.paymentType,
@@ -174,7 +174,25 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         onSubmit: (values) => onsubmit(values)
     });
 
-    const AttachmentsSorted = useMemo(() => FormMovimiento.values.attachments.sort((a:AttachmentType,b:AttachmentType) => b.file.name.localeCompare(a.file.name)),[FormMovimiento.values.attachments]);
+    const AttachmentsSorted = useMemo(() =>
+    {
+        return FormMovimiento.values.attachments.sort((a:AttachmentType | string,b:AttachmentType | string) =>
+        {
+            const aIsFile =  typeof	a !== "string"
+            const bIsFile =  typeof	b !== "string"
+
+            if(aIsFile && bIsFile)
+                b.file.name.localeCompare(a.file.name)
+
+            if(!aIsFile && bIsFile)
+                b.file.name.localeCompare(a);
+
+            if(aIsFile && !bIsFile)
+                b.localeCompare(a.file.name);
+
+            return 0;
+        })
+    },[FormMovimiento.values.attachments]);
 
 
     useEffect(() => 
@@ -461,7 +479,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
     {
         const newMovimiento: Movement =
         {
-            tempId: values.tempId,
+            id: props.defaultValue !== null ? props.defaultValue.id :  Date.now(),
             description: values.description,
             type: values.type,
             amount: values.amount,
@@ -481,7 +499,6 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         if(props.defaultValue !== null)
             props.callBackUpdate(newMovimiento)
 
-        newMovimiento.tempId = Date.now()
 
         if(props.defaultValue === null)
             props.callBackDialogAdd(newMovimiento);
@@ -523,10 +540,10 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         FormMovimiento.setFieldValue("attachments",oldAttachments);
     }
 
-    const removeFile = (id: string) =>
+    const removeFile = (indexToDelete: number) =>
     {
         const oldAttachments: AttachmentType[] = FormMovimiento.values.attachments;
-        const newAttachments = oldAttachments.filter(attachment => attachment.id !== id);
+        const newAttachments = oldAttachments.filter((_,index) => index !== indexToDelete);
         FormMovimiento.setFieldValue("attachments",newAttachments);
     }
 
@@ -660,7 +677,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
         <Dropzone  multiple id="imageUpload" onDrop={onDrop}  type="file" onChange={onSelectFile} value={""}  accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf,image/jpeg,image/png,image/jpg"></Dropzone>
         <AttachmentsContainer>
-            {AttachmentsSorted.map((attachment:AttachmentType) => <Attachment attachment={attachment} key={attachment.id} removeFile={removeFile}/>)}
+            {AttachmentsSorted.map((attachment:AttachmentType | string,index: number) => <Attachment attachment={attachment} attachmentIndex={index} key={attachment.toString()} removeFile={removeFile}/>)}
         </AttachmentsContainer>
         <div>
             <Button label={props.defaultValue === null ? 'Agregar' : 'Actualizar' } type="submit" id="button_add"/>
