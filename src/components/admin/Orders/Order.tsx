@@ -17,7 +17,7 @@ import { useDispatch } from "react-redux";
 import { createAlert } from "../../../stores/alerts.slicer";
 import { ContainerInput } from "../../../styles/admin/ordenes/movimiento/crear";
 import { AddText, ContainerInfo, ContainerTables, Panel, PanelContent, PanelHeader } from "../../../styles/admin/ordenes";
-
+import "../../../styles/admin/ordenes/movimiento/createUpdate.css"
 interface Props
 {
     type: "add" | "edit";
