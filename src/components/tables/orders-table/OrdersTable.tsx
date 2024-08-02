@@ -1,12 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { OrdersTableFilter } from "./OrdersTableFilter";
 import { Group } from "../../Group";
-import {
-  TableContainer,
-  StyledDataTable,
-  TableTitle,
-  TitleGroup,
-} from "../styles";
+import { TableContainer, StyledDataTable, TableTitle, TitleGroup } from "../styles";
 import { Column } from "primereact/column";
 import { formatDate } from "../../../utils/dates";
 import { Loader } from "../../Loader";
@@ -69,6 +64,8 @@ export const StyledTable = (props:Props) =>
 
   const onClickDelete = (orderId: number) => 
   {
+    console.log(orderId);
+
     const deleteOrder = async (orderId: number) =>
     {
       try 

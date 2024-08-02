@@ -5,6 +5,7 @@ import OrderComp from "../../../components/admin/Orders/Order";
 import Order from "../../../interfaces/orders/order";
 import HeaderLayout  from "../../../layouts/Admin"
 import useAuth from "../../../hooks/auth";
+import Loading from "../../../components/Loading";
 
 const OrderEdit = () => 
 {
@@ -39,7 +40,7 @@ const OrderEdit = () =>
 
     if(isLoading)
         return <HeaderLayout>
-            <h2>Cargando...</h2>
+            <Loading/>
         </HeaderLayout>
 
     if(!OrderFound)

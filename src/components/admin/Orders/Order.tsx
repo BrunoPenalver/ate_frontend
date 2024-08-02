@@ -16,8 +16,8 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { createAlert } from "../../../stores/alerts.slicer";
 import { ContainerInput } from "../../../styles/admin/ordenes/movimiento/crear";
-import { AddText, ContainerInfo, ContainerTables, Panel, PanelContent, PanelHeader } from "../../../styles/admin/ordenes";
-import "../../../styles/admin/ordenes/movimiento/createUpdate.css"
+import { AddText, ContainerButtons, ContainerInfo, ContainerTables, Panel, PanelContent, PanelHeader } from "../../../styles/admin/ordenes";
+import "../../../styles/admin/ordenes/movimiento/createUpdate.scoped.css"
 interface Props
 {
     type: "add" | "edit";
@@ -74,10 +74,27 @@ const getErrors = (values: any) =>
 
 const Order = (props: Props) =>
 {
+    const { pathname } = location;
+
+
     const [isLoading, setIsLoading] = useState(false);
+    const [havePrevData, setHavePrevData] = useState(localStorage.getItem(pathname) ? true : false);
+    
 
     const generateInitialValues = (): FormikValues =>
     {
+        if(havePrevData)
+        {
+            const prevData = localStorage.getItem(pathname);
+
+            if(prevData)
+            {
+                const prevDataParsed = JSON.parse(prevData);
+
+                return { ...prevDataParsed, date: new Date(prevDataParsed.date) };
+            }
+        }
+
         if(props.type === "edit" && props.values)
             return { ...props.values, date: new Date(props.values.date) };
         
@@ -127,20 +144,21 @@ const Order = (props: Props) =>
             await api.post("/orders", Payload, { headers: { "Content-Type": "multipart/form-data" } });
             
             dispatch(createAlert({ severity: "success", summary: "Orden creada", detail: `La orden fue creada correctamente`}));
-        
-            setTimeout(() => navigate("/admin/ordenes"), 250);
+            
+            return true;
         } 
         catch (error: any) 
         {
             console.log(error);
             dispatch(createAlert({ severity: "error", summary: "Error al crear la orden", detail: error.response.data.message || "Error al crear la orden" }));
+            return false;
         }
     }
 
     const update = async (values:any) =>
     {
         if(!props.values)
-            return;
+            return false;
 
         const Payload = new FormData();
         
@@ -180,13 +198,15 @@ const Order = (props: Props) =>
             await api.put(`/orders/${props.values.id}`, Payload, { headers: { "Content-Type": "multipart/form-data" } });
             
             dispatch(createAlert({ severity: "success", summary: "Orden actualizada", detail: `La orden fue actualizada correctamente`}));
+
+            return true;
         
-            setTimeout(() => navigate("/admin/ordenes"), 250);
+           
         } 
         catch (error: any) 
         {
-            console.log(error);
             dispatch(createAlert({ severity: "error", summary: "Error al actualizar la orden", detail: error.response.data.message || "Error al actualizar la orden" }));
+            return false;
         }
     }
 
@@ -203,7 +223,13 @@ const Order = (props: Props) =>
             return;
         }
 
-        props.type === "add" ? await create(values) : await update(values);
+        const saved = props.type === "add" ? await create(values) : await update(values);
+
+        if(saved)
+        {
+            localStorage.removeItem(pathname);
+            setTimeout(() => navigate("/admin/ordenes"), 250);
+        }
         
         setIsLoading(false);
     };
@@ -271,6 +297,53 @@ const Order = (props: Props) =>
     }
 
     /* Totalizadores */
+
+    const getPresaved =  () => 
+    {
+        const predata = localStorage.getItem(pathname);
+
+        const movimientosLimpios = Movimientos.map(movimiento => 
+        {
+            const { attachments, ...rest } = movimiento;
+            const attachmentsClean = attachments.filter(attachment => typeof attachment === "string" && attachment);
+
+            return { ...rest, attachments: attachmentsClean };
+        });
+
+        const predataJson = predata ? JSON.parse(predata) : {};
+
+        const data = { ...predataJson , movements: movimientosLimpios };
+
+        return data;
+    }
+
+    const preSave = () =>
+    {
+        const predata = getPresaved();
+        localStorage.setItem(pathname, JSON.stringify(predata));
+
+
+        if(havePrevData)
+            dispatch(createAlert({ severity: "info", summary: "Información pre-guardada", detail: "Se ha actualizado el pre-guardado" }));
+        else
+            dispatch(createAlert({ severity: "info", summary: "Información pre-guardada", detail: "Se ha pre-guardado la información" }));
+
+        setHavePrevData(true);
+    }
+
+    const isSameData = useMemo(() => 
+    {
+        const predata = getPresaved()
+        return JSON.stringify(predata) === JSON.stringify(Form.values);
+
+    }, [ Form.values,  Movimientos ]);
+
+    const deletePrevData = () =>
+    {
+        localStorage.removeItem(pathname);
+        dispatch(createAlert({ severity: "info", summary: "Información pre-guardada eliminada", detail:  "" }));
+        setHavePrevData(false);
+    }
     
     const TotalHaber = useMemo( () => TypesHaber.reduce((acc, movimiento) => acc + movimiento.amount, 0), [ TypesHaber ] );
     const TotalDebe = useMemo( () => TypesDebe.reduce((acc, movimiento) => acc + movimiento.amount, 0), [ TypesDebe ] );
@@ -330,8 +403,15 @@ const Order = (props: Props) =>
         </Dialog>
 
 
-        {props.type === "add"  && <Button disabled={isLoading} label="Guardar"    id="save-order" className="p-button-success" type="submit"/>}
-        {props.type === "edit" && <Button disabled={isLoading} label="Actualizar" id="edit-order" className="p-button-success" type="submit"/>}
+        <ContainerButtons>
+            {props.type === "add"  && <Button disabled={isLoading} label="Guardar"    id="save-order" className="p-button-success" type="submit"/>}
+            {props.type === "edit" && <Button disabled={isLoading} label="Actualizar" id="edit-order" className="p-button-success" type="submit"/>}
+
+            <div>
+                {!isSameData && <Button label="Pre-guardar" type="button" id="presave" onClick={preSave}/>}
+                {havePrevData && <Button label="Eliminar información previa" type="button" id="presave" className="p-button-danger" onClick={deletePrevData}/>}
+            </div>
+        </ContainerButtons>
     </form>
 }
 
