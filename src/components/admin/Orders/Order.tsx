@@ -300,8 +300,6 @@ const Order = (props: Props) =>
 
     const getPresaved =  () => 
     {
-        const predata = localStorage.getItem(pathname);
-
         const movimientosLimpios = Movimientos.map(movimiento => 
         {
             const { attachments, ...rest } = movimiento;
@@ -310,7 +308,7 @@ const Order = (props: Props) =>
             return { ...rest, attachments: attachmentsClean };
         });
 
-        const predataJson = predata ? JSON.parse(predata) : {};
+        const predataJson = Form.values;
 
         const data = { ...predataJson , movements: movimientosLimpios };
 
@@ -331,12 +329,6 @@ const Order = (props: Props) =>
         setHavePrevData(true);
     }
 
-    const isSameData = useMemo(() => 
-    {
-        const predata = getPresaved()
-        return JSON.stringify(predata) === JSON.stringify(Form.values);
-
-    }, [ Form.values,  Movimientos ]);
 
     const deletePrevData = () =>
     {
@@ -408,7 +400,7 @@ const Order = (props: Props) =>
             {props.type === "edit" && <Button disabled={isLoading} label="Actualizar" id="edit-order" className="p-button-success" type="submit"/>}
 
             <div>
-                {!isSameData && <Button label="Pre-guardar" type="button" id="presave" onClick={preSave}/>}
+                <Button label="Pre-guardar" type="button" id="presave" onClick={preSave}/>
                 {havePrevData && <Button label="Eliminar información previa" type="button" id="presave" className="p-button-danger" onClick={deletePrevData}/>}
             </div>
         </ContainerButtons>
