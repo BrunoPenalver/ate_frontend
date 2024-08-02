@@ -3,7 +3,7 @@ import { OrdersTableFilter } from "./OrdersTableFilter";
 import { Group } from "../../Group";
 import { TableContainer, StyledDataTable, TableTitle, TitleGroup } from "../styles";
 import { Column } from "primereact/column";
-import { formatDate } from "../../../utils/dates";
+import { formatDate, formatFullDate } from "../../../utils/dates";
 import { Loader } from "../../Loader";
 import { AppDispatch, RootState } from "../../../stores/stores";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,6 +16,7 @@ import { createAlert } from "../../../stores/alerts.slicer";
 import { deleteById } from '../../../stores/orders.slice';
 import { Button } from "primereact/button";
 import { Link } from "react-router-dom";
+import { formatPrice } from "../../../utils/prices";
 
 interface Props
 {
@@ -155,8 +156,9 @@ export const StyledTable = (props:Props) =>
           const totalDebe  = row.movements.filter((mov: any) => mov.type === "Debe").reduce((acc: number, mov: any) => acc + mov.amount, 0);
           const totalHaber = row.movements.filter((mov: any) => mov.type === "Haber").reduce((acc: number, mov: any) => acc + mov.amount, 0);
 
-          return `$ ${totalDebe - totalHaber}`;
+          return `$ ${formatPrice(totalDebe - totalHaber)}`;
         }}/>
+         <Column sortable filter filterPlaceholder="Filtrar..." field="updatedAt" header="Ultima actualización" body={row => formatFullDate(row.updatedAt)}/>
         <Column key="actions" header="Acciones" body={(row) => 
         {
           return <>
