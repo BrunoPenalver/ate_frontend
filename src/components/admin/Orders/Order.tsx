@@ -60,7 +60,7 @@ const getErrors = (values: any) =>
 
     var errors : any = {};
 
-    const requireds = ["date", "description", "state"];
+    const requireds = ["date", "description", "state", "period"];
 
     requireds.forEach(required => 
     {
@@ -102,6 +102,7 @@ const Order = (props: Props) =>
             date: new Date(), //TODO: Preguntar si ponemos la fecha actual por defecto
             description: "",
             state: options_state[0],
+            period: "",
             movements: []
         }
     };
@@ -116,6 +117,7 @@ const Order = (props: Props) =>
         Payload.append("date", values.date);
         Payload.append("description", values.description);
         Payload.append("state", values.state);
+        Payload.append("period", values.period);
         
         try 
         {
@@ -165,6 +167,7 @@ const Order = (props: Props) =>
         Payload.append("date", values.date);
         Payload.append("description", values.description);
         Payload.append("state", values.state);
+        Payload.append("period", values.period);
         
         try 
         {
@@ -333,8 +336,9 @@ const Order = (props: Props) =>
     const deletePrevData = () =>
     {
         localStorage.removeItem(pathname);
-        dispatch(createAlert({ severity: "info", summary: "Información pre-guardada eliminada", detail:  "" }));
+        dispatch(createAlert({ severity: "info", summary: "Información pre-guardada eliminada", detail:  " " }));
         setHavePrevData(false);
+        Form.setValues(generateInitialValues());
     }
     
     const TotalHaber = useMemo( () => TypesHaber.reduce((acc, movimiento) => acc + movimiento.amount, 0), [ TypesHaber ] );
@@ -358,6 +362,13 @@ const Order = (props: Props) =>
                         <label htmlFor="description">Descripción</label>    
                     </FloatLabel>  
                     {getFormErrorMessage("description")}
+                </ContainerInput>
+                <ContainerInput>
+                    <FloatLabel>  
+                        <InputText id="period" value={Form.values.period} onChange={e => Form.setFieldValue("period",e.target.value)}/>
+                        <label htmlFor="period">Periodo</label>    
+                    </FloatLabel>  
+                    {getFormErrorMessage("period")}
                 </ContainerInput>
                 <ContainerInput>
                     <FloatLabel>  
