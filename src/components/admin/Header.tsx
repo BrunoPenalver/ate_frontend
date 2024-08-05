@@ -36,9 +36,19 @@ const HeaderComp = () =>
         ], 
       },
       {
-        label: "Auditoria",
-        command: () => navigate("/admin/auditoria"),
+        label:"Administración",
+        items: [
+        {
+          label: "Auditoria",
+          command: () => navigate("/admin/auditoria"),
+        },
+        {
+          label: "Base de datos",
+          command: () => navigate("/admin/datos"),
+        },
+      ]
       },
+
       {
         label: `${user.firstname} ${user.lastname}`,
         items:
@@ -46,6 +56,7 @@ const HeaderComp = () =>
           { label: "Cerrar sesión" , command: async () =>  await logOut() }
         ], 
       },
+
     ];
     
     return <Header>
