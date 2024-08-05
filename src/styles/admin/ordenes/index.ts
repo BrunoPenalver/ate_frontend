@@ -34,7 +34,7 @@ margin: 20px 0;`;
 export const PanelContent = styled.div`
 display: grid;
 gap: 10px;
-grid-template-columns: 1fr 1fr 1fr;
+grid-template-columns: 1fr 1fr 1fr 1fr;
 
 .input
 {
@@ -47,4 +47,26 @@ grid-template-columns: 1fr 1fr 1fr;
     gap: 25px;
 }
 
+`;
+
+export const ContainerButtons = styled.div`
+display: flex;
+gap: 10px;
+justify-content: space-between;
+
+div
+{
+    display: flex;
+    gap: 10px;
+}
+
+@media (max-width: 768px)
+{
+    flex-direction: column;
+
+    div
+    {
+        flex-direction: column;
+    }
+}
 `;

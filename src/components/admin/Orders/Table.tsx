@@ -1,7 +1,8 @@
-import Movement from "../../../../interfaces/orders/movement";
+import Movement from "../../../interfaces/orders/movement";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { confirmDialog } from "primereact/confirmdialog";
+import { formatPrice } from "../../../utils/prices";
 
 interface Props
 {
@@ -32,13 +33,13 @@ const TableMovimientos = (props: Props) =>
     return <div>
         <h4>{title}</h4>
         <DataTable value={movimientos} emptyMessage="No hay movimientos cargados" stripedRows tableStyle={{ minWidth: 'auto' }}>
-            <Column field="amount" header="Importe"/>
+            <Column header="Importe" body={(row) => `$${formatPrice(row.amount)}`}/>
             <Column field="account.name" header="Cuenta contable"/>
             <Column header="Acciones" body={(row) => 
             {
                 return <div style={{ display: "flex", gap: "10px", justifyContent: "center", textDecoration: "none",}}>
                     <i className="pi pi-pen-to-square" style={{marginRight: "10px", color: "var(--cyan-500)", cursor: "pointer"}} onClick={() =>  props.onUpdate(row)}/>
-                    <i className="pi pi-trash" style={{color: "var(--red-600)", cursor: "pointer"}} onClick={() =>  onClickDelete(row.tempId)}/> 
+                    <i className="pi pi-trash" style={{color: "var(--red-600)", cursor: "pointer"}} onClick={() =>  onClickDelete(row.id)}/> 
                 </div>
             }}/>
         </DataTable>

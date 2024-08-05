@@ -11,9 +11,6 @@ export const openAndFillMovimientoForm = (isHaber:boolean) =>
     if(isHaber)
         cy.get(`#select-type > div:nth-child(2) > span`).click();
 
-    cy.get("#concept").type("3 -");
-    cy.get("#concept_list > li").first().click();
-
     cy.get("#origin").type("Rendiciones ");
     cy.get("#origin_list > li").first().click();
     
@@ -26,14 +23,11 @@ export const openAndFillMovimientoForm = (isHaber:boolean) =>
     cy.get("#bankAccount").type("Banco nación");
     cy.get("#bankAccount_list > li").first().click();
 
-    
     cy.get("#sectional").type("CDP JUJUY");
     cy.get("#sectional_list > li").first().click();
-
     
-    cy.get("#paymentDate").click();
-    cy.get(".p-datepicker-today").click();
-
+    cy.get("#concept").type("3 -");
+    cy.get("#concept_list > li").first().click();
 
     cy.get("#details").type("Detalles \nde la \norden");
 

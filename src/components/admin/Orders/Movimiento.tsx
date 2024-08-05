@@ -1,27 +1,26 @@
 import { SelectButton } from "primereact/selectbutton";
-import { ContainerInput, Dropzone, FirstRow, Form, SecondRow } from "../../../../styles/admin/ordenes/agregar/crearMovimiento";
+import { ContainerInput, Dropzone, FirstRow, Form, SecondRow } from "../../../styles/admin/ordenes/movimiento/crear";
 import { FloatLabel } from "primereact/floatlabel";
 import { InputNumber } from "primereact/inputnumber";
 import { InputTextarea } from 'primereact/inputtextarea';
 import { useFormik } from "formik";
 import { AutoComplete, AutoCompleteChangeEvent, AutoCompleteCompleteEvent } from "primereact/autocomplete";
 import { useEffect, useMemo, useState } from "react";
-import Concept from "../../../../interfaces/orders/concept";
-import Sectional from "../../../../interfaces/orders/sectional";
+import Concept from "../../../interfaces/orders/concept";
+import Sectional from "../../../interfaces/orders/sectional";
 import { useDispatch } from "react-redux";
-import { createAlert } from "../../../../stores/alerts.slicer";
+import { createAlert } from "../../../stores/alerts.slicer";
 import { InputText } from "primereact/inputtext";
-import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
-import Movement, { Attachment as AttachmentType } from "../../../../interfaces/orders/movement";
-import api from "../../../../utils/api";
-import Loading from "../../../Loading";
-import Account from "../../../../interfaces/orders/account";
-import BankAccount from "../../../../interfaces/orders/bankAccount";
+import Movement, { Attachment as AttachmentType } from "../../../interfaces/orders/movement";
+import api from "../../../utils/api";
+import Loading from "../../Loading";
+import Account from "../../../interfaces/orders/account";
+import BankAccount from "../../../interfaces/orders/bankAccount";
 import Attachment from "./Attachment";
-import Beneficiary from "../../../../interfaces/orders/beneficiary";
-import PaymentType from "../../../../interfaces/orders/paymenttype";
-import { AttachmentsContainer } from "../../../../styles/admin/ordenes/agregar/Movimiento/Attachment";
+import Beneficiary from "../../../interfaces/orders/beneficiary";
+import PaymentType from "../../../interfaces/orders/paymenttype";
+import { AttachmentsContainer } from "../../../styles/admin/ordenes/movimiento/attachment";
 
 const Types = [ "Debe", "Haber" ];
 
@@ -31,6 +30,7 @@ const getInitialValue = () =>
     return {
         tempId: Date.now(),
         type: Types[0],
+        description: "",
         paymentType: null,
         amount: null,
         concept: null,
@@ -44,7 +44,6 @@ const getInitialValue = () =>
         bankAccount: null,
         originBankNumber: "",
         originBankCBU: "",
-        paymentDate: null,
         details: "",
         attachments:[]
     }
@@ -53,7 +52,8 @@ const getInitialValue = () =>
 const generateFromDefaultValue = (movement: Movement) =>
 {
     return {
-        tempId: movement.tempId,
+        id: movement.id,
+        description: movement.description,
         type: movement.type,
         paymentType: movement.paymentType,
         beneficiary: movement.beneficiary,
@@ -62,7 +62,6 @@ const generateFromDefaultValue = (movement: Movement) =>
         sectional: movement.sectional,
         origin: movement.account,
         originBank: movement.bankAccount,
-        paymentDate: movement.paymentDate,
         details: movement.details,
         attachments: movement.attachments,
         operation: movement.operation,
@@ -104,7 +103,7 @@ const getErrors = (values: any) =>
 
     var errors : any = {};
 
-    const requireds = ["amount","concept","account","beneficiary","paymentType","bankAccount","paymentDate","sectional"];
+    const requireds = ["amount","concept","account","beneficiary","paymentType","bankAccount","sectional"];
 
     requireds.forEach(required => 
     {
@@ -175,7 +174,25 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         onSubmit: (values) => onsubmit(values)
     });
 
-    const AttachmentsSorted = useMemo(() => FormMovimiento.values.attachments.sort((a:AttachmentType,b:AttachmentType) => b.file.name.localeCompare(a.file.name)),[FormMovimiento.values.attachments]);
+    const AttachmentsSorted = useMemo(() =>
+    {
+        return FormMovimiento.values.attachments.sort((a:AttachmentType | string,b:AttachmentType | string) =>
+        {
+            const aIsFile =  typeof	a !== "string"
+            const bIsFile =  typeof	b !== "string"
+
+            if(aIsFile && bIsFile)
+                b.file.name.localeCompare(a.file.name)
+
+            if(!aIsFile && bIsFile)
+                b.file.name.localeCompare(a);
+
+            if(aIsFile && !bIsFile)
+                b.localeCompare(a.file.name);
+
+            return 0;
+        })
+    },[FormMovimiento.values.attachments]);
 
 
     useEffect(() => 
@@ -255,9 +272,12 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         setFilteredConcepts(filteredConcepts);
     }
 
-    const templateOptionConcepts = (concept: Concept) =>
+    const templateOptionConcepts = (concept: Concept) => `${concept.code} - ${concept.description}`
+
+    const onLeaveConcept = () => 
     {
-        return <p>{concept.code} - {concept.description}</p>
+        if(typeof FormMovimiento.values.concept === "string" || FormMovimiento.values.concept === null)
+            FormMovimiento.setFieldValue("concept",null);
     }
 
     const onChangeConcept = (event:AutoCompleteChangeEvent) =>
@@ -277,14 +297,23 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         if(query.trim() === "")
             setFilteredSectionals(Sectionals);
 
-        const filteredSectionals = Sectionals.filter(sectional => sectional.name.toLowerCase().includes(query.toLowerCase()));
+        const filteredSectionals = Sectionals.filter(sectional => 
+        {
+            const optionText = `${sectional.id} - ${sectional.name}`.toLowerCase();
+
+            return optionText.includes(query.trim().toLowerCase());
+        });
         setFilteredSectionals(filteredSectionals);
     }
 
-    const templateOptionSectionals = (sectional: Sectional) =>
+    const onLeaveSectional = () =>
     {
-        return <p>{sectional.name}</p>
+        if(typeof FormMovimiento.values.sectional === "string" || FormMovimiento.values.sectional === null)
+            FormMovimiento.setFieldValue("sectional",null);
     }
+
+    const templateOptionSectionals = (sectional: Sectional) => `${sectional.id} - ${sectional.name}`
+    
 
     const onChangeSectional = (event:AutoCompleteChangeEvent) =>
     {
@@ -314,9 +343,12 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         setFilteredBeneficiaries(filteredBeneficiaries);
     }
 
-    const templateOptionBeneficiary = (beneficiary: Beneficiary) =>
+    const templateOptionBeneficiary = (beneficiary: Beneficiary) => `${beneficiary.code} - ${beneficiary.businessName}`
+
+    const onLeaveBeneficiary = () =>
     {
-        return <p>{beneficiary.code} - {beneficiary.businessName}</p>
+        if(typeof FormMovimiento.values.beneficiary === "string" || FormMovimiento.values.beneficiary === null)
+            FormMovimiento.setFieldValue("beneficiary",null);
     }
 
     const onChangeBeneficiary = (event:AutoCompleteChangeEvent) =>
@@ -332,8 +364,22 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
         const { bankAccounts , cuit } = value as Beneficiary;
         
+
         FormMovimiento.setFieldValue("originBanks",bankAccounts);
         FormMovimiento.setFieldValue("beneficiaryCuit",cuit);
+    
+
+
+        if(bankAccounts.length === 0 && FormMovimiento.values.originBanks !== bankAccounts)
+        {
+            dispatch(createAlert({severity: "warn", summary: "Advertencia", detail: "El beneficiario no tiene bancos"}))
+
+
+        }
+
+        FormMovimiento.setFieldValue("bankAccount",null);
+        FormMovimiento.setFieldValue("originBankNumber","");
+        FormMovimiento.setFieldValue("originBankCBU","");
     }
 
     // Cuenta contable  : Origen
@@ -360,8 +406,15 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
     const templateOptionLedgerAccount = (account: Account) =>
     {
-        return <p>{account.code} - {account.number} - {account.name}</p>
+        return `${account.code} - ${account.number} - ${account.name}`
     }
+
+    const onLeaveLedgerAccount = () =>
+    {
+        if(typeof FormMovimiento.values.account === "string" || FormMovimiento.values.account === null)
+            FormMovimiento.setFieldValue("account",null);
+    }
+
 
     const onChangeOrigin = (event:AutoCompleteChangeEvent) =>
     {
@@ -394,9 +447,13 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         setFilteredOriginBanks(filteredOriginBanks);
     }
 
-    const templateOptionOriginBank = (bankAccount: BankAccount) =>
+    const templateOptionOriginBank = (bankAccount: BankAccount) => `${bankAccount.CBU} - ${bankAccount.bank}`;
+
+    const onLeaveBank = () =>
     {
-        return <p>{bankAccount.CBU} - {bankAccount.bank}</p>
+        console.log(FormMovimiento.values.bankAccount)
+        if(typeof FormMovimiento.values.bankAccount === "string" || FormMovimiento.values.bankAccount === null)
+            FormMovimiento.setFieldValue("bankAccount",null);
     }
 
     const onChangeOriginBank = (event:AutoCompleteChangeEvent) =>
@@ -422,7 +479,8 @@ const CreateOrUpdateMovimiento = (props: Props) =>
     {
         const newMovimiento: Movement =
         {
-            tempId: values.tempId,
+            id: props.defaultValue !== null ? props.defaultValue.id :  Date.now(),
+            description: values.description,
             type: values.type,
             amount: values.amount,
             beneficiary: values.beneficiary,
@@ -430,7 +488,6 @@ const CreateOrUpdateMovimiento = (props: Props) =>
             sectional: values.sectional,
             account: values.account,
             bankAccount: values.bankAccount,
-            paymentDate: values.paymentDate,
             holder: values.holder,
             operation: values.operation,
             paymentType: values.paymentType,
@@ -442,7 +499,6 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         if(props.defaultValue !== null)
             props.callBackUpdate(newMovimiento)
 
-        newMovimiento.tempId = Date.now()
 
         if(props.defaultValue === null)
             props.callBackDialogAdd(newMovimiento);
@@ -455,9 +511,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
     const styleForm = useMemo(() => 
     {  
-        // const color = FormMovimiento.values.type === "Haber" ? "#f96060" : "#6bc56b"; //TODO: preguntar grado del borde   
         const color = FormMovimiento.values.type === "Haber" ? "red" : "green";
-
         return { border: `10px solid ${color}`, padding: '1.5rem 2rem', transition: 'border 0.5s' }
     },[FormMovimiento.values.type]);
 
@@ -486,10 +540,10 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         FormMovimiento.setFieldValue("attachments",oldAttachments);
     }
 
-    const removeFile = (id: string) =>
+    const removeFile = (indexToDelete: number) =>
     {
         const oldAttachments: AttachmentType[] = FormMovimiento.values.attachments;
-        const newAttachments = oldAttachments.filter(attachment => attachment.id !== id);
+        const newAttachments = oldAttachments.filter((_,index) => index !== indexToDelete);
         FormMovimiento.setFieldValue("attachments",newAttachments);
     }
 
@@ -519,36 +573,37 @@ const CreateOrUpdateMovimiento = (props: Props) =>
                 </FloatLabel>  
                 {getFormErrorMessage("amount")}
             </ContainerInput>
+
             <ContainerInput>
                 <FloatLabel>
-                    <AutoComplete id="concept" value={FormMovimiento.values.concept} dropdown forceSelection suggestions={FilteredConcepts} 
-                    completeMethod={searchMethodConcepts} itemTemplate={templateOptionConcepts} field="description" onChange={onChangeConcept}/>
-                    <label htmlFor="concept">Concepto</label>
+                    <InputText id="description" value={FormMovimiento.values.description} onChange={e => FormMovimiento.setFieldValue("description",e.target.value)}/>
+                    <label htmlFor="description">Descripción</label>
                 </FloatLabel>
-                {getFormErrorMessage("concept")}
-            </ContainerInput>
+                {getFormErrorMessage("description")}
+            </ContainerInput> 
+
+
         </FirstRow>
 
-        <SecondRow>
-            <ContainerInput>
-                <FloatLabel>
-                    <AutoComplete dropdown forceSelection id="origin" value={FormMovimiento.values.account} suggestions={FilteredOrigins} 
-                    completeMethod={searchMethodOrigins} itemTemplate={templateOptionLedgerAccount} field="name" onChange={onChangeOrigin}/>
-                    <label htmlFor="account">Cuenta Contable</label>
-                </FloatLabel>
-                {getFormErrorMessage("account")}
-            </ContainerInput>
+        <ContainerInput>
+            <FloatLabel>
+                <AutoComplete dropdown id="origin" value={FormMovimiento.values.account} suggestions={FilteredOrigins} onBlur={onLeaveLedgerAccount}
+                completeMethod={searchMethodOrigins} itemTemplate={templateOptionLedgerAccount} selectedItemTemplate={templateOptionLedgerAccount} onChange={onChangeOrigin}/>
+                <label htmlFor="account">Cuenta Contable (Número - Código Abr - Nombre)</label>
+            </FloatLabel>
+            {getFormErrorMessage("account")}
+        </ContainerInput>
 
-            <ContainerInput>
-                <FloatLabel>
-                    <AutoComplete dropdown forceSelection id="beneficiary" value={FormMovimiento.values.beneficiary} field="businessName" suggestions={FilteredBeneficiaries}
-                    completeMethod={searchMethodBeneficiaries} itemTemplate={templateOptionBeneficiary} onChange={onChangeBeneficiary}/>
-                    <label htmlFor="beneficiary">Beneficiario a cobrar</label>
-                </FloatLabel>
-                {getFormErrorMessage("beneficiary")}
-            </ContainerInput>
-        </SecondRow>
 
+        <ContainerInput>
+            <FloatLabel>
+                <AutoComplete dropdown id="beneficiary" value={FormMovimiento.values.beneficiary} suggestions={FilteredBeneficiaries} onBlur={onLeaveBeneficiary}
+                completeMethod={searchMethodBeneficiaries} itemTemplate={templateOptionBeneficiary} selectedItemTemplate={templateOptionBeneficiary} onChange={onChangeBeneficiary}/>
+                <label htmlFor="beneficiary">Beneficiario a cobrar (Número - Nombre)</label>
+            </FloatLabel>
+            {getFormErrorMessage("beneficiary")}
+        </ContainerInput>
+        
         <SecondRow>
             <ContainerInput>
                 <FloatLabel>
@@ -560,9 +615,9 @@ const CreateOrUpdateMovimiento = (props: Props) =>
             </ContainerInput>
             <ContainerInput>
                 <FloatLabel>
-                    <AutoComplete emptyMessage="El beneficiario no tiene bancos" dropdown forceSelection id="bankAccount" value={FormMovimiento.values.bankAccount} field="bank" suggestions={FilteredOriginBanks}
-                    completeMethod={searchMethodBankAccount} itemTemplate={templateOptionOriginBank}  onChange={onChangeOriginBank}/>
-                    <label htmlFor="bankAccount">Banco</label>
+                    <AutoComplete emptyMessage="El beneficiario no tiene bancos" dropdown id="bankAccount" value={FormMovimiento.values.bankAccount} onBlur={onLeaveBank}
+                    suggestions={FilteredOriginBanks} completeMethod={searchMethodBankAccount} itemTemplate={templateOptionOriginBank} selectedItemTemplate={templateOptionOriginBank}  onChange={onChangeOriginBank}/>
+                    <label htmlFor="bankAccount">Banco (CBU de beneficiario y banco)</label>
                 </FloatLabel>
                 {getFormErrorMessage("bankAccount")}
             </ContainerInput>
@@ -586,9 +641,9 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         <SecondRow>
             <ContainerInput>
                 <FloatLabel>
-                    <AutoComplete id="sectional" value={FormMovimiento.values.sectional} dropdown forceSelection suggestions={FilteredSectionals} 
-                    completeMethod={searchMethodSectionals} itemTemplate={templateOptionSectionals} field="name" onChange={onChangeSectional}/>
-                    <label htmlFor="sectional">Seccional</label>
+                    <AutoComplete id="sectional" value={FormMovimiento.values.sectional} dropdown suggestions={FilteredSectionals} onBlur={onLeaveSectional}  completeMethod={searchMethodSectionals} 
+                    itemTemplate={templateOptionSectionals} selectedItemTemplate={templateOptionSectionals} onChange={onChangeSectional}/>
+                    <label htmlFor="sectional">Seccional (Número - Nombre)</label>
                 </FloatLabel>
                 {getFormErrorMessage("sectional")}
             </ContainerInput>
@@ -601,14 +656,16 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         </SecondRow>
 
         <SecondRow>
+
             <ContainerInput>
                 <FloatLabel>
-                    <Calendar id="paymentDate" placeholder="Fecha de cobro" value={FormMovimiento.values.paymentDate} onChange={e => FormMovimiento.setFieldValue("paymentDate",e.target.value)}  dateFormat="dd/mm/yy"/>
-                    <label htmlFor="paymentDate">Fecha de cobro</label>
+                    <AutoComplete id="concept" value={FormMovimiento.values.concept} dropdown suggestions={FilteredConcepts} onBlur={onLeaveConcept}
+                    completeMethod={searchMethodConcepts} itemTemplate={templateOptionConcepts} selectedItemTemplate={templateOptionConcepts} onChange={onChangeConcept}/>
+                    <label htmlFor="concept">Concepto (Número - Nombre)</label>
                 </FloatLabel>
-                {getFormErrorMessage("paymentDate")}
+                {getFormErrorMessage("concept")}
             </ContainerInput>
-
+           
             <ContainerInput>
                 <FloatLabel>
                     <InputTextarea id="details"  rows={3} value={FormMovimiento.values.details} onChange={e => FormMovimiento.setFieldValue("details",e.target.value)}/>
@@ -620,7 +677,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
         <Dropzone  multiple id="imageUpload" onDrop={onDrop}  type="file" onChange={onSelectFile} value={""}  accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf,image/jpeg,image/png,image/jpg"></Dropzone>
         <AttachmentsContainer>
-            {AttachmentsSorted.map((attachment:AttachmentType) => <Attachment attachment={attachment} key={attachment.id} removeFile={removeFile}/>)}
+            {AttachmentsSorted.map((attachment:AttachmentType | string,index: number) => <Attachment attachment={attachment} attachmentIndex={index} key={attachment.toString()} removeFile={removeFile}/>)}
         </AttachmentsContainer>
         <div>
             <Button label={props.defaultValue === null ? 'Agregar' : 'Actualizar' } type="submit" id="button_add"/>

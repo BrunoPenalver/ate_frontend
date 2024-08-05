@@ -1,14 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { OrdersTableFilter } from "./OrdersTableFilter";
 import { Group } from "../../Group";
-import {
-  TableContainer,
-  StyledDataTable,
-  TableTitle,
-  TitleGroup,
-} from "../styles";
+import { TableContainer, StyledDataTable, TableTitle, TitleGroup } from "../styles";
 import { Column } from "primereact/column";
-import { formatDate } from "../../../utils/dates";
+import { formatDate, formatFullDate } from "../../../utils/dates";
 import { Loader } from "../../Loader";
 import { AppDispatch, RootState } from "../../../stores/stores";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,6 +16,7 @@ import { createAlert } from "../../../stores/alerts.slicer";
 import { deleteById } from '../../../stores/orders.slice';
 import { Button } from "primereact/button";
 import { Link } from "react-router-dom";
+import { formatPrice } from "../../../utils/prices";
 
 interface Props
 {
@@ -69,6 +65,8 @@ export const StyledTable = (props:Props) =>
 
   const onClickDelete = (orderId: number) => 
   {
+    console.log(orderId);
+
     const deleteOrder = async (orderId: number) =>
     {
       try 
@@ -158,12 +156,13 @@ export const StyledTable = (props:Props) =>
           const totalDebe  = row.movements.filter((mov: any) => mov.type === "Debe").reduce((acc: number, mov: any) => acc + mov.amount, 0);
           const totalHaber = row.movements.filter((mov: any) => mov.type === "Haber").reduce((acc: number, mov: any) => acc + mov.amount, 0);
 
-          return `$ ${totalDebe - totalHaber}`;
+          return `$ ${formatPrice(totalDebe - totalHaber)}`;
         }}/>
+         <Column sortable filter filterPlaceholder="Filtrar..." field="updatedAt" header="Ultima actualización" body={row => formatFullDate(row.updatedAt)}/>
         <Column key="actions" header="Acciones" body={(row) => 
         {
           return <>
-            {useActiveOrders &&  <i className="pi pi-pen-to-square" style={{marginRight: "10px", color: "var(--cyan-500)"}}/>}
+            {useActiveOrders &&   <Link style={{textDecoration:"none"}} to={`/admin/ordenes/${row.id}`}> <i className="pi pi-pen-to-square" style={{marginRight: "10px", color: "var(--cyan-500)"}}/> </Link>}
             {!useActiveOrders &&  <i className="pi pi-undo" style={{marginRight: "10px", color: "var(--cyan-500)", cursor: "pointer"}} onClick={() => onClickUndo(row.id)}  />}
             <i className="pi pi-trash" style={{color: "var(--red-600)", cursor: "pointer"}} onClick={() => onClickDelete(row.id)}/>  
           </>
