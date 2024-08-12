@@ -299,7 +299,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
         const filteredSectionals = Sectionals.filter(sectional => 
         {
-            const optionText = `${sectional.id} - ${sectional.name}`.toLowerCase();
+            const optionText = `${sectional.code} - ${sectional.name}`.toLowerCase();
 
             return optionText.includes(query.trim().toLowerCase());
         });
