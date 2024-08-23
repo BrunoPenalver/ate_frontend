@@ -44,20 +44,29 @@ export const RegularColumn = (key: any, index: number) => {
               color: rowData.active ? "black" : "#dbdbdb",
             }}
           >
-            {typeof rowData[key.key] === "boolean" && rowData[key.key] === true
+            {typeof rowData[key?.key] === "boolean" && rowData[key.key] === true
               ? "Si"
-              : typeof rowData[key.key] === "boolean" &&
-                rowData[key.key] === false
+              : typeof rowData[key?.key] === "boolean" &&
+                rowData[key?.key] === false
               ? "No"
-              : rowData[key.key] === null || rowData[key.key] === ""
+              : rowData[key?.key] === null || rowData[key?.key] === ""
               ? "---"
-              : key.label === "Provincia" ? (
+              : key?.label === "Provincia" ? (
                 `${rowData?.province?.name}`
                 
-              ) : key.label === "Tipo de beneficiario" ? (
+              ) : key?.label === "Localidad" ? (
+                `${rowData?.city?.name}`
+                
+              ) : key?.label === "Tipo de beneficiario" ? (
                 `${rowData?.beneficiaryType?.type}`
                 
-              ) : rowData[key.key]}
+              ) : key?.label === "Tipo de cuenta" ? (
+                `${rowData?.accountType?.type}`
+                
+              ) : key?.label === "Tipo de registro" ? (
+                `${rowData?.registryType?.type}`
+                
+              )   : rowData[key?.key]}
           </span>
         );
       }}
@@ -66,18 +75,5 @@ export const RegularColumn = (key: any, index: number) => {
 };
 
 
-// export const SelectColumn = (key: MasterCRUDColumnObjectKeys,options: Option[]) => 
-// {
-//   return  <Column sortable  field={key.key} header={key.label} body={(rowData) => 
-//   {
-//     const optionsFiltered = options[key.key];
-//     const optionSelected = optionsFiltered.find((option:Option) => option.value === rowData[key.key]);
-    
-//     return <span  style={{ textDecoration: rowData.active ? "none" : "line-through", color: rowData.active ? "black" : "#dbdbdb",}}>
-//       {optionSelected ? optionSelected.label : "---"}
-//     </span>
-    
-//   }}/>
-// }
 
 

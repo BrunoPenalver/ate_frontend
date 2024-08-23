@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import styled from "styled-components";
 import { AccountTypeTypes } from "../../../../models/accountType";
 import api from "../../../../utils/api";
+import BankAccount from '../../../../interfaces/orders/bankAccount';
 
 // Define las opciones para el campo de tipo utilizando los valores de AccountTypeTypes
 const bankTypes = Object.values(AccountTypeTypes).map(type => ({ label: type, value: type }));
@@ -45,7 +46,16 @@ const StyledButton = styled(Button)`
   width: 100%;
 `;
 
-export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing, beneficiaryId }) => {
+interface DialogProps  {
+  isOpen: boolean;
+  bankAccount: BankAccount | null;
+  onClose: () => void;
+  isEditing: boolean;
+  beneficiaryId: number
+}
+
+
+export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing, beneficiaryId }: DialogProps) => {
   const formik = useFormik({
     initialValues: {
       bank: "",
@@ -59,11 +69,12 @@ export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing
     onSubmit: async (values) => {
       try {
         if (isEditing) {
-          await api.put(`/bankaccounts/${bankAccount.id}`, { ...values, beneficiaryId });
-          console.log("Cuenta bancaria editada:", values);
+          await api.put(`/bankaccounts/${bankAccount?.id}`, { ...values, beneficiaryId });
+       
         } else {
           await api.post("/bankaccounts", { ...values, beneficiaryId });
-          console.log("Nueva cuenta bancaria agregada:", { ...values, beneficiaryId });
+          formik.resetForm();
+      
         }
         onClose(); // Cerrar el diálogo al finalizar
       } catch (error) {

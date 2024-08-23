@@ -1,8 +1,8 @@
 import styled from "styled-components";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
-import { useEffect, useState } from "react";
-import { Loader } from "../../Loader/Loader";
+import Concept from "../../../interfaces/orders/concept";
+import Beneficiary from '../../../interfaces/orders/beneficiary';
 
 export const StyledEditDialog = styled(Dialog)`
   display: flex;
@@ -66,6 +66,16 @@ export const ButtonContainer = styled.div`
   }
 `;
 
+interface StyledTableProps {
+  itemSwitchedState: Concept | Beneficiary | null;
+  singular: string
+  showModalDelete: boolean
+  switchStateModalDelete: () => void
+  handleDelete: () => void
+  loadingDelete: boolean
+  refetch: () => void
+}
+
 export const DeleteDialog = ({
   itemSwitchedState,
   singular,
@@ -74,9 +84,9 @@ export const DeleteDialog = ({
   handleDelete,
   loadingDelete,
   refetch,
-}) => {
 
-  const [loading, setLoading] = useState(false);
+}: StyledTableProps) => {
+
 
 
   const handleDeleteAndRefetch = async () => {
@@ -87,7 +97,7 @@ export const DeleteDialog = ({
 
   return (
     <>
-      {loading && <Loader text="Cargando datos" />}
+      
       {itemSwitchedState && (
         <>
             <StyledEditDialog
@@ -106,7 +116,7 @@ export const DeleteDialog = ({
                 <Button
                   className="p-button-primary"
                   label="Cancelar"
-                  onClick={() => switchStateModalDelete()}
+                  onClick={switchStateModalDelete}
                   loading={loadingDelete}
                 />
               </ButtonContainer>

@@ -1,5 +1,5 @@
 import { Column } from "primereact/column";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   StyledDataTable,
   StyledTableButton,
@@ -10,13 +10,69 @@ import {
 import { Group } from "../../../Group";
 import { AdminTableFilter } from "../../../adminTableFilter/AdminTableFilter";
 import { BankAccountsFormDialog } from "./BankAccountsFormDialog";
-import api from "../../../../utils/api";
+import socket from "../../../../utils/socket";
+import { StyledCell } from "./styles";
+import { DeactivateBankAccountDialog } from "./DeactivateBankAccountDialog";
+import { DeleteDialog } from "./DeleteBankAccountDialog";
+import BankAccount from "../../../../interfaces/orders/bankAccount";
 
-export const BankAccountsTable = ({ bankAccounts, beneficiaryId }) => {
+interface DialogProps {
+  bankAccounts: BankAccount[];
+  beneficiaryId: number;
+}
+
+export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps) => {
   const [globalFilter, setGlobalFilter] = useState("");
   const [isDialogVisible, setIsDialogVisible] = useState(false);
-  const [selectedBankAccount, setSelectedBankAccount] = useState(null);
+  const [isDeleteDialogVisible, setIsDeleteDialogVisible] = useState(false);
+  const [isDeactivateDialogVisible, setIsDeactivateDialogVisible] =
+    useState(false);
+  const [selectedBankAccount, setSelectedBankAccount] = useState<BankAccount | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [localBankAccounts, setLocalBankAccounts] = useState(bankAccounts);
+
+  useEffect(() => {
+    setLocalBankAccounts(
+      bankAccounts.filter((account) => account.active !== null)
+    );
+  }, [bankAccounts]);
+
+  useEffect(() => {
+    socket.on("created-bank-account", (newBankAccount) => {
+      setLocalBankAccounts((prev) => [...prev, newBankAccount]);
+    });
+
+    socket.on("updated-bank-account", (updatedBankAccount) => {
+      setLocalBankAccounts((prev) =>
+        prev.map((account) =>
+          account.id === updatedBankAccount.id ? updatedBankAccount : account
+        )
+      );
+    });
+
+    socket.on("deactivated-bank-account", (deactivatedBankAccount) => {
+      setLocalBankAccounts((prev) =>
+        prev.map((account) =>
+          account.id === deactivatedBankAccount.id
+            ? { ...account, active: deactivatedBankAccount.active }
+            : account
+        )
+      );
+    });
+
+    socket.on("deleted-bank-account", (deletedBankAccountId) => {
+      setLocalBankAccounts((prev) =>
+        prev.filter((account) => account.id !== deletedBankAccountId)
+      );
+    });
+
+    return () => {
+      socket.off("created-bank-account");
+      socket.off("updated-bank-account");
+      socket.off("deactivated-bank-account");
+      socket.off("deleted-bank-account");
+    };
+  }, []);
 
   const openAddBankAccountDialog = () => {
     setSelectedBankAccount(null);
@@ -24,37 +80,56 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId }) => {
     setIsDialogVisible(true);
   };
 
-  const openEditBankAccountDialog = (bankAccount) => {
+  const openEditBankAccountDialog = (bankAccount : BankAccount) => {
     setSelectedBankAccount(bankAccount);
     setIsEditing(true);
     setIsDialogVisible(true);
+  };
+
+  const openDeleteBankAccountDialog = (bankAccount: BankAccount) => {
+    setSelectedBankAccount(bankAccount);
+    setIsDeleteDialogVisible(!isDeleteDialogVisible);
+  };
+
+  const openDeactivateBankAccountDialog = (bankAccount: BankAccount) => {
+    setSelectedBankAccount(bankAccount);
+    setIsDeactivateDialogVisible(!isDeactivateDialogVisible);
   };
 
   const closeDialog = () => {
     setIsDialogVisible(false);
   };
 
-  if (bankAccounts.length === 0 || !bankAccounts)
+  if (localBankAccounts.length === 0 || !localBankAccounts)
     return (
-      <TableContainer>
-        <TitleGroup>
-          <TableTitle>Listado de cuentas bancarias</TableTitle>{" "}
-          <StyledTableButton
-            label="Agregar cuenta"
-            className="p-button-primary"
-            onClick={openAddBankAccountDialog}
-          />
-        </TitleGroup>
-        <p
-          style={{
-            fontSize: "18px",
-            marginTop: "30px",
-            fontFamily: "var(--bs-body-font-family)",
-          }}
-        >
-          No hay cuentas cargadas para este usuario
-        </p>{" "}
-      </TableContainer>
+      <>
+        <TableContainer>
+          <TitleGroup>
+            <TableTitle>Listado de cuentas bancarias</TableTitle>{" "}
+            <StyledTableButton
+              label="Agregar cuenta"
+              className="p-button-primary"
+              onClick={openAddBankAccountDialog}
+            />
+          </TitleGroup>
+          <p
+            style={{
+              fontSize: "18px",
+              marginTop: "30px",
+              fontFamily: "var(--bs-body-font-family)",
+            }}
+          >
+            No hay cuentas cargadas para este usuario
+          </p>{" "}
+        </TableContainer>
+        <BankAccountsFormDialog
+          isOpen={isDialogVisible}
+          bankAccount={selectedBankAccount}
+          onClose={closeDialog}
+          isEditing={isEditing}
+          beneficiaryId={beneficiaryId}
+        />
+      </>
     );
 
   return (
@@ -63,7 +138,10 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId }) => {
         <TitleGroup>
           <Group>
             <TableTitle>Listado de cuentas bancarias</TableTitle>
-            <AdminTableFilter filter={globalFilter} setFilter={setGlobalFilter} />
+            <AdminTableFilter
+              filter={globalFilter}
+              setFilter={setGlobalFilter}
+            />
           </Group>
           <StyledTableButton
             label="Agregar cuenta"
@@ -72,7 +150,7 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId }) => {
           />
         </TitleGroup>
         <StyledDataTable
-          value={bankAccounts.sort((a, b) => a.id - b.id)}
+          value={localBankAccounts.sort((a, b) => a.id - b.id)}
           paginator
           rows={10}
           rowsPerPageOptions={[1, 2, 5, 10]}
@@ -81,13 +159,62 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId }) => {
           removableSort
           globalFilter={globalFilter}
         >
-          <Column field="id" header="ID" sortable />
-          <Column field="bank" header="Banco" sortable />
-          <Column field="CBU" header="CBU" sortable />
-          <Column field="alias" header="Alias" sortable />
-          <Column field="holder" header="Titular" sortable />
-          <Column field="number" header="Numero" sortable />
-          <Column field="type" header="Tipo" sortable />
+          <Column
+            field="id"
+            header="ID"
+            sortable
+            body={(rowData) => (
+              <StyledCell $active={rowData?.active}>{rowData.id}</StyledCell>
+            )}
+          />
+          <Column
+            field="bank"
+            header="Banco"
+            sortable
+            body={(rowData) => (
+              <StyledCell $active={rowData?.active}>{rowData.bank}</StyledCell>
+            )}
+          />
+          <Column
+            field="CBU"
+            header="CBU"
+            sortable
+            body={(rowData) => (
+              <StyledCell $active={rowData?.active}>{rowData.CBU}</StyledCell>
+            )}
+          />
+          <Column
+            field="alias"
+            header="Alias"
+            sortable
+            body={(rowData) => (
+              <StyledCell $active={rowData?.active}>{rowData.alias}</StyledCell>
+            )}
+          />
+          <Column
+            field="holder"
+            header="Titular"
+            sortable
+            body={(rowData) => (
+              <StyledCell $active={rowData?.active}>{rowData.holder}</StyledCell>
+            )}
+          />
+          <Column
+            field="number"
+            header="Numero"
+            sortable
+            body={(rowData) => (
+              <StyledCell $active={rowData?.active}>{rowData.number}</StyledCell>
+            )}
+          />
+          <Column
+            field="type"
+            header="Tipo"
+            sortable
+            body={(rowData) => (
+              <StyledCell $active={rowData?.active}>{rowData.type}</StyledCell>
+            )}
+          />
           <Column
             header="Acciones"
             body={(row) => {
@@ -116,12 +243,12 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId }) => {
                       color: row.active ? "var(--gray-500)" : "#10b981",
                       cursor: "pointer",
                     }}
-                    onClick= {async () => api.patch(`bankAccounts/${row.id}`)}
-                    
+                    onClick={() => openDeactivateBankAccountDialog(row)}
                   />
                   <i
                     className="pi pi-trash"
                     style={{ color: "var(--red-600)", cursor: "pointer" }}
+                    onClick={() => openDeleteBankAccountDialog(row)}
                   />
                 </div>
               );
@@ -134,7 +261,17 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId }) => {
         bankAccount={selectedBankAccount}
         onClose={closeDialog}
         isEditing={isEditing}
-        beneficiaryId={beneficiaryId} // Pasar beneficiaryId
+        beneficiaryId={beneficiaryId}
+      />
+      <DeleteDialog
+        isOpen={isDeleteDialogVisible}
+        setIsOpen={setIsDeleteDialogVisible}
+        bankAccount={selectedBankAccount}
+      />
+      <DeactivateBankAccountDialog
+        isOpen={isDeactivateDialogVisible}
+        setIsOpen={setIsDeactivateDialogVisible}
+        bankAccount={selectedBankAccount}
       />
     </>
   );

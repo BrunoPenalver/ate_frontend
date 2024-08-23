@@ -4,7 +4,7 @@ import { Toast } from "primereact/toast";
 import { getTranslate } from "../utils/translates";
 import api from "../utils/api";
 import { MasterCRUD } from "../models/mastersModel";
-import { get } from "lodash";
+
 
 
 
@@ -93,7 +93,7 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
     );
   };
 
-  const handleAdd = async (values: any, FormAdd) => {
+  const handleAdd = async (values: any, FormAdd: any) => {
     try {
       setLoadingAdd(true);
       
@@ -213,11 +213,11 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
       setLoadingUpdate(true);
 
       const { id } = values;
-
+      console.log(values)
       const URL_API = API.put.replace(":id", id);
 
       const { data } = await api.put(URL_API, values);
-      console.log("data de update",data)
+   
  
       const index = Items.findIndex((item: any) => item.id === id);
 
@@ -271,10 +271,7 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
 
         if (getOptionsFrom) {
           const { data } = await api.get(getOptionsFrom);
-          console.log(
-            "Opciones para el form que están llegando del servidor:",
-            data
-          );
+
           setOptionsForms((prev: any) => ({ ...prev, [key.key]: data }));
         }
       }
@@ -311,6 +308,7 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
   /* ######### Actualizar ######### */
   const [showModalUpdate, setShowModalUpdate] = useState<boolean>(false);
   const [LoadingUpdate, setLoadingUpdate] = useState<boolean>(false);
+
   /* ######### Desactivar/Activar ######### */
   const [itemSwitchedState, setItemSwitchedState] = useState<any>(
     getInitialValues(ObjectKeys)
@@ -323,7 +321,7 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
 const [loadingDelete, setLoadingDelete] = useState<boolean>(false);
 
 
-  const setItemSwitchedStateAndSwitchModal = (item: any) => {
+  const setItemSwitchedStateAndSwitchModal = (item: any = null) => {
     setItemSwitchedState(item);
     setShowModalDesactivate(true);
   };
@@ -339,6 +337,7 @@ const [loadingDelete, setLoadingDelete] = useState<boolean>(false);
   const switchStateModalDelete = () => {
     setShowModalDelete(!showModalDelete);
   };
+
 
   const switchStateModalUpdate = () => setShowModalUpdate(!showModalUpdate);
 
@@ -395,7 +394,7 @@ const [loadingDelete, setLoadingDelete] = useState<boolean>(false);
     setLoadingDelete,
     switchStateModalDelete,
     setItemSwitchedStateAndSwitchModalDelete,
-    
+
 
 
   };

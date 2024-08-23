@@ -1,9 +1,6 @@
-import { useEffect } from "react";
-
+import { useEffect, useState } from "react";
 import { Toast } from "primereact/toast";
 import { useFormik } from "formik";
-
-
 import { Loader } from "../../Loader/Loader";
 import { useMasterComponent } from "../../../hooks/useMasterComponent";
 import { DeleteDialog } from "./EliminateDialog";
@@ -11,13 +8,12 @@ import { DeactivateDialog } from "./DeactivateDialog";
 import { NormalEditDialog } from "./NormalEditDialog";
 import { NormalAddDialog } from "./NormalAddDialog";
 import { MasterCRUD } from "../../../models/mastersModel";
-import {  StyledMastersTable } from "../../tables/mastersTable/MastersTable";
-
-
+import { StyledMastersTable } from "../../tables/mastersTable/MastersTable";
+import socket from "../../../utils/socket"; // Asegúrate de importar el socket
 
 const MasterCRUDComp = ({ item }: { item: MasterCRUD }) => {
+  const [refetchTrigger, setRefetchTrigger] = useState(0);  // Cambia el estado a un trigger basado en número
   const {
-    refetch,
     Loading,
     Errors,
     showModalAdd,
@@ -49,10 +45,10 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) => {
     ObjectKeys,
     setItemSwitchedStateAndSwitchModalDelete,
     showModalDelete,
-    loadingDelete
+    loadingDelete,
   } = useMasterComponent({ item });
 
-  const FormAdd = useFormik({
+  const FormAdd : any = useFormik({
     initialValues: getInitialValues(ObjectKeys),
     validate: (values) => getErrors(values, ObjectKeys),
     onSubmit: async (values) => handleAdd(values, FormAdd),
@@ -77,9 +73,20 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) => {
   };
 
   useEffect(() => {
-    
     getData();
-  }, [refetch]);
+  }, [refetchTrigger]);  // El hook ahora se ejecuta cuando cambia el valor de refetchTrigger
+
+  useEffect(() => {
+    // Escuchar el evento de socket para actualizaciones
+    socket.on("updated-entities", () => {
+     
+      setRefetchTrigger(prev => prev + 1);  // Cambia el estado para forzar un refetch
+    });
+
+    return () => {
+      socket.off("updated-entities");
+    };
+  }, []);
 
   if (Loading) return <Loader text={`Cargando ${plural.toLowerCase()}`} />;
 
@@ -97,18 +104,17 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) => {
         plural={plural}
         label={labelAgregar}
       />
-     
-        <NormalAddDialog
-          labelAgregar={labelAgregar}
-          showModalAdd={showModalAdd}
-          hideFN={() => switchStateModalAdd()}
-          FormAdd={FormAdd}
-          ObjectKeys={ObjectKeys}
-          OptionsForms={OptionsForms}
-          getFormErrorMessage={getFormErrorMessage}
-          LoadingAdd={LoadingAdd}
-      
-        ></NormalAddDialog>
+
+      <NormalAddDialog
+        labelAgregar={labelAgregar}
+        showModalAdd={showModalAdd}
+        hideFN={() => switchStateModalAdd()}
+        FormAdd={FormAdd}
+        ObjectKeys={ObjectKeys}
+        OptionsForms={OptionsForms}
+        getFormErrorMessage={getFormErrorMessage}
+        LoadingAdd={LoadingAdd}
+      ></NormalAddDialog>
 
       <NormalEditDialog
         labelActualizar={labelActualizar}
@@ -128,20 +134,17 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) => {
         switchStateModalDesactivate={switchStateModalDesactivate}
         handleDesactivate={handleDesactivate}
         loadingDesactivate={loadingDesactivate}
-        
       ></DeactivateDialog>
 
       <DeleteDialog
         itemSwitchedState={itemSwitchedState}
         singular={singular}
         showModalDelete={showModalDelete}
-        switchStateModalDelete={setItemSwitchedStateAndSwitchModalDelete}
+        switchStateModalDelete={() => setItemSwitchedStateAndSwitchModalDelete(null)}
         handleDelete={handleDelete}
         loadingDelete={loadingDelete}
-        refetch={refetch}
-        
+        refetch={() => setRefetchTrigger(prev => prev + 1)}  // Pasar la función refetch
       ></DeleteDialog>
-
 
       <Toast ref={Errors} position="bottom-center" />
     </>

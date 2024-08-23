@@ -1,6 +1,11 @@
 import { FilterInput } from "./styles";
 
-export const AdminTableFilter = ({ filter , setFilter }) => {
+interface AdminTableFilterProps {
+  filter: string;
+  setFilter: (value: string) => void;
+}
+
+export const AdminTableFilter = ({ filter , setFilter }:AdminTableFilterProps ) => {
   return (
     <div>
       <FilterInput

@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../utils/api';
-import { BeneficiaryType } from '../models/beneficiaryTypeModel';
+import { BeneficiaryType } from '../interfaces/orders/beneficiary';
+
 
 interface BeneficiaryTypesState {
   beneficiaryTypes: BeneficiaryType[];

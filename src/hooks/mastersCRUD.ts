@@ -5,6 +5,7 @@ import { MasterCRUD } from "../models/mastersModel";
 
 
 
+
 export const useMastersCRUD = () => {
 
 
@@ -53,7 +54,7 @@ export const useMastersCRUD = () => {
           key:"email"
           ,label:"Email",
           field:{type:"input", rules:[]},
-          showInTable:true,
+          showInTable:false,
           showInForm:true,
         },
         {
@@ -106,13 +107,13 @@ export const useMastersCRUD = () => {
           showInTable: true,
           showInForm: true,
         },
-        // {
-        //   key: "city",
-        //   label: "Localidad",
-        //   field:{type:"input", rules:[]},
-        //   showInTable: true,
-        //   showInForm: true,
-        // },
+        {
+          key: "city",
+          label: "Localidad",
+          field: { type: "select", rules: ["required"], getOptionsFrom: "cities/options"},
+          showInTable: true,
+          showInForm: true,
+        },
         {
           key: "beneficiaryType",
           label: "Tipo de beneficiario",
@@ -134,10 +135,103 @@ export const useMastersCRUD = () => {
         patch: "beneficiaries/:id",
         delete: "beneficiaries/:id",
       },
+
     };
+    const ConceptSchema: MasterCRUD = {
+      title: "Conceptos",
+      singular: "Concepto",
+      plural: "Conceptos",
+      ObjectKeys: [
+        {
+          key: "id",
+          label: "ID",
+          field: { type: "readonly", rules: ["required"] },
+          isID: true,
+          showInTable: true,
+          showInForm: true,
+        },
+        {
+          key: "code",
+          label: "Código",
+          field: { type: "input", rules: ["required"] },
+          showInTable: true,
+          showInForm: true,
+        },
+        {
+          key: "description",
+          label: "Descripción",
+          field: { type: "input", rules: ["required"] },
+          showInTable: true,
+          showInForm: true,
+        },
+        {
+          key: "registryType",
+          label: "Tipo de registro",
+          field: { type: "select", rules: ["required"], getOptionsFrom: "registrytypes/options"},
+          showInTable: true,
+          showInForm: true,
+        },
+        { 
+          key: "debitAccount",
+          label: "Cuenta debe",
+          field: { type: "input", rules: ["required"]},
+          showInTable: true,
+          showInForm: true,
+        },
+        { 
+          key: "creditAccount",
+          label: "Cuenta haber",
+          field: { type: "input", rules: ["required"]},
+          showInTable: true,
+          showInForm: true,
+        },
+        {
+          key: "accountType",
+          label: "Tipo de cuenta",
+          field: { type: "select", rules: [], getOptionsFrom: "accounttypes/options"},
+          showInTable: true,
+          dependsOn: "registryType",
+          showInForm: true,
+        },
+        {
+          key: "accountNumber",
+          label: "Nº de cuenta",
+          field: { type: "input", rules: [] },
+          dependsOn: "registryType",
+          showInTable: true,
+          showInForm: true,
+        },
+        {
+          key: "CBU",
+          label: "CBU",
+          field: { type: "input", rules: [] },
+          dependsOn: "registryType",
+          showInTable: true,
+          showInForm: true,
+        },
+        {
+          key: "alias",
+          label: "Alias",
+          field: { type: "input", rules: [] },
+          dependsOn: "registryType",
+          showInTable: true,
+          showInForm: true,
+        },
+
+        
+      ],
+      API: {
+        get: "concepts",
+        post: "concepts",
+        put: "concepts/:id",
+        patch: "concepts/:id",
+        delete: "concepts/:id",
+      },
+    }
   
   const MastersTab: MasterCRUD[] = [
     BeneficiarySchema,
+    ConceptSchema,
   ].sort((a, b) => a.plural.localeCompare(b.title));
 
   return MastersTab;

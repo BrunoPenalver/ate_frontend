@@ -10,9 +10,14 @@ import {
 
 import { Group } from "../../group/styles";
 import { DateColumn, RegularColumn } from "./tableutils";
-import { MasterCRUDColumnObjectKeys, Option } from "../../../models/mastersModel";
+import {
+  MasterCRUDColumnObjectKeys,
+  Option,
+} from "../../../models/mastersModel";
 import { AdminTableFilter } from "../../adminTableFilter/AdminTableFilter";
 import { BankAccountsDialog } from "../../admin/masterCRUDComponent/bankAccounts/BankAccountsDialog";
+import { DetailDialog } from "../../admin/masterCRUDComponent/beneficiaries/DetailDialog";
+
 
 interface StyledTableProps {
   items: any[];
@@ -45,11 +50,21 @@ export const StyledMastersTable = (props: StyledTableProps) => {
   const [globalFilter, setGlobalFilter] = useState("");
   const [isBankAccountsVisible, setIsBankAccountsVisible] = useState(false);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState<any>(null);
+  const [isDetailDialogVisible, setIsDetailDialogVisible] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+
+  const openDetailDialog = (item: any) => {
+    setSelectedItem(item);
+    setIsDetailDialogVisible(true);
+  };
 
   const openBankAccounts = (beneficiary: any) => {
     setSelectedBeneficiary(beneficiary);
     setIsBankAccountsVisible(!isBankAccountsVisible);
-  }
+  };
+
+
+
 
   if (errorOnLoad) {
     return (
@@ -77,7 +92,7 @@ export const StyledMastersTable = (props: StyledTableProps) => {
     );
   }
 
-  if (items.length === 0 || !items)
+  if (items?.length === 0 || !items)
     return (
       <TableContainer>
         <TitleGroup>
@@ -95,126 +110,139 @@ export const StyledMastersTable = (props: StyledTableProps) => {
             fontFamily: "var(--bs-body-font-family)",
           }}
         >
-          No hay {plural.toLowerCase()} cargados
+          No hay {plural?.toLowerCase()} cargados
         </p>{" "}
       </TableContainer>
     );
   return (
     <>
-    <TableContainer>
-      <TitleGroup>
-        <Group>
-          <TableTitle>{plural}</TableTitle>
-          <AdminTableFilter filter={globalFilter} setFilter={setGlobalFilter} />
-        </Group>
-        <StyledTableButton
-          label={label}
-          className="p-button-primary"
-          onClick={fn3}
-        />
-      </TitleGroup>
-      <StyledDataTable
-        value={items.sort((a, b) => a.id - b.id)}
-        paginator
-        rows={10}
-        rowsPerPageOptions={[1, 2, 5, 10]}
-        stripedRows
-        size="small"
-        removableSort
-        globalFilter={globalFilter}
-      >
-        {ObjectKeys.map((key, index) => {
-          if (key.showInTable && key.field.as === "date")
-            return DateColumn(key, index);
+      <TableContainer>
+        <TitleGroup>
+          <Group>
+            <TableTitle>{plural}</TableTitle>
+            <AdminTableFilter
+              filter={globalFilter}
+              setFilter={setGlobalFilter}
+            />
+          </Group>
+          <StyledTableButton
+            label={label}
+            className="p-button-primary"
+            onClick={fn3}
+          />
+        </TitleGroup>
+        <StyledDataTable
+          value={items?.sort((a, b) => a.id - b.id)}
+          paginator
+          rows={10}
+          rowsPerPageOptions={[1, 2, 5, 10]}
+          stripedRows
+          size="small"
+          removableSort
+          globalFilter={globalFilter}
+        >
+          {ObjectKeys?.map((key, index) => {
 
-          if (key.showInTable) return RegularColumn(key, index);
-        })}
-        {plural === "Beneficiarios" && (
-          
-          <Column
-          header="Cuentas bancarias"
-          body={(row) => {
-            return (
-              <div
-                style={{
-                  display: "flex",
-                  padding: "0 10px",
-                  gap: "5px",
-                  justifyContent: "center",
-                  textDecoration: "none",
-                  alignItems: "center",
-                  color: "#10b981",
-                  cursor: "pointer",
-                }}
-                onClick={() => openBankAccounts(row)}
-              > 
-              Ver cuentas
-               <i
-                    className="pi pi-search"
+            if (key?.showInTable && key?.field.as === "date")
+              return DateColumn(key, index);
+
+            if (key?.showInTable) return RegularColumn(key, index);
+          })}
+          {plural === "Beneficiarios" && (
+            <Column
+              header="Cuentas bancarias"
+              body={(row) => {
+                return (
+                  <div
                     style={{
-                      
+                      display: "flex",
+                      padding: "0 10px",
+                      gap: "5px",
+                      justifyContent: "center",
+                      textDecoration: "none",
+                      alignItems: "center",
                       color: "#10b981",
                       cursor: "pointer",
                     }}
-                    
+                    onClick={() => openBankAccounts(row)}
+                  >
+                    Ver cuentas
+                    <i
+                      className="pi pi-search"
+                      style={{
+                        color: "#10b981",
+                        cursor: "pointer",
+                      }}
+                    ></i>
+                  </div>
+                );
+              }}
+            />
+          )}
+          <Column
+            header="Acciones"
+            body={(row) => {
+              return (
+                <div
+                  style={{
+                    display: "flex",
+                    padding: "0 10px",
+                    gap: "10px",
+                    justifyContent: "center",
+                    textDecoration: "none",
+                    alignItems: "center",
+                  }}
+                >
+                  <i
+                    className="pi pi-search"
+                    style={{
+                      color: "#10b981",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => openDetailDialog(row)}
                   ></i>
-                
-              </div>
-            );
-          }}
+                  <i
+                    className="pi pi-pencil"
+                    style={{
+                      color: "#10b981",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => fn1(row)}
+                  ></i>
+                  <i
+                    className={row?.active ? "pi pi-eye-slash" : "pi pi-eye"}
+                    style={{
+                      color: row?.active ? "var(--gray-500)" : "#10b981",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => fn2(row)}
+                  />
+                  <i
+                    className="pi pi-trash"
+                    style={{ color: "var(--red-600)", cursor: "pointer" }}
+                    onClick={() => fn4(row)}
+                  />
+                </div>
+              );
+            }}
+          />
+        </StyledDataTable>
+      </TableContainer>
+      {plural === "Beneficiarios" && (
+        <BankAccountsDialog
+          isOpen={isBankAccountsVisible}
+          beneficiary={selectedBeneficiary}
+          setIsOpen={() => openBankAccounts(null)}
+         
         />
-          )
-        }
-        <Column
-          header="Acciones"
-          body={(row) => {
-            return (
-              <div
-                style={{
-                  display: "flex",
-                  padding: "0 10px",
-                  gap: "10px",
-                  justifyContent: "center",
-                  textDecoration: "none",
-                  alignItems: "center",
-                }}
-              >
-                <i
-                  className="pi pi-search"
-                  style={{
-                    color: "#10b981",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => fn1(row)}
-                ></i>
-                <i
-                  className="pi pi-pencil"
-                  style={{
-                    color: "#10b981",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => fn1(row)}
-                ></i>
-                <i
-                  className={row.active ? "pi pi-eye-slash" : "pi pi-eye"}
-                  style={{
-                    color: row.active ? "var(--gray-500)" : "#10b981",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => fn2(row)}
-                />
-                <i
-                  className="pi pi-trash"
-                  style={{ color: "var(--red-600)", cursor: "pointer" }}
-                  onClick={() => fn4(row)}
-                />
-              </div>
-            );
-          }}
-        />
-      </StyledDataTable>
-    </TableContainer>
-    {plural === "Beneficiarios" && <BankAccountsDialog isOpen={isBankAccountsVisible} beneficiary={selectedBeneficiary} setIsOpen={openBankAccounts} />}
+      )}
+      <DetailDialog
+        isOpen={isDetailDialogVisible}
+        data={selectedItem}
+        keys={ObjectKeys}
+        onHide={() => setIsDetailDialogVisible(false)}
+        title="Detalles del Beneficiario"
+      />
     </>
   );
 };

@@ -1,8 +1,8 @@
 import styled from "styled-components";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
-import { useState } from "react";
-import { Loader } from "../../Loader/Loader";
+import Concept from "../../../interfaces/orders/concept";
+import Beneficiary from "../../../interfaces/orders/beneficiary";
 
 export const StyledEditDialog = styled(Dialog)`
   display: flex;
@@ -65,6 +65,14 @@ export const ButtonContainer = styled.div`
     }
   }
 `;
+interface StyledTableProps {
+  itemSwitchedState: Concept | Beneficiary | null;
+  singular: string
+  showModalDesactivate: boolean
+  switchStateModalDesactivate: () => void
+  handleDesactivate: () => void
+  loadingDesactivate: boolean
+}
 
 export const DeactivateDialog = ({
   itemSwitchedState,
@@ -73,29 +81,27 @@ export const DeactivateDialog = ({
   switchStateModalDesactivate,
   handleDesactivate,
   loadingDesactivate,
-}) => {
+} : StyledTableProps) => {
 
 
   
-  const [loading, setLoading] = useState(false);
-
 
 
   return (
     <>
-      {loading && <Loader text="Cargando datos" />}
+   
       
-        <>
+
             <StyledEditDialog
               header={`Cambiar estado de este elemento`}
               visible={showModalDesactivate}
               onHide={() => switchStateModalDesactivate()}
             >
-              <p>¿Estás seguro que deseas cambiar el estado de este elemento?</p>
+              <p>`¿Estás seguro que deseas cambiar el estado de este ${singular}?`</p>
               <ButtonContainer>
                 <Button
-                  className={itemSwitchedState.active ? "p-button-danger" : "p-button-primary"}
-                  label={itemSwitchedState.active ? "Desactivar" : "Activar"}
+                  className={itemSwitchedState?.active ? "p-button-danger" : "p-button-primary"}
+                  label={itemSwitchedState?.active ? "Desactivar" : "Activar"}
                   onClick={handleDesactivate}
                   loading={loadingDesactivate}
                 />
@@ -110,6 +116,6 @@ export const DeactivateDialog = ({
       
         </>
     
-    </>
+
   );
 };

@@ -16,6 +16,7 @@ export interface Option {
     as?: "text" | "number" | "date" | "password" | "color" ;
     rules?: string[];
     format?: string;
+    dependsOn?: string;
   }
   
   export interface MasterCRUDColumnObjectKeys {
@@ -26,6 +27,7 @@ export interface Option {
     showInTable: boolean;
     showInForm: boolean;
     showInUpdate?: boolean;
+    dependsOn?: string;
   }
   
   export interface MasterCRUD {
