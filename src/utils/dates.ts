@@ -1,6 +1,10 @@
 
-export const formatFullDate = (date: string) =>
+export const formatFullDate = (date: string | null) =>
 {
+    if(date === null)
+        return "-";
+
+
     const dateObj = new Date(date);
 
     const day = dateObj.getDate().toString().padStart(2, '0');
@@ -18,11 +22,11 @@ export const formatFullDate = (date: string) =>
 export const formatDate = (date: string) =>
 {
     const dateObj = new Date(date);
+    dateObj.setHours(dateObj.getHours() + 3);
 
     const day = dateObj.getDate().toString().padStart(2, '0');
     const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
     const year = dateObj.getFullYear();
-
 
     return `${day}/${month}/${year}`;
 }

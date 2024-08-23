@@ -8,7 +8,7 @@ const OrdenesActivasPage = () =>
 
   return (
     <AdminLayout>
-        <StyledTable useActiveOrders={true}/>
+      <StyledTable useActiveOrders={true}/>
     </AdminLayout>
   )
 }
