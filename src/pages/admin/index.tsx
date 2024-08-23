@@ -1,14 +1,17 @@
-import useAuth from "../../hooks/auth";
+
 import AdminLayout from "../../layouts/Admin";
+import MastersIndex from "../../components/admin/mastersIndex/MastersIndex";
 
-const AdminPage = () => 
+const AdminIndex = () => 
 {
-    useAuth();
 
-    return <AdminLayout>
-        <h1>Admin</h1>
+
+  return (
+    <AdminLayout>
+    <MastersIndex />
+ 
     </AdminLayout>
-}
+  );
+};
 
-
-export default AdminPage;
+export default AdminIndex;
