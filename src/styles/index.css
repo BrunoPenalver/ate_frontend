@@ -1,6 +1,40 @@
-.container-form 
+input
 {
-    display: flex;
-    flex-direction: column;
-    gap: 10px
+  display: block;
 }
+
+.container-form
+{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.p-tabview-ink-bar
+{
+  width: 0 !important;
+}
+
+.container-modal
+{
+  padding: 15px ;
+} 
+
+.container-modal form
+{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.container-modal form input
+{
+  width: 100%;
+
+}
+
+.container-modal form .form-group label
+{
+  margin-bottom: 5px;
+}
+

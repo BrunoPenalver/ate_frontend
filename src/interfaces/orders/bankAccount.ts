@@ -10,4 +10,5 @@ export default interface BankAccount
     beneficiaryId: number;
     createdAt: string;
     updatedAt: string;
+    active?: boolean;
 }

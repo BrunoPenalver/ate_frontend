@@ -23,4 +23,5 @@ export default interface Concept
     updatedAt: string;
     accountType: AccountType;
     registryType: AccountType;
+    active?: boolean;
 }

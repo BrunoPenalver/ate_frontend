@@ -1,5 +1,5 @@
 
-interface BeneficiaryType 
+export interface BeneficiaryType 
 {
     id: number;
     type: string;
@@ -46,4 +46,5 @@ export default interface Beneficiary
     province: Province;
     beneficiaryType: BeneficiaryType;
     bankAccounts: any[];
+    active?: boolean;
 }

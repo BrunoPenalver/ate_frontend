@@ -7,11 +7,9 @@ const OrdenesActivasPage = () =>
   useAuth();
 
   return (
-    <>
     <AdminLayout>
         <StyledTable useActiveOrders={true}/>
     </AdminLayout>
-    </>
   )
 }
 

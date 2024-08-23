@@ -127,32 +127,20 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
     const [isLoading, setIsLoading] = useState(false);
 
-    const [Sectionals, setSectionals] = useState<Sectional[]>([]);
-    const [Concepts, setConcepts] = useState<Concept[]>([]);
     const [Accounts, setAccounts] = useState<Account[]>([]);
-    const [Beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
     const [PaymentTypes, setPaymentTypes] = useState<PaymentType[]>([]);
 
-  
     useEffect(() => 
     {
         const getData = async () =>
         {
             try 
             {
-                const { data: sectionals } = await api.get<Sectional[]>("/sectionalnames");
-                const { data: concepts } = await api.get<Concept[]>("/concepts");
-
-                const { data: beneficiaries } = await api.get<Beneficiary[]>("/beneficiaries");
                 const { data: accounts } = await api.get<Account[]>("/accounts");
-
                 const { data: paymenttypes } = await api.get<PaymentType[]>("/paymenttypes");
                 
-                setSectionals(sectionals);
-                setConcepts(concepts);
                 setAccounts(accounts);
-                setBeneficiaries(beneficiaries);    
-                setPaymentTypes(paymenttypes);
+                setPaymentTypes(paymenttypes); 
             } 
             catch (error) 
             {
@@ -227,8 +215,6 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
     const [FilteredPaymentTypes, setFilteredPaymentTypes] = useState<PaymentType[]>(PaymentTypes);
 
-
-
     const searchMethodPaymentTypes = (event:AutoCompleteCompleteEvent) =>
     {
         const { query } = event;
@@ -255,127 +241,125 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
     const [FilteredConcepts, setFilteredConcepts] = useState<Concept[]>();
 
-    const searchMethodConcepts = (event:AutoCompleteCompleteEvent) =>
+    const searchMethodConcepts = async (event:AutoCompleteCompleteEvent) =>
     {
         const { query } = event;
 
-        if(query.trim() === "")
-            setFilteredConcepts(Concepts);
+        if(query.trim().length < 3)
+            return setFilteredConcepts([]);
 
         const inputSearch = query.trim().toLowerCase();
 
-        const filteredConcepts = Concepts.filter(concept =>
+        try 
         {
-            const objectText = `${concept.code} - ${concept.description}`.toLowerCase();
-            return objectText.includes(inputSearch);
-        });
-        setFilteredConcepts(filteredConcepts);
+            const { data: concetps } = await api.get<Concept[]>(`/concepts?search=${inputSearch}`);
+            setFilteredConcepts(concetps);    
+        } 
+        catch (error) 
+        {
+            dispatch(createAlert({severity: "error", summary: "Error", detail: "No se pudo cargar los conceptos"}))
+            setFilteredConcepts([]);
+        }
     }
 
-    const templateOptionConcepts = (concept: Concept) => `${concept.code} - ${concept.description}`
-
-    const onLeaveConcept = () => 
-    {
-        if(typeof FormMovimiento.values.concept === "string" || FormMovimiento.values.concept === null)
-            FormMovimiento.setFieldValue("concept",null);
-    }
+    const templateOptionConcepts = (concept: Concept) => `${concept.id} - ${concept.code} - ${concept.description}`
 
     const onChangeConcept = (event:AutoCompleteChangeEvent) =>
     {
         const { value } = event;
+        
+        if(!value)
+            return
+
         FormMovimiento.setFieldValue("concept",value);
     }
 
     // Seccional
 
-    const [FilteredSectionals, setFilteredSectionals] = useState<Sectional[]>(Sectionals);
+    const [FilteredSectionals, setFilteredSectionals] = useState<Sectional[]>([]);
 
-    const searchMethodSectionals = (event:AutoCompleteCompleteEvent) =>
+    const searchMethodSectionals = async (event:AutoCompleteCompleteEvent) =>
     {
         const { query } = event;
 
-        if(query.trim() === "")
-            setFilteredSectionals(Sectionals);
+        if(query.trim().length < 3)
+            return setFilteredSectionals([{"id": 0, "code": "N0", "name": "NINGUNA","description":"", createdAt: "", updatedAt: ""}]);
 
-        const filteredSectionals = Sectionals.filter(sectional => 
+        const inputSearch = query.trim().toLowerCase();
+
+        try 
         {
-            const optionText = `${sectional.id} - ${sectional.name}`.toLowerCase();
-
-            return optionText.includes(query.trim().toLowerCase());
-        });
-        setFilteredSectionals(filteredSectionals);
+            const { data: sectionals } = await api.get<Sectional[]>(`/sectionalnames?search=${inputSearch}`);
+            setFilteredSectionals(sectionals);    
+        } 
+        catch (error) 
+        {
+            dispatch(createAlert({severity: "error", summary: "Error", detail: "No se pudo cargar las seccionales"}))
+            setFilteredSectionals([{"id": 0, "code": "N0", "name": "NINGUNA","description":"", createdAt: "", updatedAt: ""}]);
+        }
     }
 
-    const onLeaveSectional = () =>
-    {
-        if(typeof FormMovimiento.values.sectional === "string" || FormMovimiento.values.sectional === null)
-            FormMovimiento.setFieldValue("sectional",null);
-    }
-
-    const templateOptionSectionals = (sectional: Sectional) => `${sectional.id} - ${sectional.name}`
+    const templateOptionSectionals = (sectional: Sectional) => `${sectional.id} - ${sectional.code} - ${sectional.name}`
     
-
     const onChangeSectional = (event:AutoCompleteChangeEvent) =>
     {
         const { value } = event;
+
+        console.log(value);
+
+        if(value === null)
+            return
+
         FormMovimiento.setFieldValue("sectional",value);
     }
 
     // Beneficiario 
 
-    const [FilteredBeneficiaries, setFilteredBeneficiaries] = useState<Beneficiary[]>(Beneficiaries);
+    const [FilteredBeneficiaries, setFilteredBeneficiaries] = useState<Beneficiary[]>([]);
 
-    const searchMethodBeneficiaries = (event:AutoCompleteCompleteEvent) =>
+    const searchMethodBeneficiaries = async (event:AutoCompleteCompleteEvent) =>
     {
         const { query } = event;
 
-        if(query.trim() === "")
-            setFilteredBeneficiaries(Beneficiaries);
+        if(query.trim().length < 3)
+            return setFilteredBeneficiaries([]);
 
         const inputSearch = query.trim().toLowerCase();
 
-        const filteredBeneficiaries = Beneficiaries.filter(beneficiary => 
+        try 
         {
-            const textSearchObject = `${beneficiary.code} - ${beneficiary.businessName}`.toLowerCase();
-            return textSearchObject.includes(inputSearch);
-        });
-
-        setFilteredBeneficiaries(filteredBeneficiaries);
+            const { data: beneficiaries } = await api.get<Beneficiary[]>(`/beneficiaries?search=${inputSearch}`);
+            setFilteredBeneficiaries(beneficiaries);    
+        } 
+        catch (error) 
+        {
+            dispatch(createAlert({severity: "error", summary: "Error", detail: "No se pudo cargar los beneficiarios"}))
+            setFilteredBeneficiaries([]);
+        }
     }
 
-    const templateOptionBeneficiary = (beneficiary: Beneficiary) => `${beneficiary.code} - ${beneficiary.businessName}`
-
-    const onLeaveBeneficiary = () =>
-    {
-        if(typeof FormMovimiento.values.beneficiary === "string" || FormMovimiento.values.beneficiary === null)
-            FormMovimiento.setFieldValue("beneficiary",null);
-    }
+    const templateOptionBeneficiary = (beneficiary: Beneficiary) => `${beneficiary.id} - ${beneficiary.code} - ${beneficiary.businessName}`
 
     const onChangeBeneficiary = (event:AutoCompleteChangeEvent) =>
     {
         const { value } = event;
+
+        if(!value)
+            return
+
         FormMovimiento.setFieldValue("beneficiary",value);
 
         if (typeof value === "string" || value === null)
-        {
-            FormMovimiento.setFieldValue("beneficiaryCuit",null);
-            return;
-        }
+            return FormMovimiento.setFieldValue("beneficiaryCuit",null);
+      
 
         const { bankAccounts , cuit } = value as Beneficiary;
-        
 
         FormMovimiento.setFieldValue("originBanks",bankAccounts);
         FormMovimiento.setFieldValue("beneficiaryCuit",cuit);
     
-
-
         if(bankAccounts.length === 0 && FormMovimiento.values.originBanks !== bankAccounts)
-        {
             dispatch(createAlert({severity: "warn", summary: "Advertencia", detail: "El beneficiario no tiene bancos"}))
-
-
-        }
 
         FormMovimiento.setFieldValue("bankAccount",null);
         FormMovimiento.setFieldValue("originBankNumber","");
@@ -451,7 +435,6 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
     const onLeaveBank = () =>
     {
-        console.log(FormMovimiento.values.bankAccount)
         if(typeof FormMovimiento.values.bankAccount === "string" || FormMovimiento.values.bankAccount === null)
             FormMovimiento.setFieldValue("bankAccount",null);
     }
@@ -512,7 +495,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
     const styleForm = useMemo(() => 
     {  
         const color = FormMovimiento.values.type === "Haber" ? "red" : "green";
-        return { border: `10px solid ${color}`, padding: '1.5rem 2rem', transition: 'border 0.5s' }
+        return { border: `10px solid ${color}`, padding: '1.5rem 2rem', transition: 'border 0.5s'  }
     },[FormMovimiento.values.type]);
 
 
@@ -568,7 +551,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
             <SelectButton id="select-type" value={FormMovimiento.values.type} onChange={(e) => FormMovimiento.setFieldValue("type",e.target.value)} options={Types}/>     
             <ContainerInput>
                 <FloatLabel>
-                    <InputNumber id="amount" locale="es" value={FormMovimiento.values.amount} onChange={e => FormMovimiento.setFieldValue("amount",e.value)} />
+                    <InputNumber id="amount" locale="de-DE" minFractionDigits={2} maxFractionDigits={2} value={FormMovimiento.values.amount} onChange={e => FormMovimiento.setFieldValue("amount",e.value)} />
                     <label htmlFor="amount">Importe</label>    
                 </FloatLabel>  
                 {getFormErrorMessage("amount")}
@@ -597,9 +580,9 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
         <ContainerInput>
             <FloatLabel>
-                <AutoComplete dropdown id="beneficiary" value={FormMovimiento.values.beneficiary} suggestions={FilteredBeneficiaries} onBlur={onLeaveBeneficiary}
+                <AutoComplete dropdown id="beneficiary" value={FormMovimiento.values.beneficiary} suggestions={FilteredBeneficiaries} forceSelection
                 completeMethod={searchMethodBeneficiaries} itemTemplate={templateOptionBeneficiary} selectedItemTemplate={templateOptionBeneficiary} onChange={onChangeBeneficiary}/>
-                <label htmlFor="beneficiary">Beneficiario a cobrar (Número - Nombre)</label>
+                <label htmlFor="beneficiary">Beneficiario a cobrar (Número - Código - Nombre)</label>
             </FloatLabel>
             {getFormErrorMessage("beneficiary")}
         </ContainerInput>
@@ -641,9 +624,9 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         <SecondRow>
             <ContainerInput>
                 <FloatLabel>
-                    <AutoComplete id="sectional" value={FormMovimiento.values.sectional} dropdown suggestions={FilteredSectionals} onBlur={onLeaveSectional}  completeMethod={searchMethodSectionals} 
+                    <AutoComplete id="sectional" value={FormMovimiento.values.sectional} dropdown suggestions={FilteredSectionals} forceSelection  completeMethod={searchMethodSectionals} 
                     itemTemplate={templateOptionSectionals} selectedItemTemplate={templateOptionSectionals} onChange={onChangeSectional}/>
-                    <label htmlFor="sectional">Seccional (Número - Nombre)</label>
+                    <label htmlFor="sectional">Seccional (Número - Código - Nombre)</label>
                 </FloatLabel>
                 {getFormErrorMessage("sectional")}
             </ContainerInput>
@@ -659,9 +642,9 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
             <ContainerInput>
                 <FloatLabel>
-                    <AutoComplete id="concept" value={FormMovimiento.values.concept} dropdown suggestions={FilteredConcepts} onBlur={onLeaveConcept}
+                    <AutoComplete id="concept" value={FormMovimiento.values.concept} dropdown suggestions={FilteredConcepts} forceSelection
                     completeMethod={searchMethodConcepts} itemTemplate={templateOptionConcepts} selectedItemTemplate={templateOptionConcepts} onChange={onChangeConcept}/>
-                    <label htmlFor="concept">Concepto (Número - Nombre)</label>
+                    <label htmlFor="concept">Concepto (Número - Código - Nombre)</label>
                 </FloatLabel>
                 {getFormErrorMessage("concept")}
             </ContainerInput>
