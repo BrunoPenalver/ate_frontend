@@ -11,4 +11,6 @@ export default interface Order
     paymentDate: string;
     movements: Movement[];
     active: boolean;
+    lastModifiedBy: string;
+    exportedAt: null | Date;
 }

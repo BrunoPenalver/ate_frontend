@@ -34,7 +34,7 @@ margin: 20px 0;`;
 export const PanelContent = styled.div`
 display: grid;
 gap: 10px;
-grid-template-columns: 1fr 1fr 1fr 1fr;
+grid-template-columns: 1fr 1fr 1fr;
 
 .input
 {

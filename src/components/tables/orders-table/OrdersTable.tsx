@@ -147,10 +147,7 @@ export const StyledTable = (props:Props) =>
         <Column sortable filter filterPlaceholder="Filtrar..." field="description" header="Descripción"/>
         <Column sortable filter filterPlaceholder="Filtrar..." field="state" header="Estado"/>
 
-        <Column sortable filter filterPlaceholder="Filtrar..." field="movements" header="Cantidad de movimientos" body={row =>
-        {
-          return row.movements.length;
-        }}/>
+      
         <Column sortable filter filterPlaceholder="Filtrar..." field="total" header="Total" body={row =>
         {
           const totalDebe  = row.movements.filter((mov: any) => mov.type === "Debe").reduce((acc: number, mov: any) => acc + mov.amount, 0);
@@ -158,7 +155,8 @@ export const StyledTable = (props:Props) =>
 
           return `$ ${formatPrice(totalDebe - totalHaber)}`;
         }}/>
-         <Column sortable filter filterPlaceholder="Filtrar..." field="updatedAt" header="Ultima actualización" body={row => formatFullDate(row.updatedAt)}/>
+        <Column sortable filter filterPlaceholder="Filtrar..." field="lastModifiedBy" header="Ultima actualización" />
+        <Column sortable filter filterPlaceholder="Filtrar..." field="exportedAt" header="Fecha de exportación" body={row => formatFullDate(row.exportedAt)}/>
         <Column key="actions" header="Acciones" body={(row) => 
         {
           return <>
