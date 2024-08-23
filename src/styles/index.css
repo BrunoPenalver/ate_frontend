@@ -3,12 +3,6 @@ input
   display: block;
 }
 
-.container{
-  max-width: 1920px;
-}
-
-
-
 .container-form
 {
   display: flex;
