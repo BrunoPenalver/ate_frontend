@@ -30,7 +30,7 @@ interface Props
     };
 }
 
-const options_state = [ "Abierta", "Cerrada" ];
+const options_state = [ "Abierta", "Borrador" , "Cerrada" ];
 
 const getErrors = (values: any) =>
 {
@@ -60,7 +60,7 @@ const getErrors = (values: any) =>
 
     var errors : any = {};
 
-    const requireds = ["date", "description", "state", "period"];
+    const requireds = ["date", "description", "state"];
 
     requireds.forEach(required => 
     {
@@ -102,7 +102,6 @@ const Order = (props: Props) =>
             date: new Date(), //TODO: Preguntar si ponemos la fecha actual por defecto
             description: "",
             state: options_state[0],
-            period: "",
             movements: []
         }
     };
@@ -117,7 +116,6 @@ const Order = (props: Props) =>
         Payload.append("date", values.date);
         Payload.append("description", values.description);
         Payload.append("state", values.state);
-        Payload.append("period", values.period);
         
         try 
         {
@@ -167,7 +165,6 @@ const Order = (props: Props) =>
         Payload.append("date", values.date);
         Payload.append("description", values.description);
         Payload.append("state", values.state);
-        Payload.append("period", values.period);
         
         try 
         {
@@ -293,10 +290,30 @@ const Order = (props: Props) =>
     };
 
     const deleteMovement = (movementId: number) => setMovimientos(prev => prev.filter(movimiento => movimiento.id !== movementId));
+
     const updateMovement = (toUpdate: Movement) =>
     {
         setSelectedToUpdate(toUpdate);
         switchShowUpdate();
+    }
+
+    const cloneMovement = (toClone: Movement) =>
+    {
+        const cloned = { ...toClone, id: Math.floor(Math.random() * 1000000) };
+        setMovimientos([...Movimientos, cloned]);
+
+
+        dispatch(createAlert({ severity: "info", summary: "Movimiento copiado", detail: "Se ha copiado el movimiento" }));
+
+
+    }
+
+    const rotateMovement = (toRotate: Movement) =>
+    {
+        const rotated = { ...toRotate, type: toRotate.type === "Debe" ? "Haber" : "Debe", id: Date.now() } as Movement;
+        setMovimientos([...Movimientos, rotated]);
+        setMovimientos(old => old.filter(movimiento => movimiento.id !== toRotate.id));
+        dispatch(createAlert({ severity: "info", summary: "Movimiento rotado", detail: "Se ha rotado el movimiento" }));
     }
 
     /* Totalizadores */
@@ -332,7 +349,6 @@ const Order = (props: Props) =>
         setHavePrevData(true);
     }
 
-
     const deletePrevData = () =>
     {
         localStorage.removeItem(pathname);
@@ -365,13 +381,6 @@ const Order = (props: Props) =>
                 </ContainerInput>
                 <ContainerInput>
                     <FloatLabel>  
-                        <InputText id="period" value={Form.values.period} onChange={e => Form.setFieldValue("period",e.target.value)}/>
-                        <label htmlFor="period">Periodo</label>    
-                    </FloatLabel>  
-                    {getFormErrorMessage("period")}
-                </ContainerInput>
-                <ContainerInput>
-                    <FloatLabel>  
                         <Dropdown id="state" options={options_state} value={Form.values.state} onChange={e => Form.setFieldValue("state",e.target.value)}/>
                         <label htmlFor="state">Estado</label>    
                     </FloatLabel>  
@@ -388,8 +397,8 @@ const Order = (props: Props) =>
 
         <Panel header={ Movimientos.length === 1 ? '1 Movimiento' : `${Movimientos.length} Movimientos`} toggleable>
             <ContainerTables>
-                <TableMovimientos movimientos={TypesDebe}  title="Debe"  onDelete={movementId => deleteMovement(movementId)} onUpdate={toUpdate => updateMovement(toUpdate)}/>
-                <TableMovimientos movimientos={TypesHaber} title="Haber" onDelete={movementId => deleteMovement(movementId)} onUpdate={toUpdate => updateMovement(toUpdate)}/>
+                <TableMovimientos movimientos={TypesDebe}  title="Debe"  onDelete={movementId => deleteMovement(movementId)} onUpdate={toUpdate => updateMovement(toUpdate)} onClone={toClone => cloneMovement(toClone)} onRotate={toClone => rotateMovement(toClone)}/>
+                <TableMovimientos movimientos={TypesHaber} title="Haber" onDelete={movementId => deleteMovement(movementId)} onUpdate={toUpdate => updateMovement(toUpdate)} onClone={toClone => cloneMovement(toClone)} onRotate={toClone => rotateMovement(toClone)}/>
             </ContainerTables>
         </Panel>
 
@@ -407,13 +416,13 @@ const Order = (props: Props) =>
 
 
         <ContainerButtons>
-            {props.type === "add"  && <Button disabled={isLoading} label="Guardar"    id="save-order" className="p-button-success" type="submit"/>}
-            {props.type === "edit" && <Button disabled={isLoading} label="Actualizar" id="edit-order" className="p-button-success" type="submit"/>}
-
             <div>
                 <Button label="Pre-guardar" type="button" id="presave" onClick={preSave}/>
                 {havePrevData && <Button label="Eliminar información previa" type="button" id="presave" className="p-button-danger" onClick={deletePrevData}/>}
             </div>
+
+            {props.type === "add"  && <Button disabled={isLoading} label="Guardar"    id="save-order" className="p-button-success" type="submit"/>}
+            {props.type === "edit" && <Button disabled={isLoading} label="Actualizar" id="edit-order" className="p-button-success" type="submit"/>}
         </ContainerButtons>
     </form>
 }
