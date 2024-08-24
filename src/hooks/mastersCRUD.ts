@@ -228,10 +228,48 @@ export const useMastersCRUD = () => {
         delete: "concepts/:id",
       },
     }
-  
+    const LedgerAccountSchema: MasterCRUD = {
+      title: "Cuentas contables",
+      singular: "Cuenta contable",
+      plural: "Cuentas contables",
+      ObjectKeys: [
+        {
+          key: "code",
+          label: "Código",
+          field: { type: "input", rules: ["required"] },
+          showInTable: true,
+          showInForm: true,
+        },
+        {
+          key:"number",
+          label:"Número",
+          field:{type:"input", rules:["required"]},
+          showInTable:true,
+          showInForm:true,
+        },
+        
+          {
+            key:"name",
+            label:"Descripción",
+            field:{type:"input", rules:["required"]},
+            showInTable:true,
+            showInForm:true,
+          },
+        
+
+      ],
+      API: {
+        get: "accounts",
+        post: "accounts",
+        put: "accounts/:id",
+        patch: "accounts/:id",
+        delete: "accounts/:id",
+      },
+    }
   const MastersTab: MasterCRUD[] = [
     BeneficiarySchema,
     ConceptSchema,
+    LedgerAccountSchema
   ].sort((a, b) => a.plural.localeCompare(b.title));
 
   return MastersTab;
