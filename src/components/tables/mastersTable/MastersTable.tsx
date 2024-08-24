@@ -110,7 +110,7 @@ export const StyledMastersTable = (props: StyledTableProps) => {
             fontFamily: "var(--bs-body-font-family)",
           }}
         >
-          No hay {plural?.toLowerCase()} cargados
+          No hay  elementos cargados.
         </p>{" "}
       </TableContainer>
     );

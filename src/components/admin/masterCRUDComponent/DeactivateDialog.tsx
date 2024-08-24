@@ -97,7 +97,7 @@ export const DeactivateDialog = ({
               visible={showModalDesactivate}
               onHide={() => switchStateModalDesactivate()}
             >
-              <p>`¿Estás seguro que deseas cambiar el estado de este ${singular}?`</p>
+              <p>¿Estás seguro que deseas cambiar el estado de este elemento?</p>
               <ButtonContainer>
                 <Button
                   className={itemSwitchedState?.active ? "p-button-danger" : "p-button-primary"}

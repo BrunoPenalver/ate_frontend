@@ -20,7 +20,7 @@ export const useMastersCRUD = () => {
           field: { type: "readonly", rules: ["required"] },
           isID: true,
           showInTable: true,
-          showInForm: true,
+          showInForm: false,
         },
         {
           key: "code",
@@ -148,7 +148,7 @@ export const useMastersCRUD = () => {
           field: { type: "readonly", rules: ["required"] },
           isID: true,
           showInTable: true,
-          showInForm: true,
+          showInForm: false,
         },
         {
           key: "code",
@@ -233,6 +233,14 @@ export const useMastersCRUD = () => {
       singular: "Cuenta contable",
       plural: "Cuentas contables",
       ObjectKeys: [
+        {
+          key: "id",
+          label: "ID",
+          field: { type: "readonly", rules: ["required"] },
+          isID: true,
+          showInTable: true,
+          showInForm: true,
+        },
         {
           key: "code",
           label: "Código",
