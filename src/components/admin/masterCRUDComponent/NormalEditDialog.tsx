@@ -149,6 +149,7 @@ export const NormalEditDialog = (props: Props) => {
 
 
             if (type === "select" && !title && !value && !dependsOn) {
+              console.log(FormUpdate.values);
               TypeComp = (
                 <>
                   <label htmlFor={label}>{label}</label>
@@ -157,14 +158,16 @@ export const NormalEditDialog = (props: Props) => {
                     key={key}
                     emptyMessage={emptyOptions}
                     placeholder={
-                      FormUpdate.values[key].name
-                        ? FormUpdate.values[key]?.name
-                        : FormUpdate.values[key]?.type
-                        ? FormUpdate.values[key]?.type
+                      FormUpdate?.values[key]?.name
+                        ? FormUpdate?.values[key]?.name
+                        : FormUpdate?.values[key]?.type
+                        ? FormUpdate?.values[key]?.type
+                        : FormUpdate?.values[key]?.businessname 
+                        ? FormUpdate?.values[key]?.businessname
                         : label
                     }
                     options={OptionsForms[key]}
-                    optionLabel={OptionsForms[key].label}
+                    optionLabel={OptionsForms[key]?.label}
                     value={FormUpdate.values[key]}
                     onChange={(e) => FormUpdate.setFieldValue(key, e.value)}
                     style={{ width: "100%" }}

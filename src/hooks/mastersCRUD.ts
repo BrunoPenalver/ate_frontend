@@ -30,6 +30,13 @@ export const useMastersCRUD = () => {
           showInForm: true,
         },
         {
+          key: "beneficiaryType",
+          label: "Tipo de beneficiario",
+          field: { type: "select", rules: ["required"], getOptionsFrom: "beneficiaryTypes/options"},
+          showInTable: true,
+          showInForm: true,
+        },
+        {
           key: "businessName",
           label: "Razón social",
           field: { type: "input", rules: ["required"] },
@@ -41,6 +48,35 @@ export const useMastersCRUD = () => {
           label:"CUIT",
           field:{type:"input", rules:["required"]},
           showInTable:true,
+          showInForm:true,
+        },
+
+        {
+          key: "address",
+          label: "Dirección",
+          field: { type: "input", rules: [] },
+          showInTable: false,
+          showInForm: true,
+        },
+        {
+          key: "province",
+          label: "Provincia",
+          field: { type: "select", rules: ["required"], getOptionsFrom: "provinces/options"},
+          showInTable: true,
+          showInForm: true,
+        },
+        {
+          key: "city",
+          label: "Localidad",
+          field: { type: "select", rules: ["required"], getOptionsFrom: "cities/options"},
+          showInTable: true,
+          showInForm: true,
+        },
+        {
+          key:"postalCode",
+          label:"Código postal",
+          field:{type:"input", rules:[]},
+          showInTable:false,
           showInForm:true,
         },
         {
@@ -58,15 +94,8 @@ export const useMastersCRUD = () => {
           showInForm:true,
         },
         {
-          key: "address",
-          label: "Dirección",
-          field: { type: "input", rules: [] },
-          showInTable: false,
-          showInForm: true,
-        },
-        {
-          key:"postalCode",
-          label:"Código postal",
+          key:"contact",
+          label:"Contacto",
           field:{type:"input", rules:[]},
           showInTable:false,
           showInForm:true,
@@ -85,13 +114,7 @@ export const useMastersCRUD = () => {
           showInTable: false,
           showInForm: true,
         },
-        {
-          key:"contact",
-          label:"Contacto",
-          field:{type:"input", rules:[]},
-          showInTable:false,
-          showInForm:true,
-        },
+
         {
           key:"active",
           label:"Activo",
@@ -100,30 +123,6 @@ export const useMastersCRUD = () => {
           showInForm:false,
 
         },
-        {
-          key: "province",
-          label: "Provincia",
-          field: { type: "select", rules: ["required"], getOptionsFrom: "provinces/options"},
-          showInTable: true,
-          showInForm: true,
-        },
-        {
-          key: "city",
-          label: "Localidad",
-          field: { type: "select", rules: ["required"], getOptionsFrom: "cities/options"},
-          showInTable: true,
-          showInForm: true,
-        },
-        {
-          key: "beneficiaryType",
-          label: "Tipo de beneficiario",
-          field: { type: "select", rules: ["required"], getOptionsFrom: "beneficiaryTypes/options"},
-          showInTable: true,
-          showInForm: true,
-        },
-
-
-
 
 
         
@@ -158,19 +157,20 @@ export const useMastersCRUD = () => {
           showInForm: true,
         },
         {
-          key: "description",
-          label: "Descripción",
-          field: { type: "input", rules: ["required"] },
-          showInTable: true,
-          showInForm: true,
-        },
-        {
           key: "registryType",
           label: "Tipo de registro",
           field: { type: "select", rules: ["required"], getOptionsFrom: "registrytypes/options"},
           showInTable: true,
           showInForm: true,
         },
+        {
+          key: "description",
+          label: "Descripción",
+          field: { type: "input", rules: ["required"] },
+          showInTable: true,
+          showInForm: true,
+        },
+
         { 
           key: "debitAccount",
           label: "Cuenta debe",
@@ -190,14 +190,14 @@ export const useMastersCRUD = () => {
           label: "Tipo de cuenta",
           field: { type: "select", rules: [], getOptionsFrom: "accounttypes/options"},
           showInTable: true,
-          dependsOn: "registryType",
+          // dependsOn: "registryType",
           showInForm: true,
         },
         {
           key: "accountNumber",
           label: "Nº de cuenta",
           field: { type: "input", rules: [] },
-          dependsOn: "registryType",
+          // dependsOn: "registryType",
           showInTable: true,
           showInForm: true,
         },

@@ -132,7 +132,7 @@ export const StyledMastersTable = (props: StyledTableProps) => {
           />
         </TitleGroup>
         <StyledDataTable
-          value={items?.sort((a, b) => a.id - b.id)}
+          value={items?.sort((a, b) => a.id + b.id)}
           paginator
           rows={10}
           rowsPerPageOptions={[1, 2, 5, 10]}
