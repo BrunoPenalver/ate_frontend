@@ -3,69 +3,83 @@ import { Header, Logo, WelcomeText, Menubar, ContainerActions } from "../../styl
 import User from "../../interfaces/user";
 import { useNavigate } from "react-router-dom";
 import api from "../../utils/api";
+import { useMastersCRUD } from "../../hooks/mastersCRUD";
+import { MasterCRUD } from "../../models/mastersModel";
 
 const HeaderComp = () => 
 {
-    const navigate = useNavigate();
-    const user = useSelector((state: any) => state.user.user) as User;
-    
-    const logOut = async () => 
+  const navigate = useNavigate();
+  const masterCrud = useMastersCRUD() as MasterCRUD[];
+
+  const user = useSelector((state: any) => state.user.user) as User;
+  
+  const logOut = async () => 
+  {
+      try {
+          await api.put("/users/logout");
+      } catch (error) {
+          
+      }
+
+      localStorage.removeItem("user");
+  
+      document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"; // autodelete cookie
+  
+      navigate("/login");
+  }
+
+  const items = 
+  [
     {
-        try {
-            await api.put("/users/logout");
-        } catch (error) {
-            
+      label: `Ordenes de pago`,
+      items:
+      [
+        { label: "Listado" , command: () => navigate("/admin/ordenes"), },
+        { label: "Agregar orden" , command: () => navigate("/admin/ordenes/agregar"), },
+        { label: "Eliminadas" , command: () => navigate("/admin/ordenes/eliminadas"), },
+      ], 
+    },
+    {
+      label: "Información",
+      items: masterCrud.map((master) => 
+      {
+        return {
+          label: master.title,
+          command: () => navigate(`/admin/informacion/${master.title}`.toLowerCase()),
         }
-
-        localStorage.removeItem("user");
-    
-        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"; // autodelete cookie
-    
-        navigate("/login");
-    }
-
-    const items = 
-    [
+      })
+    },
+    {
+      label:"Administración",
+      items: [
       {
-        label: `Ordenes de pago`,
-        items:
-        [
-          { label: "Listado" , command: () => navigate("/admin/ordenes"), },
-          { label: "Agregar orden" , command: () => navigate("/admin/ordenes/agregar"), },
-          { label: "Eliminadas" , command: () => navigate("/admin/ordenes/eliminadas"), },
-        ], 
+        label: "Auditoria",
+        command: () => navigate("/admin/auditoria"),
       },
-      {
-        label:"Administración",
-        items: [
-        {
-          label: "Auditoria",
-          command: () => navigate("/admin/auditoria"),
-        },
-        {
-          label: "Base de datos",
-          command: () => navigate("/admin/datos"),
-        },
-      ]
-      },
+      // {
+      //   label: "Base de datos",
+      //   command: () => navigate("/admin/datos"),
+      // },
+    ]
+    },
 
-      {
-        label: `${user.firstname} ${user.lastname}`,
-        items:
-        [
-          { label: "Cerrar sesión" , command: async () =>  await logOut() }
-        ], 
-      },
+    {
+      label: `${user.firstname} ${user.lastname}`,
+      items:
+      [
+        { label: "Cerrar sesión" , command: async () =>  await logOut() }
+      ], 
+    },
 
-    ];
-    
-    return <Header>
-        <Logo alt="Banner de ATE" src="/images/isotipo.png"/>
-        <ContainerActions>
-            <WelcomeText>Bienvenido {user.firstname}</WelcomeText>
-            <Menubar model={items}/>
-        </ContainerActions>
-    </Header>
+  ];
+  
+  return <Header>
+      <Logo alt="Banner de ATE" src="/images/isotipo.png"/>
+      <ContainerActions>
+          <WelcomeText>Bienvenido {user.firstname}</WelcomeText>
+          <Menubar model={items}/>
+      </ContainerActions>
+  </Header>
 }
 
 export default HeaderComp;

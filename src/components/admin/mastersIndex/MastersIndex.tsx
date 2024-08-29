@@ -33,7 +33,7 @@ export const StyledDropdown = styled(Dropdown)`
 `;
 
 export const MastersIndex = () => {
-  const MastersTab = useMastersCRUD();
+  const MastersTab = useMastersCRUD() as MasterCRUD[];
 
 
   interface MasterOption {
@@ -41,7 +41,7 @@ export const MastersIndex = () => {
     code: MasterCRUD;
   }
 
-  const mastersMap = MastersTab?.map((master) => {
+  const mastersMap = MastersTab.map((master) => {
     return { name: master.title, code: master };
   });
   const [selectedMaster, setSelectedMaster] = useState<MasterOption[]>([]);

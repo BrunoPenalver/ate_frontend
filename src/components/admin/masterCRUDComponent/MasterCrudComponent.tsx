@@ -74,13 +74,12 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) => {
 
   useEffect(() => {
     getData();
-  }, [refetchTrigger]);  // El hook ahora se ejecuta cuando cambia el valor de refetchTrigger
+  }, [refetchTrigger,item]);  
 
   useEffect(() => {
-    // Escuchar el evento de socket para actualizaciones
-    socket.on("updated-entities", () => {
+    socket.on("updated-entities", () => {1
      
-      setRefetchTrigger(prev => prev + 1);  // Cambia el estado para forzar un refetch
+      setRefetchTrigger(prev => prev + 1);  
     });
 
     return () => {

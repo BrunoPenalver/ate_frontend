@@ -305,8 +305,6 @@ const CreateOrUpdateMovimiento = (props: Props) =>
     {
         const { value } = event;
 
-        console.log(value);
-
         if(value === null)
             return
 
