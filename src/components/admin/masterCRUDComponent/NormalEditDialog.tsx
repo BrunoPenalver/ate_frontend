@@ -39,7 +39,6 @@ export const NormalEditDialog = (props: Props) => {
 
 
   useEffect(() => {
-    // console.log(FormUpdate.values.registryType.type === "Concepto");
     if (FormUpdate?.values?.province) {
         const isProvinceNumber = typeof FormUpdate?.values?.province === 'number';
 
@@ -58,7 +57,6 @@ export const NormalEditDialog = (props: Props) => {
 }, [FormUpdate.values.province]);
 
   useEffect (() => {
-      // console.log(FormUpdate?.values?.registryType)
     if (FormUpdate?.values?.registryType?.type === "Concepto" || FormUpdate?.values?.registryType === 2) {
       setRegistryTypeDisabled(true);
 

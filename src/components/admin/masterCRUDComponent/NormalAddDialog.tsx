@@ -103,7 +103,6 @@ export const NormalAddDialog = (props: Props) => {
   };
   const submitForm = (e: any) => {
     e.preventDefault();
-    console.log(FormAdd.values)
     FormAdd.handleSubmit()
   }
   return (

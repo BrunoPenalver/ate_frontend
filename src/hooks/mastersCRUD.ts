@@ -6,10 +6,10 @@ import { MasterCRUD } from "../models/mastersModel";
 
 
 
-export const useMastersCRUD = () => {
-
-
-    const BeneficiarySchema: MasterCRUD = {
+export const useMastersCRUD = (title= "") => 
+{ 
+  const BeneficiarySchema: MasterCRUD = 
+  {
       title: "Beneficiarios",
       singular: "Beneficiario",
       plural: "Beneficiarios",
@@ -274,11 +274,15 @@ export const useMastersCRUD = () => {
         delete: "accounts/:id",
       },
     }
+    
   const MastersTab: MasterCRUD[] = [
     BeneficiarySchema,
     ConceptSchema,
     LedgerAccountSchema
   ].sort((a, b) => a.plural.localeCompare(b.title));
+
+  if(title.length > 0)
+    return MastersTab.find((master) => master.title.toLowerCase() === title.toLowerCase());
 
   return MastersTab;
 };
