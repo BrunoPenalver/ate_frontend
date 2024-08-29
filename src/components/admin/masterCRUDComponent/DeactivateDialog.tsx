@@ -76,7 +76,6 @@ interface StyledTableProps {
 
 export const DeactivateDialog = ({
   itemSwitchedState,
-  singular,
   showModalDesactivate,
   switchStateModalDesactivate,
   handleDesactivate,
