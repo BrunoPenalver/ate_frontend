@@ -49,25 +49,17 @@ const HeaderComp = () =>
         }
       })
     },
-    {
-      label:"Administración",
-      items: [
-      {
-        label: "Auditoria",
-        command: () => navigate("/admin/auditoria"),
-      },
-      // {
-      //   label: "Base de datos",
-      //   command: () => navigate("/admin/datos"),
-      // },
-    ]
-    },
-
+  
     {
       label: `${user.firstname} ${user.lastname}`,
       items:
       [
-        { label: "Cerrar sesión" , command: async () =>  await logOut() }
+        {
+          label: "Auditoria",
+          command: () => navigate("/admin/auditoria"),
+        },
+        { label: "Cerrar sesión" , command: async () =>  await logOut() },
+
       ], 
     },
 
