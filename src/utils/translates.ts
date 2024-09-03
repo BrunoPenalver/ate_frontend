@@ -13,6 +13,7 @@ const translates: Translations =
         deleteOrder: "Eliminó una orden",
         deleteForce: "Eliminó permanentemente una orden",
         undoOrder: "Restauró una orden",
+        "The Cbu entered is not valid": "El CBU ingresado no es válido",
     },
 };
 

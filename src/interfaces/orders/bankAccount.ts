@@ -1,6 +1,7 @@
 export default interface BankAccount 
 {
     id: number;
+    code: string;
     bank: string;
     holder: string;
     number: string;

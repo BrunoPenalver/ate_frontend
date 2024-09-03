@@ -5,7 +5,7 @@ export interface Option {
   
   export interface ColumnField 
   {
-    type: "readonly" | "input" | "textarea" | "select" | "address" | "number" | "checkbox";
+    type: "readonly" | "input" | "textarea" | "select" | "address" | "number" | "checkbox" | "mask";
     emptyOptions?: string;
     options?: Option[];
     getOptionsFrom?: string;
@@ -13,7 +13,7 @@ export interface Option {
     max?: number;
     value?: string;
     title?: string;
-    as?: "text" | "number" | "date" | "password" | "color" ;
+    as?: "text" | "number" | "date" | "password" | "color" | "mask" ;
     rules?: string[];
     format?: string;
     dependsOn?: string;

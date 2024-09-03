@@ -8,6 +8,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { Fragment, useEffect, useState } from "react";
 
 import { MasterCRUDColumnObjectKeys } from "../../../models/mastersModel";
+import { InputMask } from "primereact/inputmask";
 
 
 interface Props {
@@ -335,7 +336,7 @@ export const NormalAddDialog = (props: Props) => {
             }
 
             if (type !== "select" && dependsOn === "registryType"){
-      
+
               TypeComp = (
                 <>
                   <label htmlFor={label}>{label}</label>
@@ -349,6 +350,41 @@ export const NormalAddDialog = (props: Props) => {
                 </>
               );
             }
+            if (type !== "select" && dependsOn === "registryType" && key === "CBU"){
+    
+              TypeComp = (
+                <>
+                  <label htmlFor={label}>{label}</label>
+                  <InputMask
+                    id={label}
+                    mask="99999999-99999999999999"  // Máscara para el CBU (22 dígitos con un guion en el medio)
+                    placeholder="CBU"
+                    value={FormAdd.values[key]}
+                    onChange={(e) => FormAdd.setFieldValue(key, e.value)}
+                    style={{ width: '100%' }}
+                    disabled={registryTypeDisabled} // Deshabilitar el campo basado en registryTypeDisabled
+                  />
+                </>
+              );
+            }
+            if (key === "cuit"){
+    
+              TypeComp = (
+                <>
+                  <label htmlFor={label}>{label}</label>
+                  <InputMask
+                    id={label}
+                    mask="99-99999999-9"  
+                    placeholder="Cuit"
+                    value={FormAdd.values[key]}
+                    onChange={(e) => FormAdd.setFieldValue(key, e.value)}
+                    style={{ width: '100%' }}
+            
+                  />
+                </>
+              );
+            }
+            
 
             if (type === "textarea")
               TypeComp = (

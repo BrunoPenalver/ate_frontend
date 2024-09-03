@@ -46,7 +46,7 @@ export const useMastersCRUD = (title= "") =>
         {
           key:"cuit",
           label:"CUIT",
-          field:{type:"input", rules:["required"]},
+          field:{type:"input", rules:["required", "validCuit"]},
           showInTable:true,
           showInForm:true,
         },
@@ -204,7 +204,7 @@ export const useMastersCRUD = (title= "") =>
         {
           key: "CBU",
           label: "CBU",
-          field: { type: "input", rules: [] },
+          field: { type: "input", rules: [] , as:"mask" },
           dependsOn: "registryType",
           showInTable: true,
           showInForm: true,

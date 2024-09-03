@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { OrdersTableFilter } from "./OrdersTableFilter";
-import { Group } from "../../Group";
-import { TableContainer, StyledDataTable, TableTitle, TitleGroup } from "../styles";
+import { TableContainer, StyledDataTable, TitleGroup } from "../styles";
 import { Column } from "primereact/column";
 import { formatDate, formatFullDate } from "../../../utils/dates";
 import { Loader } from "../../Loader";
@@ -17,6 +15,7 @@ import { deleteById } from '../../../stores/orders.slice';
 import { Button } from "primereact/button";
 import { Link } from "react-router-dom";
 import { formatPrice } from "../../../utils/prices";
+import { InputText } from "primereact/inputtext";
 
 interface Props
 {
@@ -134,10 +133,7 @@ export const StyledTable = (props:Props) =>
   return (
     <TableContainer>
       <TitleGroup>
-        <Group>
-          <TableTitle>Ordenes de pago {!useActiveOrders && "eliminadas"}</TableTitle>
-          <OrdersTableFilter filter={globalFilter} setFilter={setGlobalFilter}/>
-        </Group>
+        <InputText placeholder="Buscar..." value={globalFilter} onChange={(e) => setGlobalFilter(e.target.value)}/>
         <Link to="/admin/ordenes/agregar"> <Button label="Agregar Orden"  color="#1da750"/>  </Link>
       </TitleGroup>
       <StyledDataTable value={OrdersFiltereds} paginator rows={10} rowsPerPageOptions={[1, 2, 5, 10]} stripedRows size="small" removableSort emptyMessage="No hay órdenes">

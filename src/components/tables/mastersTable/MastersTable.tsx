@@ -1,23 +1,11 @@
 import { Column } from "primereact/column";
-import { useState } from "react";
-import {
-  StyledTableButton,
-  TableContainer,
-  StyledDataTable,
-  TableTitle,
-  TitleGroup,
-} from "./styles";
-
+import { ReactElement, useState } from "react";
+import { StyledTableButton, TableContainer, StyledDataTable, TableTitle, TitleGroup } from "./styles";
 import { Group } from "../../group/styles";
 import { DateColumn, RegularColumn } from "./tableutils";
-import {
-  MasterCRUDColumnObjectKeys,
-  Option,
-} from "../../../models/mastersModel";
-import { AdminTableFilter } from "../../adminTableFilter/AdminTableFilter";
+import { MasterCRUDColumnObjectKeys, Option } from "../../../models/mastersModel";
 import { BankAccountsDialog } from "../../admin/masterCRUDComponent/bankAccounts/BankAccountsDialog";
 import { DetailDialog } from "../../admin/masterCRUDComponent/beneficiaries/DetailDialog";
-
 
 interface StyledTableProps {
   items: any[];
@@ -32,98 +20,49 @@ interface StyledTableProps {
   auxEditFN?: (id: number) => void;
   errorOnLoad: boolean;
   OptionsForms: Option[];
+  input: ReactElement;
 }
 
-export const StyledMastersTable = (props: StyledTableProps) => {
-  const {
-    items,
-    ObjectKeys,
-    plural,
-    fn1,
-    fn2,
-    label,
-    fn3,
-    fn4,
-    errorOnLoad,
-  } = props;
+export const StyledMastersTable = (props: StyledTableProps) => 
+{
+  const { items, ObjectKeys, plural, fn1, fn2, label, fn3, fn4, errorOnLoad, input  } = props;
 
-  const [globalFilter, setGlobalFilter] = useState("");
   const [isBankAccountsVisible, setIsBankAccountsVisible] = useState(false);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState<any>(null);
   const [isDetailDialogVisible, setIsDetailDialogVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
 
-  const openDetailDialog = (item: any) => {
+  const openDetailDialog = (item: any) => 
+  {
     setSelectedItem(item);
     setIsDetailDialogVisible(true);
-  };
-
-  const openBankAccounts = (beneficiary: any) => {
-    setSelectedBeneficiary(beneficiary);
-    setIsBankAccountsVisible(!isBankAccountsVisible);
-  };
-
-
-
-
-  if (errorOnLoad) {
-    return (
-      <TableContainer>
-        <TitleGroup>
-          <TableTitle>{plural}</TableTitle>{" "}
-          <StyledTableButton
-            label={label}
-            className="p-button-primary"
-            onClick={fn3}
-          />
-        </TitleGroup>
-        <p
-          style={{
-            fontSize: "18px",
-            marginTop: "30px",
-            fontFamily: "var(--bs-body-font-family)",
-          }}
-        >
-          {typeof errorOnLoad === "string"
-            ? errorOnLoad
-            : `Error al cargar ${plural.toLowerCase()}`}
-        </p>{" "}
-      </TableContainer>
-    );
   }
 
-  if (items?.length === 0 || !items)
-    return (
-      <TableContainer>
-        <TitleGroup>
-          <TableTitle>{plural}</TableTitle>{" "}
-          <StyledTableButton
-            label={label}
-            className="p-button-primary"
-            onClick={fn3}
-          />
-        </TitleGroup>
-        <p
-          style={{
-            fontSize: "18px",
-            marginTop: "30px",
-            fontFamily: "var(--bs-body-font-family)",
-          }}
-        >
-          No hay  elementos cargados.
-        </p>{" "}
-      </TableContainer>
-    );
+  const openBankAccounts = (beneficiary: any) => 
+  {
+    setSelectedBeneficiary(beneficiary);
+    setIsBankAccountsVisible(!isBankAccountsVisible);
+  }
+
+  if (errorOnLoad) 
+  {
+    return <TableContainer>
+      <TitleGroup>
+        <TableTitle>{plural}</TableTitle>{" "}
+        <StyledTableButton label={label} className="p-button-primary" onClick={fn3}/>
+      </TitleGroup>
+      <p style={{ fontSize: "18px", marginTop: "30px", fontFamily: "var(--bs-body-font-family)" }}>
+        {typeof errorOnLoad === "string" ? errorOnLoad: `Error al cargar ${plural.toLowerCase()}`}
+      </p>
+    </TableContainer>
+  }
+
   return (
     <>
       <TableContainer>
         <TitleGroup>
           <Group>
-            <TableTitle>{plural}</TableTitle>
-            <AdminTableFilter
-              filter={globalFilter}
-              setFilter={setGlobalFilter}
-            />
+            {input}
           </Group>
           <StyledTableButton
             label={label}
@@ -132,14 +71,11 @@ export const StyledMastersTable = (props: StyledTableProps) => {
           />
         </TitleGroup>
         <StyledDataTable
-          value={items?.sort((a, b) => a.id + b.id)}
-          paginator
-          rows={10}
-          rowsPerPageOptions={[1, 2, 5, 10]}
+          value={items.sort((a, b) => a.id + b.id)}
+          emptyMessage={`No se encontraron ${plural.toLowerCase()}`}
           stripedRows
           size="small"
           removableSort
-          globalFilter={globalFilter}
         >
           {ObjectKeys?.map((key, index) => {
 

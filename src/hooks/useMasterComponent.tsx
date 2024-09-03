@@ -4,6 +4,7 @@ import { Toast } from "primereact/toast";
 import { getTranslate } from "../utils/translates";
 import api from "../utils/api";
 import { MasterCRUD } from "../models/mastersModel";
+import { validateCBU, validateCUIT } from "../utils/models";
 
 
 
@@ -31,19 +32,16 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
   /*######################### Obtener los errores del form ####################################*/
   const getErrors = (values: any, ObjectKeys: any) => {
     var errors: any = {};
-
+  
     const keys = Object.keys(values);
-
+  
     for (const key of keys) {
-
       const { field } = ObjectKeys.find((column: any) => column.key === key);
-
-   
-
-      const { rules } =  field;
-                           
+    
+      const { rules } = field;
+  
       if (!rules) continue;
-
+  
       for (const rule of rules) {
         if (rule === "required") {
           const isRequired = values[key] === "" || values[key] === undefined || values[key] === null;
@@ -69,15 +67,26 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
                 break; // Salir del bucle si se encuentra un error de number
               }
             }
+            if (rule === "validCBU") {  // Nueva regla de validación para CBU
+              if (!validateCBU(values[key])) {
+                errors[key] = "El CBU ingresado no es válido";
+                break; // Salir del bucle si se encuentra un error de CBU
+              }
+            }
+            if (rule === "validCuit") {  // Nueva regla de validación para CBU
+              if (!validateCUIT(values[key])) {
+                console.log(values[key])
+                errors[key] = "El Cuit ingresado no es válido";
+                break; // Salir del bucle si se encuentra un error de CBU
+              }
+            }
           }
         }
       }
-    
-
-
     }
     return errors;
   };
+  
   /*######################### Maneja el error de formik y lo muestra ####################################*/
   const getFormErrorMessage = (key: string, formik: any) => {
     const formikTouched: any = formik.touched;
@@ -247,36 +256,23 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
       });
     } finally {
       setLoadingUpdate(false);
-      await getData();
+      await getData("");
     }
   };
 
-  const getData = async () => {
+  const getData = async (searchText: string) => 
+  {
     setLoading(true);
 
-    try {
-      const { data } = await api.get(API.get);
+    try 
+    {
+      const { data: Response } = await api.get(`${API.get}?search=${searchText}&page=${CurrentPage}&limit=${ItemsPerPage}`);
 
-      for (const key of ObjectKeys) {
-        const { field } = key;
+      const {rows, count} = Response;
 
-        const { type, getOptionsFrom, options } = field;
 
-        if (type !== "select") continue;
-
-        if (options) {
-          setOptionsForms((prev: any) => ({ ...prev, [key.key]: options }));
-          continue;
-        }
-
-        if (getOptionsFrom) {
-          const { data } = await api.get(getOptionsFrom);
-
-          setOptionsForms((prev: any) => ({ ...prev, [key.key]: data }));
-        }
-      }
-
-      setItems(data);
+      setItems(rows);
+      setTotalResult(count);
       setErrorOnLoad(false);
     } catch (error: any) 
     {
@@ -292,6 +288,31 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
     }
   };
 
+  const getDataOptions = async () => 
+  {
+    for (const key of ObjectKeys) 
+    {
+      const { field } = key;
+
+      const { type, getOptionsFrom, options } = field;
+
+
+      if (type !== "select") continue;
+
+      if (options) {
+        setOptionsForms((prev: any) => ({ ...prev, [key.key]: options }));
+        continue;
+      }
+
+      if (getOptionsFrom) {
+        const { data } = await api.get(getOptionsFrom);
+
+        setOptionsForms((prev: any) => ({ ...prev, [key.key]: data }));
+      }
+    }
+  }
+
+
   const [refetch, setRefetch] = useState(false);
   const [Loading, setLoading] = useState<boolean>(true);
   const Errors = useRef<Toast>(null);
@@ -299,6 +320,9 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
   const [LoadingAdd, setLoadingAdd] = useState<boolean>(false);
   const [errorOnLoad, setErrorOnLoad] = useState<boolean>(false);
   const [Items, setItems] = useState([]);
+  const [TotalResult, setTotalResult] = useState<number>(0);
+  const [ItemsPerPage, setItemsPerPage] = useState<number>(10);
+  const [CurrentPage, setCurrentPage] = useState<number>(0);
   const [OptionsForms, setOptionsForms] = useState<any>({});
   const labelAgregar = `Agregar ${singular.toLowerCase()}`;
   const labelActualizar = `Actualizar ${singular.toLowerCase()}`;
@@ -348,7 +372,6 @@ const [loadingDelete, setLoadingDelete] = useState<boolean>(false);
     refetch,
     setRefetch,
     Loading,
- 
     Errors,
     showModalAdd,
     setShowModalAdd,
@@ -357,6 +380,12 @@ const [loadingDelete, setLoadingDelete] = useState<boolean>(false);
     errorOnLoad,
     setErrorOnLoad,
     Items,
+    ItemsPerPage,
+    CurrentPage,
+    TotalResult,
+    setTotalResult,
+    setItemsPerPage,
+    setCurrentPage,
     setItems,
     OptionsForms,
     setOptionsForms,
@@ -386,6 +415,7 @@ const [loadingDelete, setLoadingDelete] = useState<boolean>(false);
     handleDesactivate,
     handleUpdate,
     getData,
+    getDataOptions,
     switchStateModalUpdate,
     handleDelete,
     setShowModalDelete,

@@ -6,6 +6,7 @@ import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Fragment, useEffect, useState } from "react";
 import { MasterCRUDColumnObjectKeys as Column } from "../../../models/mastersModel";
+import { InputMask } from "primereact/inputmask";
 
 
 
@@ -147,7 +148,7 @@ export const NormalEditDialog = (props: Props) => {
 
 
             if (type === "select" && !title && !value && !dependsOn) {
-              console.log(FormUpdate.values);
+         
               TypeComp = (
                 <>
                   <label htmlFor={label}>{label}</label>
@@ -313,7 +314,40 @@ export const NormalEditDialog = (props: Props) => {
                 </>
               );
             }
-
+            if (type !== "select" && dependsOn === "registryType" && key === "CBU"){
+    
+              TypeComp = (
+                <>
+                  <label htmlFor={label}>{label}</label>
+                  <InputMask
+                    id={label}
+                    mask="99999999-99999999999999"  // Máscara para el CBU (22 dígitos con un guion en el medio)
+                    placeholder="CBU"
+                    value={FormUpdate.values[key]}
+                    onChange={(e) => FormUpdate.setFieldValue(key, e.value)}
+                    style={{ width: '100%' }}
+                    disabled={registryTypeDisabled} // Deshabilitar el campo basado en registryTypeDisabled
+                  />
+                </>
+              );
+            }
+            if (key === "cuit"){
+    
+              TypeComp = (
+                <>
+                  <label htmlFor={label}>{label}</label>
+                  <InputMask
+                    id={label}
+                    mask="99-99999999-9"  
+                    placeholder="Cuit"
+                    value={FormUpdate.values[key]}
+                    onChange={(e) => FormUpdate.setFieldValue(key, e.value)}
+                    style={{ width: '100%' }}
+            
+                  />
+                </>
+              );
+            }
             if (type === "textarea") {
               TypeComp = (
                 <>

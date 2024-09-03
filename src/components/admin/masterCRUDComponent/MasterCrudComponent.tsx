@@ -10,9 +10,17 @@ import { NormalAddDialog } from "./NormalAddDialog";
 import { MasterCRUD } from "../../../models/mastersModel";
 import { StyledMastersTable } from "../../tables/mastersTable/MastersTable";
 import socket from "../../../utils/socket"; // Asegúrate de importar el socket
+import { InputText } from "primereact/inputtext";
+import { Paginator } from 'primereact/paginator';
 
-const MasterCRUDComp = ({ item }: { item: MasterCRUD }) => {
-  const [refetchTrigger, setRefetchTrigger] = useState(0);  // Cambia el estado a un trigger basado en número
+const MasterCRUDComp = ({ item }: { item: MasterCRUD }) => 
+{
+  const [refetchTrigger, setRefetchTrigger] = useState(0); 
+
+  const [SearchText, setSearchText] = useState("");
+  const [first, setFirst] = useState(0);
+  const [rows, setRows] = useState(10);
+
   const {
     Loading,
     Errors,
@@ -20,6 +28,7 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) => {
     LoadingAdd,
     errorOnLoad,
     Items,
+    TotalResult,
     OptionsForms,
     labelAgregar,
     labelActualizar,
@@ -41,6 +50,9 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) => {
     handleDelete,
     handleUpdate,
     getData,
+    getDataOptions,
+    setCurrentPage,
+    setItemsPerPage,
     switchStateModalUpdate,
     ObjectKeys,
     setItemSwitchedStateAndSwitchModalDelete,
@@ -72,8 +84,14 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) => {
     switchStateModalUpdate();
   };
 
-  useEffect(() => {
-    getData();
+  useEffect(() => 
+  {
+    getDataOptions();
+  },[]);
+
+  useEffect(() => 
+  {
+    getData(SearchText);
   }, [refetchTrigger,item]);  
 
   useEffect(() => {
@@ -87,11 +105,30 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) => {
     };
   }, []);
 
-  if (Loading) return <Loader text={`Cargando ${plural.toLowerCase()}`} />;
+  if (Loading) 
+    return <Loader text={`Cargando ${plural.toLowerCase()}`} />;
+
+  const handleSearch = (newValue: string) => setSearchText(newValue);
+  const onLeave = () => setRefetchTrigger(prev => prev + 1);
+  
+  const onPageChange = (event: { first: number; rows: number }) =>
+  {
+    const { first, rows } = event;
+    const page = Math.ceil(first / rows)
+
+    setFirst(first);
+    setRows(rows);
+
+    setCurrentPage(page);
+    setItemsPerPage(rows);
+
+    setRefetchTrigger(prev => prev + 1);
+  }
 
   return (
     <>
       <StyledMastersTable
+        input={<InputText placeholder="Buscar" value={SearchText} onChange={e => handleSearch(e.target.value)} onBlur={onLeave} onKeyDown={e => e.key === "Enter" && onLeave()}/>}
         items={Items}
         ObjectKeys={ObjectKeys}
         errorOnLoad={errorOnLoad}
@@ -103,6 +140,9 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) => {
         plural={plural}
         label={labelAgregar}
       />
+      
+      <Paginator first={first} rows={rows} totalRecords={TotalResult} rowsPerPageOptions={[10, 20, 30]} onPageChange={onPageChange} />
+
 
       <NormalAddDialog
         labelAgregar={labelAgregar}

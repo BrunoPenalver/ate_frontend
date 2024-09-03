@@ -1,32 +1,25 @@
 import { Column } from "primereact/column";
 import { useState, useEffect } from "react";
-import {
-  StyledDataTable,
-  StyledTableButton,
-  TableContainer,
-  TableTitle,
-  TitleGroup,
-} from "../../../tables/styles";
+import { StyledDataTable, StyledTableButton, TableContainer, TableTitle, TitleGroup } from "../../../tables/styles";
 import { Group } from "../../../Group";
-import { AdminTableFilter } from "../../../adminTableFilter/AdminTableFilter";
 import { BankAccountsFormDialog } from "./BankAccountsFormDialog";
-import socket from "../../../../utils/socket";
 import { StyledCell } from "./styles";
 import { DeactivateBankAccountDialog } from "./DeactivateBankAccountDialog";
 import { DeleteDialog } from "./DeleteBankAccountDialog";
 import BankAccount from "../../../../interfaces/orders/bankAccount";
+import { formatCBU } from '../../../../utils/models';
+import socket from "../../../../utils/socket";
 
 interface DialogProps {
   bankAccounts: BankAccount[];
   beneficiaryId: number;
 }
 
-export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps) => {
-  const [globalFilter, setGlobalFilter] = useState("");
+export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps) => 
+{
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [isDeleteDialogVisible, setIsDeleteDialogVisible] = useState(false);
-  const [isDeactivateDialogVisible, setIsDeactivateDialogVisible] =
-    useState(false);
+  const [isDeactivateDialogVisible, setIsDeactivateDialogVisible] =useState(false);
   const [selectedBankAccount, setSelectedBankAccount] = useState<BankAccount | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [localBankAccounts, setLocalBankAccounts] = useState(bankAccounts);
@@ -37,7 +30,8 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
     );
   }, [bankAccounts]);
 
-  useEffect(() => {
+  useEffect(() => 
+  {
     socket.on("created-bank-account", (newBankAccount) => {
       setLocalBankAccounts((prev) => [...prev, newBankAccount]);
     });
@@ -74,31 +68,34 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
     };
   }, []);
 
-  const openAddBankAccountDialog = () => {
+  const openAddBankAccountDialog = () => 
+  {
     setSelectedBankAccount(null);
     setIsEditing(false);
     setIsDialogVisible(true);
   };
 
-  const openEditBankAccountDialog = (bankAccount : BankAccount) => {
+  const openEditBankAccountDialog = (bankAccount : BankAccount) => 
+  {
     setSelectedBankAccount(bankAccount);
     setIsEditing(true);
     setIsDialogVisible(true);
   };
 
-  const openDeleteBankAccountDialog = (bankAccount: BankAccount) => {
+  const openDeleteBankAccountDialog = (bankAccount: BankAccount) => 
+  {
     setSelectedBankAccount(bankAccount);
     setIsDeleteDialogVisible(!isDeleteDialogVisible);
   };
 
-  const openDeactivateBankAccountDialog = (bankAccount: BankAccount) => {
+  const openDeactivateBankAccountDialog = (bankAccount: BankAccount) => 
+  {
     setSelectedBankAccount(bankAccount);
     setIsDeactivateDialogVisible(!isDeactivateDialogVisible);
   };
 
-  const closeDialog = () => {
-    setIsDialogVisible(false);
-  };
+  const closeDialog = () => setIsDialogVisible(false);
+
 
   if (localBankAccounts.length === 0 || !localBankAccounts)
     return (
@@ -138,10 +135,6 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
         <TitleGroup>
           <Group>
             <TableTitle>Listado de cuentas bancarias</TableTitle>
-            <AdminTableFilter
-              filter={globalFilter}
-              setFilter={setGlobalFilter}
-            />
           </Group>
           <StyledTableButton
             label="Agregar cuenta"
@@ -157,7 +150,6 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
           stripedRows
           size="small"
           removableSort
-          globalFilter={globalFilter}
         >
           <Column
             field="id"
@@ -180,7 +172,7 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
             header="CBU"
             sortable
             body={(rowData) => (
-              <StyledCell $active={rowData?.active}>{rowData.CBU}</StyledCell>
+              <StyledCell $active={rowData?.active}>{formatCBU(rowData.CBU)}</StyledCell>
             )}
           />
           <Column
