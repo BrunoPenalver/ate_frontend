@@ -13,7 +13,7 @@ export default function useOrders(filters: string = "")
         try 
         {
             setLoadingOrders(true);
-            const response = await api.get('/orders' + filters);
+            const response = await api.get('/orders?search=' + filters);
             setOrders(response.data);
         } 
         catch (error) 

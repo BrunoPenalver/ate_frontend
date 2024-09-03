@@ -4,9 +4,8 @@ import { DataTable } from "primereact/datatable";
 import { Button } from "primereact/button";
 import { Group } from "../../Group";
 export const StyledDataTable = styled(DataTable)`
-  width: 90%;
-  max-width: 1920px;
   
+
 
   .p-column-header-content {
     display: flex;
