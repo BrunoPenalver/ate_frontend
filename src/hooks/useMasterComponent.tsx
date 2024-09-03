@@ -4,6 +4,7 @@ import { Toast } from "primereact/toast";
 import { getTranslate } from "../utils/translates";
 import api from "../utils/api";
 import { MasterCRUD } from "../models/mastersModel";
+import { validateCBU, validateCUIT } from "../utils/models";
 
 
 
@@ -31,19 +32,16 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
   /*######################### Obtener los errores del form ####################################*/
   const getErrors = (values: any, ObjectKeys: any) => {
     var errors: any = {};
-
+  
     const keys = Object.keys(values);
-
+  
     for (const key of keys) {
-
       const { field } = ObjectKeys.find((column: any) => column.key === key);
-
-   
-
-      const { rules } =  field;
-                           
+    
+      const { rules } = field;
+  
       if (!rules) continue;
-
+  
       for (const rule of rules) {
         if (rule === "required") {
           const isRequired = values[key] === "" || values[key] === undefined || values[key] === null;
@@ -69,15 +67,26 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
                 break; // Salir del bucle si se encuentra un error de number
               }
             }
+            if (rule === "validCBU") {  // Nueva regla de validación para CBU
+              if (!validateCBU(values[key])) {
+                errors[key] = "El CBU ingresado no es válido";
+                break; // Salir del bucle si se encuentra un error de CBU
+              }
+            }
+            if (rule === "validCuit") {  // Nueva regla de validación para CBU
+              if (!validateCUIT(values[key])) {
+                console.log(values[key])
+                errors[key] = "El Cuit ingresado no es válido";
+                break; // Salir del bucle si se encuentra un error de CBU
+              }
+            }
           }
         }
       }
-    
-
-
     }
     return errors;
   };
+  
   /*######################### Maneja el error de formik y lo muestra ####################################*/
   const getFormErrorMessage = (key: string, formik: any) => {
     const formikTouched: any = formik.touched;

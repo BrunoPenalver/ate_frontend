@@ -15,6 +15,7 @@ import { StyledCell } from "./styles";
 import { DeactivateBankAccountDialog } from "./DeactivateBankAccountDialog";
 import { DeleteDialog } from "./DeleteBankAccountDialog";
 import BankAccount from "../../../../interfaces/orders/bankAccount";
+import { formatCBU } from '../../../../utils/models';
 
 interface DialogProps {
   bankAccounts: BankAccount[];
@@ -180,7 +181,7 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
             header="CBU"
             sortable
             body={(rowData) => (
-              <StyledCell $active={rowData?.active}>{rowData.CBU}</StyledCell>
+              <StyledCell $active={rowData?.active}>{formatCBU(rowData.CBU)}</StyledCell>
             )}
           />
           <Column

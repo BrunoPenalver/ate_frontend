@@ -1,5 +1,6 @@
 import { Column } from "primereact/column";
 import { formatDate } from "../../../utils/dates";
+import { formatCBU, formatCuit } from "../../../utils/models";
 
 
 
@@ -66,7 +67,13 @@ export const RegularColumn = (key: any, index: number) => {
               ) : key?.label === "Tipo de registro" ? (
                 `${rowData?.registryType?.type}`
                 
-              )   : rowData[key?.key]}
+              ) : key?.label === "CUIT" ? (
+                `${formatCuit(rowData?.cuit)}`
+                
+              )  : key?.label === "CBU" ? (
+                `${formatCBU(rowData?.CBU)}`
+                
+              )  : rowData[key?.key]}
           </span>
         );
       }}
