@@ -136,10 +136,10 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         {
             try 
             {
-                const { data: accounts } = await api.get<Account[]>("/accounts");
+                const { data: accounts } = await api.get("/accounts");
                 const { data: paymenttypes } = await api.get<PaymentType[]>("/paymenttypes");
                 
-                setAccounts(accounts);
+                setAccounts(accounts.rows as Account[]);
                 setPaymentTypes(paymenttypes); 
             } 
             catch (error) 
@@ -252,8 +252,8 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
         try 
         {
-            const { data: concetps } = await api.get<Concept[]>(`/concepts?search=${inputSearch}`);
-            setFilteredConcepts(concetps);    
+            const { data: concepts } = await api.get(`/concepts?search=${inputSearch}`);
+            setFilteredConcepts(concepts.rows as Concept[]);    
         } 
         catch (error) 
         {
@@ -326,8 +326,8 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
         try 
         {
-            const { data: beneficiaries } = await api.get<Beneficiary[]>(`/beneficiaries?search=${inputSearch}`);
-            setFilteredBeneficiaries(beneficiaries);    
+            const { data: beneficiaries } = await api.get(`/beneficiaries?search=${inputSearch}`);
+            setFilteredBeneficiaries(beneficiaries.rows as Beneficiary[]);    
         } 
         catch (error) 
         {
@@ -449,9 +449,10 @@ const CreateOrUpdateMovimiento = (props: Props) =>
             return;
         }
 
-        const { number , CBU } = value as BankAccount;
+        const { number , CBU, holder } = value as BankAccount;
         FormMovimiento.setFieldValue("originBankNumber",number);
         FormMovimiento.setFieldValue("originBankCBU",CBU);
+        FormMovimiento.values.holder = holder;
     }
 
     ////
@@ -630,7 +631,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
             </ContainerInput>
             <ContainerInput>
                 <FloatLabel>
-                    <InputText id="holder" value={FormMovimiento.values.holder} onChange={e => FormMovimiento.setFieldValue("holder",e.target.value)}/>
+                    <InputText id="holder" value={FormMovimiento.values.holder} disabled onChange={e => FormMovimiento.setFieldValue("holder",e.target.value)}/>
                     <label htmlFor="holder">Titular</label>
                 </FloatLabel>
             </ContainerInput>

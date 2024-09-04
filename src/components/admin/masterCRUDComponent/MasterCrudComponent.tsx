@@ -152,8 +152,7 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) =>
         ObjectKeys={ObjectKeys}
         OptionsForms={OptionsForms}
         getFormErrorMessage={getFormErrorMessage}
-        LoadingAdd={LoadingAdd}
-      ></NormalAddDialog>
+        LoadingAdd={LoadingAdd}/>
 
       <NormalEditDialog
         labelActualizar={labelActualizar}
@@ -163,8 +162,7 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) =>
         ObjectKeys={ObjectKeys}
         OptionsForms={OptionsForms}
         getFormErrorMessage={getFormErrorMessage}
-        LoadingUpdate={LoadingUpdate}
-      ></NormalEditDialog>
+        LoadingUpdate={LoadingUpdate}/>
 
       <DeactivateDialog
         itemSwitchedState={itemSwitchedState}
@@ -172,8 +170,7 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) =>
         showModalDesactivate={showModalDesactivate}
         switchStateModalDesactivate={switchStateModalDesactivate}
         handleDesactivate={handleDesactivate}
-        loadingDesactivate={loadingDesactivate}
-      ></DeactivateDialog>
+        loadingDesactivate={loadingDesactivate}/>
 
       <DeleteDialog
         itemSwitchedState={itemSwitchedState}
@@ -182,8 +179,7 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) =>
         switchStateModalDelete={() => setItemSwitchedStateAndSwitchModalDelete(null)}
         handleDelete={handleDelete}
         loadingDelete={loadingDelete}
-        refetch={() => setRefetchTrigger(prev => prev + 1)}  // Pasar la función refetch
-      ></DeleteDialog>
+        refetch={() => setRefetchTrigger(prev => prev + 1)}/>
 
       <Toast ref={Errors} position="bottom-center" />
     </>
