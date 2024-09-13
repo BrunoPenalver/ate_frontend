@@ -29,15 +29,16 @@ export const DateColumn = (key: any, index: number) => {
 
 
 export const RegularColumn = (key: any, index: number) => {
-
+  console.log("key",key)
   return (
     <Column
       sortable
       field={key.key}
       header={key.label}
       key={index}
+      style={key?.key === "cuit" ? { width: "150px", padding: "0px 10px", minWidth: "150px" } : {}}
       body={(rowData) => {
- 
+        
         return (
           <span
             style={{
