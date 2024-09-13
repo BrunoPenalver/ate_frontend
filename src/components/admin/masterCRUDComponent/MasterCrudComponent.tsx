@@ -12,9 +12,11 @@ import { StyledMastersTable } from "../../tables/mastersTable/MastersTable";
 import socket from "../../../utils/socket"; // Asegúrate de importar el socket
 import { InputText } from "primereact/inputtext";
 import { Paginator } from 'primereact/paginator';
+import { useParams } from "react-router-dom";
 
 const MasterCRUDComp = ({ item }: { item: MasterCRUD }) => 
 {
+  const { title } = useParams();
   const [refetchTrigger, setRefetchTrigger] = useState(0); 
 
   const [SearchText, setSearchText] = useState("");
@@ -87,7 +89,7 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) =>
   useEffect(() => 
   {
     getDataOptions();
-  },[]);
+  },[title]);
 
   useEffect(() => 
   {

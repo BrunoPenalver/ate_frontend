@@ -12,15 +12,16 @@ import { createAlert } from "../../../stores/alerts.slicer";
 
 
 const MasterCrudPage = () => 
-    
 {
-    
     useAuth();
 
     const { title } = useParams();
+
     const mastercrud = useMastersCRUD(title) as MasterCRUD | undefined;
     const dispatch = useDispatch<AppDispatch>();
-    useEffect(() => {
+
+    useEffect(() => 
+        {
         socket.on('invalid-Concept', (errorMessage) => {  // Recibir el mensaje del servidor
             dispatch(createAlert({
                 summary: "Error de CBU",
