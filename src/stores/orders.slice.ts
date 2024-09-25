@@ -44,6 +44,12 @@ const ordersSlice = createSlice({
         deleteByIdForce(state, action)
         {
             state.orders = state.orders.filter(order => order.id !== action.payload);
+        },
+        reopenById(state, action)
+        {
+            const index = state.orders.findIndex(order => order.id === action.payload);
+            if(index !== -1)
+                state.orders[index].state = "Abierta";
         }
     },
     extraReducers: (builder) => {
@@ -63,5 +69,5 @@ const ordersSlice = createSlice({
     },
 });
 
-export const { deleteById, deleteByIdForce } = ordersSlice.actions;
+export const { deleteById, deleteByIdForce, reopenById } = ordersSlice.actions;
 export default ordersSlice.reducer;

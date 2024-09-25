@@ -1,0 +1,9 @@
+## Configuración
+
+1. Añadir las siguientes configuraciones al archivo `.env` en la raiz del proyecto:
+
+    ```
+    VITE_BACKEND_URL=http://tu-backend-url
+    ```
+
+    Reemplaza `http://tu-backend-url` con la URL de tu backend.
