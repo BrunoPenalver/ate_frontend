@@ -50,6 +50,17 @@ const ordersSlice = createSlice({
             const index = state.orders.findIndex(order => order.id === action.payload);
             if(index !== -1)
                 state.orders[index].state = "Abierta";
+        },
+        exports(state, action: { payload: { orders: Order[], exportedAt: Date } })
+        {
+            console.log(action.payload);
+
+            for (const order of action.payload.orders) 
+            {
+                const index = state.orders.findIndex(o => o.id === order.id);
+                if(index !== -1)
+                    state.orders[index].exportedAt = action.payload.exportedAt;
+            }
         }
     },
     extraReducers: (builder) => {
@@ -69,5 +80,5 @@ const ordersSlice = createSlice({
     },
 });
 
-export const { deleteById, deleteByIdForce, reopenById } = ordersSlice.actions;
+export const { deleteById, deleteByIdForce, reopenById, exports } = ordersSlice.actions;
 export default ordersSlice.reducer;

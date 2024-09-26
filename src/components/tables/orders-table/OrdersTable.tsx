@@ -5,7 +5,7 @@ import { formatDate, formatFullDate } from "../../../utils/dates";
 import { Loader } from "../../Loader";
 import { AppDispatch, RootState } from "../../../stores/stores";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteByIdForce, fetchOrders, reopenById } from "../../../stores/orders.slice";
+import { deleteByIdForce, fetchOrders, reopenById, exports } from "../../../stores/orders.slice";
 import { setSpanishLocale } from "../../../utils/locale";
 import { locale } from "primereact/api";
 import { confirmDialog } from "primereact/confirmdialog";
@@ -17,6 +17,8 @@ import { Link } from "react-router-dom";
 import { formatPrice } from "../../../utils/prices";
 import { InputText } from "primereact/inputtext";
 import Order from "../../../interfaces/orders/order";
+import { DataTableDataSelectableEvent } from "primereact/datatable";
+import { getExportacion } from "../../../utils/exactas";
 
 interface Props
 {
@@ -50,6 +52,11 @@ export const StyledTable = (props:Props) =>
       const totalHaber = order.movements.filter((mov: any) => mov.type === "Haber").reduce((acc: number, mov: any) => acc + mov.amount, 0);
 
       if((totalDebe - totalHaber).toString().includes(searchSanitized)) return true;
+
+      for (const movement of order.movements) 
+      {
+        if(movement.beneficiary.businessName.toLowerCase().includes(searchSanitized)) return true;
+      }
     });
   }, [orders, globalFilter]);
 
@@ -162,11 +169,54 @@ export const StyledTable = (props:Props) =>
     });
   }
 
+  const confirmDialogExport = async () =>
+  {
+    try 
+    {
+      const payload = selectedProducts.map(order => order.id);
+ 
+      const { data } = await api.put("/orders/exports", {orders: payload});
+
+      const { exportedAt, orders, exportId } = data;
+
+      dispatch(exports({orders, exportedAt }));
+      await getExportacion(exportId);
+
+      const detail = orders.length === 1 ? `La orden fue exportada correctamente` : `Las órdenes fueron exportadas correctamente`;
+      dispatch(createAlert({severity: "success", summary: "Exportación", detail }));
+    } 
+    catch (error)
+    {
+      console.log(error);
+      dispatch(createAlert({severity: "error", summary: "Error", detail: `Hubo un error al exportar las órdenes`}));  
+    }
+  }
+
+  const onClickExport = () =>
+  {
+    const ordersIds = selectedProducts.map(order => order.id);
+    const message  = ordersIds.length === 1 ? `la orden ${ordersIds}` : `las órdenes ${ordersIds.join(",")}`;
+
+    confirmDialog({
+      message: `¿Estás seguro que deseas exportar ${message}?`,
+      acceptLabel: "Si",
+      rejectLabel: "No",
+      header: "Confirmar exportación",
+      icon: "pi pi-exclamation-triangle",
+      accept: confirmDialogExport,
+      reject: () => null
+    });
+  }
+
   const onChangeSelection = (e: any ) =>
   {
     const { value: ordersSelecteds } = e as {value: Order[]};
     setSelectedProducts(ordersSelecteds);
   }
+
+  const isSelectable = (order: any) => order.exportedAt === null && order.state === "Cerrada";
+
+  const isRowSelectable = (event: DataTableDataSelectableEvent) => (event.data ? isSelectable(event.data) : true);
 
   return (
     <TableContainer>
@@ -176,7 +226,7 @@ export const StyledTable = (props:Props) =>
       </TitleGroup>
 
 
-      <StyledDataTable value={OrdersFiltereds} paginator rows={10} rowsPerPageOptions={[1, 2, 5, 10]} stripedRows size="small" removableSort emptyMessage="No hay órdenes"  selectionMode={true ? null : 'checkbox'} selection={selectedProducts} onSelectionChange={onChangeSelection}>
+      <StyledDataTable value={OrdersFiltereds} paginator rows={10} rowsPerPageOptions={[1, 2, 5, 10]} stripedRows size="small" removableSort emptyMessage="No hay órdenes"  selectionMode={true ? null : 'checkbox'} selection={selectedProducts} onSelectionChange={onChangeSelection}  isDataSelectable={isRowSelectable}>
         <Column selectionMode="multiple"/>
         <Column sortable filter filterPlaceholder="Filtrar..." field="id" header="Número de Orden"/>
         <Column filterPlaceholder="Filtrar..." field="date" header="Fecha" body={row => formatDate(row.date)}/>
@@ -195,19 +245,20 @@ export const StyledTable = (props:Props) =>
         <Column sortable filter filterPlaceholder="Filtrar..." field="exportedAt" header="Fecha de exportación" body={row => formatFullDate(row.exportedAt)}/>
         <Column key="actions" header="Acciones" body={(row) => 
         {
-          const { id , state } = row as Order;
+          const { id , state, exportedAt } = row as Order;
 
           return <div style={{display:"flex",justifyContent:"flex-end"}}>
             {(useActiveOrders &&  state === "Abierta"  )&& <Link style={{textDecoration:"none"}} to={`/admin/ordenes/${id}`}> <i className="pi pi-pen-to-square" style={{marginRight: "10px", color: "var(--cyan-500)"}}/> </Link>}
             {(useActiveOrders &&  state === "Cerrada"  )&& <Link style={{textDecoration:"none"}} to={`/admin/ordenes/${id}`}> <i className="pi pi-eye" style={{marginRight: "10px", color: "var(--cyan-500)"}}/> </Link>}
             {!useActiveOrders &&  <i className="pi pi-undo" style={{marginRight: "10px", color: "var(--cyan-500)", cursor: "pointer"}} onClick={() => onClickUndo(id)}  />}
-            { state === "Cerrada" && <i className="pi pi-lock-open" style={{marginRight: "10px", color: "var(--cyan-500)", cursor: "pointer"}} onClick={() => onClickRevertClosed(id)}  />}
+            { (state === "Cerrada" && exportedAt === null) && <i className="pi pi-lock-open" style={{marginRight: "10px", color: "var(--cyan-500)", cursor: "pointer"}} onClick={() => onClickRevertClosed(id)}  />}
             <i className="pi pi-trash" style={{color: "var(--red-600)", cursor: "pointer"}} onClick={() => onClickDelete(id)}/>  
           </div>
         }}/>
+
       </StyledDataTable>
 
-     <Button icon="pi pi-file-export" rounded aria-label="Filter"/>
+     <Button icon="pi pi-file-export" rounded aria-label="Filter" visible={showExport} onClick={onClickExport} style={{position: 'fixed', bottom: '20px', right: '20px'}}/>
     </TableContainer>
   );
 };

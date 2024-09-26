@@ -6,6 +6,7 @@ import OrdenesActivaPages from "../pages/admin/ordenes";
 import OrdenesEliminadasPages from "../pages/admin/ordenes/eliminadas";
 import OrderEdit from "../pages/admin/ordenes/_id";
 import MasterCrudPage from "../pages/admin/informacion/[id]";
+import ExportacionesPage from "../pages/admin/Exportaciones";
 
 const router = createBrowserRouter([
     {
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
     {
         path: "/admin/ordenes/agregar",
         element: <AgregarPage/>
+    },
+    {
+        path: "/admin/ordenes/exportaciones",
+        element: <ExportacionesPage/>
     },
     {
         path: "/admin/ordenes/:id",
