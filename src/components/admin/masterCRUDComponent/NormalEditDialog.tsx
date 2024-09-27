@@ -26,6 +26,7 @@ interface Props {
 export const NormalEditDialog = (props: Props) => {
   const [filteredCities, setFilteredCities] = useState<any[]>([]);
   const [registryTypeDisabled, setRegistryTypeDisabled] = useState<boolean>(false);
+  const [isCityDisabled, setIsCityDisabled] = useState(true);
 
   const {
     labelActualizar,
@@ -39,23 +40,25 @@ export const NormalEditDialog = (props: Props) => {
   } = props;
 
 
-  useEffect(() => {
-    if (FormUpdate?.values?.province) {
-        const isProvinceNumber = typeof FormUpdate?.values?.province === 'number';
+useEffect(() => {
+  if (FormUpdate?.values?.province) {
+    const isProvinceNumber = typeof FormUpdate?.values?.province === 'number';
 
-        const filtered = OptionsForms?.city.filter((city: any) => {
-            if (isProvinceNumber) {
-                return city?.provinceId === FormUpdate?.values?.province;
-            } else {
-                return city?.provinceId === FormUpdate?.values?.province?.id;
-            }
-        });
+    const filtered = OptionsForms?.city.filter((city: any) => {
+      if (isProvinceNumber) {
+        return city?.provinceId === FormUpdate?.values?.province;
+      } else {
+        return city?.provinceId === FormUpdate?.values?.province?.id;
+      }
+    });
 
-        setFilteredCities(filtered);
-    } else {
-        setFilteredCities([]);
-    }
-}, [FormUpdate.values.province]);
+    setFilteredCities(filtered);
+    setIsCityDisabled(false); // Habilitar el campo de ciudad cuando se selecciona una provincia
+  } else {
+    setFilteredCities([]);
+    setIsCityDisabled(true); // Deshabilitar el campo de ciudad cuando no hay provincia seleccionada
+  }
+}, [FormUpdate.values.province, OptionsForms]);
 
   useEffect (() => {
     if (FormUpdate?.values?.registryType?.type === "Concepto" || FormUpdate?.values?.registryType === 2) {
@@ -87,12 +90,18 @@ export const NormalEditDialog = (props: Props) => {
     }
 };
 
+const handleClose = () => {
+  FormUpdate.resetForm(); // Resetea el formulario, limpiando valores, errores y touched
+  setIsCityDisabled(true); // Opcional: Restablece el estado de isCityDisabled
+  switchStateModalUpdate(); // Cierra el diálogo
+};
+
   return (
     <Dialog
       header={labelActualizar}
       style={{ width: "50vw" }}
       visible={showModalUpdate}
-      onHide={() => switchStateModalUpdate()}
+      onHide={handleClose}
     >
       <div className="container-modal">
         <form onSubmit={FormUpdate.handleSubmit}>
@@ -303,13 +312,14 @@ export const NormalEditDialog = (props: Props) => {
                     key={key}
                     emptyMessage="No hay opciones disponibles"
                     placeholder={FormUpdate?.values[key]?.name || label}
-                    options={filteredCities ? filteredCities : []}
+                    options={filteredCities.length > 0 ? filteredCities : []}
                     optionLabel="label"
                     value={FormUpdate?.values[key]}
                     onChange={(e) => FormUpdate.setFieldValue(key, e.value)}
                     style={{ width: "100%" }}
                     virtualScrollerOptions={{ itemSize: 38 }}
                     filter
+                    disabled={isCityDisabled} // Aquí aplicamos el estado para deshabilitar/habilitar
                   />
                 </>
               );

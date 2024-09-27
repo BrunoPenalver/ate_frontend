@@ -30,7 +30,7 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
   };
 
   /*######################### Obtener los errores del form ####################################*/
-  const getErrors = (values: any, ObjectKeys: any) => {
+  const getErrors = async (values: any, ObjectKeys: any) => {
     var errors: any = {};
   
     const keys = Object.keys(values);
@@ -75,9 +75,27 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
             }
             if (rule === "validCuit") {  // Nueva regla de validación para CBU
               if (!validateCUIT(values[key])) {
-                console.log(values[key])
+                
                 errors[key] = "El Cuit ingresado no es válido";
                 break; // Salir del bucle si se encuentra un error de CBU
+              }
+            }
+            if(rule === "existingCuit")
+            { 
+              console.log(values)
+              const sanitizedCUIT = values[key].replace(/-/g, '');
+              const beneficiaryCode = values?.code; // Asegúrate de que 'code' esté presente en 'values'
+  
+              // Prepara los parámetros para la solicitud
+              const params = { cuit: sanitizedCUIT , code: beneficiaryCode };
+            
+              console.log(params)
+              const { data } = await api.get(`/beneficiaries/check-cuit`, { params });
+              console.log(data)
+              if(data.exists)
+              {
+                errors[key] = "El Cuit ingresado ya existe";
+                break;
               }
             }
           }

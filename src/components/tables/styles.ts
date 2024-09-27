@@ -19,7 +19,7 @@ export const StyledDataTable = styled(DataTable)`
   }
 
   th {
-    background-color: var(--green-600);
+    background-color: #10b981;
     color: white;
   }
 

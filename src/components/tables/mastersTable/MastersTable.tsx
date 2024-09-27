@@ -61,15 +61,18 @@ export const StyledMastersTable = (props: StyledTableProps) =>
     <>
       <TableContainer>
         <TitleGroup>
+       
           <Group>
+          <TableTitle>{plural}</TableTitle>{" "}
             {input}
           </Group>
-          <StyledTableButton
+          { plural !== "Cuentas contables" && <StyledTableButton
             label={label}
             className="p-button-primary"
             onClick={fn3}
           />
-        </TitleGroup>
+        }
+        </TitleGroup> 
         <StyledDataTable
           value={items.sort((a, b) => a.id + b.id)}
           emptyMessage={`No se encontraron ${plural.toLowerCase()}`}
@@ -84,7 +87,7 @@ export const StyledMastersTable = (props: StyledTableProps) =>
 
             if (key?.showInTable) return RegularColumn(key, index);
           })}
-          {plural === "Beneficiarios" && (
+          {plural === "Proovedores" && (
             <Column
               header="Cuentas bancarias"
               body={(row) => {
@@ -115,7 +118,7 @@ export const StyledMastersTable = (props: StyledTableProps) =>
               }}
             />
           )}
-          <Column
+        { plural !== "Cuentas contables" && <Column
             header="Acciones"
             body={(row) => {
               return (
@@ -161,10 +164,10 @@ export const StyledMastersTable = (props: StyledTableProps) =>
                 </div>
               );
             }}
-          />
+          /> }
         </StyledDataTable>
       </TableContainer>
-      {plural === "Beneficiarios" && (
+      {plural === "Proovedores" && (
         <BankAccountsDialog
           isOpen={isBankAccountsVisible}
           beneficiary={selectedBeneficiary}
