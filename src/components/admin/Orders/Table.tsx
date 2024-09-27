@@ -10,6 +10,7 @@ interface Props
 {
     movimientos: Movement[];
     title: Movement["type"];
+    disableEdit: boolean;
     onDelete: (id: number) => void;
     onUpdate: (toUpdate: Movement) => void;
     onClone: (toClone: Movement) => void;
@@ -18,7 +19,7 @@ interface Props
 
 const TableMovimientos = (props: Props) => 
 {
-    const { movimientos, title, onDelete } = props;
+    const { movimientos, title, onDelete, disableEdit } = props;
 
     const screenSize = useScreenSize();
 
@@ -55,10 +56,10 @@ const TableMovimientos = (props: Props) =>
             <Column header="Acciones" body={(row) => 
             {
                 return <div style={{ display: "flex", gap: "10px", justifyContent: "center", textDecoration: "none",}}>
-                    <i className="pi pi-copy" style={{marginRight: "10px", color: "var(--cyan-500)", cursor: "pointer"}} onClick={() =>  props.onClone(row)}/>
-                    <i className={row.type === "Debe" ? iconRotateDebe : iconRotateHaber} style={{marginRight: "10px", color: "var(--cyan-500)", cursor: "pointer"}} onClick={() =>  props.onRotate(row)}/>
-                    <i className="pi pi-pen-to-square" style={{marginRight: "10px", color: "var(--cyan-500)", cursor: "pointer"}} onClick={() =>  props.onUpdate(row)}/>
-                    <i className="pi pi-trash" style={{color: "var(--red-600)", cursor: "pointer"}} onClick={() =>  onClickDelete(row.id)}/> 
+                    { !disableEdit && <i className="pi pi-copy" style={{marginRight: "10px", color: "var(--cyan-500)", cursor: "pointer"}} onClick={() =>  props.onClone(row)}/> }
+                    { !disableEdit && <i className={row.type === "Debe" ? iconRotateDebe : iconRotateHaber} style={{marginRight: "10px", color: "var(--cyan-500)", cursor: "pointer"}} onClick={() =>  props.onRotate(row)}/> }
+                    <i className={!disableEdit ? 'pi pi-pen-to-square' : 'pi pi pi-eye' } style={{marginRight: "10px", color: "var(--cyan-500)", cursor: "pointer"}} onClick={() =>  props.onUpdate(row)}/>
+                    { !disableEdit && <i className="pi pi-trash" style={{color: "var(--red-600)", cursor: "pointer"}} onClick={() =>  onClickDelete(row.id)}/>  }
                 </div>
             }}/>
         </DataTable>

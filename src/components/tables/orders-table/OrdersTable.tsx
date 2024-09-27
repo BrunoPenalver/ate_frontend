@@ -5,7 +5,7 @@ import { formatDate, formatFullDate } from "../../../utils/dates";
 import { Loader } from "../../Loader";
 import { AppDispatch, RootState } from "../../../stores/stores";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteByIdForce, fetchOrders } from "../../../stores/orders.slice";
+import { deleteByIdForce, fetchOrders, reopenById } from "../../../stores/orders.slice";
 import { setSpanishLocale } from "../../../utils/locale";
 import { locale } from "primereact/api";
 import { confirmDialog } from "primereact/confirmdialog";
@@ -16,6 +16,7 @@ import { Button } from "primereact/button";
 import { Link } from "react-router-dom";
 import { formatPrice } from "../../../utils/prices";
 import { InputText } from "primereact/inputtext";
+import Order from "../../../interfaces/orders/order";
 
 interface Props
 {
@@ -52,6 +53,10 @@ export const StyledTable = (props:Props) =>
     });
   }, [orders, globalFilter]);
 
+  const [selectedProducts, setSelectedProducts] = useState<Order[]>([]);
+
+  const showExport = useMemo(() => selectedProducts.length > 0, [selectedProducts]);
+
   useEffect(() => {
     setSpanishLocale()
     locale("es")
@@ -61,7 +66,6 @@ export const StyledTable = (props:Props) =>
   if (loading) 
     return <Loader text="Cargando ordenes de pago" />;
   
-
   const onClickDelete = (orderId: number) => 
   {
     console.log(orderId);
@@ -98,7 +102,35 @@ export const StyledTable = (props:Props) =>
       accept: () => deleteOrder(orderId),
       reject: () => null
     });
+  }
 
+  const onClickRevertClosed = (orderId: number) =>
+  {
+    const reOpenOrder = async (orderId: number) =>
+    {
+      try 
+      {
+        await api.put(`/orders/${orderId}/reopen`);  
+
+    
+        dispatch(createAlert({severity: "success", summary: "Orden abierta", detail: `La orden fue abierta permanentemente`}));
+        dispatch(reopenById(orderId));
+      } 
+      catch (error) 
+      {
+        dispatch(createAlert({severity: "error", summary: "Error", detail: `Hubo un error al abierta la orden`}));
+      }
+    }
+  
+    confirmDialog({
+      message: `¿Estás seguro que deseas reabrir la orden ${orderId}?`,
+      acceptLabel: "Si",
+      rejectLabel: "No",
+      header: "Confirmar re-apertura",
+      icon: "pi pi-exclamation-triangle",
+      accept: () => reOpenOrder(orderId),
+      reject: () => null
+    });
   }
 
   const onClickUndo = (orderId: number) =>
@@ -130,14 +162,22 @@ export const StyledTable = (props:Props) =>
     });
   }
 
+  const onChangeSelection = (e: any ) =>
+  {
+    const { value: ordersSelecteds } = e as {value: Order[]};
+    setSelectedProducts(ordersSelecteds);
+  }
+
   return (
     <TableContainer>
       <TitleGroup>
         <InputText placeholder="Buscar..." value={globalFilter} onChange={(e) => setGlobalFilter(e.target.value)}/>
         <Link to="/admin/ordenes/agregar"> <Button label="Agregar Orden"  color="#1da750"/>  </Link>
       </TitleGroup>
-      <StyledDataTable value={OrdersFiltereds} paginator rows={10} rowsPerPageOptions={[1, 2, 5, 10]} stripedRows size="small" removableSort emptyMessage="No hay órdenes">
 
+
+      <StyledDataTable value={OrdersFiltereds} paginator rows={10} rowsPerPageOptions={[1, 2, 5, 10]} stripedRows size="small" removableSort emptyMessage="No hay órdenes"  selectionMode={true ? null : 'checkbox'} selection={selectedProducts} onSelectionChange={onChangeSelection}>
+        <Column selectionMode="multiple"/>
         <Column sortable filter filterPlaceholder="Filtrar..." field="id" header="Número de Orden"/>
         <Column filterPlaceholder="Filtrar..." field="date" header="Fecha" body={row => formatDate(row.date)}/>
         <Column sortable filter filterPlaceholder="Filtrar..." field="description" header="Descripción"/>
@@ -155,13 +195,19 @@ export const StyledTable = (props:Props) =>
         <Column sortable filter filterPlaceholder="Filtrar..." field="exportedAt" header="Fecha de exportación" body={row => formatFullDate(row.exportedAt)}/>
         <Column key="actions" header="Acciones" body={(row) => 
         {
-          return <>
-            {useActiveOrders &&   <Link style={{textDecoration:"none"}} to={`/admin/ordenes/${row.id}`}> <i className="pi pi-pen-to-square" style={{marginRight: "10px", color: "var(--cyan-500)"}}/> </Link>}
-            {!useActiveOrders &&  <i className="pi pi-undo" style={{marginRight: "10px", color: "var(--cyan-500)", cursor: "pointer"}} onClick={() => onClickUndo(row.id)}  />}
-            <i className="pi pi-trash" style={{color: "var(--red-600)", cursor: "pointer"}} onClick={() => onClickDelete(row.id)}/>  
-          </>
+          const { id , state } = row as Order;
+
+          return <div style={{display:"flex",justifyContent:"flex-end"}}>
+            {(useActiveOrders &&  state === "Abierta"  )&& <Link style={{textDecoration:"none"}} to={`/admin/ordenes/${id}`}> <i className="pi pi-pen-to-square" style={{marginRight: "10px", color: "var(--cyan-500)"}}/> </Link>}
+            {(useActiveOrders &&  state === "Cerrada"  )&& <Link style={{textDecoration:"none"}} to={`/admin/ordenes/${id}`}> <i className="pi pi-eye" style={{marginRight: "10px", color: "var(--cyan-500)"}}/> </Link>}
+            {!useActiveOrders &&  <i className="pi pi-undo" style={{marginRight: "10px", color: "var(--cyan-500)", cursor: "pointer"}} onClick={() => onClickUndo(id)}  />}
+            { state === "Cerrada" && <i className="pi pi-lock-open" style={{marginRight: "10px", color: "var(--cyan-500)", cursor: "pointer"}} onClick={() => onClickRevertClosed(id)}  />}
+            <i className="pi pi-trash" style={{color: "var(--red-600)", cursor: "pointer"}} onClick={() => onClickDelete(id)}/>  
+          </div>
         }}/>
       </StyledDataTable>
+
+     <Button icon="pi pi-file-export" rounded aria-label="Filter"/>
     </TableContainer>
   );
 };

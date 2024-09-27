@@ -116,6 +116,7 @@ const getErrors = (values: any) =>
 
 interface Props
 {
+    disabled: boolean;
     callBackDialogAdd: (newMovimiento: Movement) => void;
     defaultValue: Movement | null;
     callBackUpdate: (toUpdate: Movement) => void;
@@ -123,6 +124,7 @@ interface Props
 
 const CreateOrUpdateMovimiento = (props: Props) => 
 {
+    const { disabled } = props;
     const dispatch = useDispatch();
 
     const [isLoading, setIsLoading] = useState(false);
@@ -547,10 +549,10 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
     return <Form onSubmit={FormMovimiento.handleSubmit} style={styleForm}>    
         <FirstRow>
-            <SelectButton id="select-type" value={FormMovimiento.values.type} onChange={(e) => FormMovimiento.setFieldValue("type",e.target.value)} options={Types}/>     
+            <SelectButton id="select-type" value={FormMovimiento.values.type} onChange={(e) => FormMovimiento.setFieldValue("type",e.target.value)} options={Types} disabled={disabled}/>     
             <ContainerInput>
                 <FloatLabel>
-                    <InputNumber id="amount" locale="de-DE" minFractionDigits={2} maxFractionDigits={2} value={FormMovimiento.values.amount} onChange={e => FormMovimiento.setFieldValue("amount",e.value)} />
+                    <InputNumber id="amount" locale="de-DE" minFractionDigits={2} maxFractionDigits={2} value={FormMovimiento.values.amount} onChange={e => FormMovimiento.setFieldValue("amount",e.value)} disabled={disabled}/>
                     <label htmlFor="amount">Importe</label>    
                 </FloatLabel>  
                 {getFormErrorMessage("amount")}
@@ -558,7 +560,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
 
             <ContainerInput>
                 <FloatLabel>
-                    <InputText id="description" value={FormMovimiento.values.description} onChange={e => FormMovimiento.setFieldValue("description",e.target.value)}/>
+                    <InputText id="description" value={FormMovimiento.values.description} onChange={e => FormMovimiento.setFieldValue("description",e.target.value)} disabled={disabled}/>
                     <label htmlFor="description">Descripción</label>
                 </FloatLabel>
                 {getFormErrorMessage("description")}
@@ -570,7 +572,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         <ContainerInput>
             <FloatLabel>
                 <AutoComplete dropdown id="origin" value={FormMovimiento.values.account} suggestions={FilteredOrigins} onBlur={onLeaveLedgerAccount}
-                completeMethod={searchMethodOrigins} itemTemplate={templateOptionLedgerAccount} selectedItemTemplate={templateOptionLedgerAccount} onChange={onChangeOrigin}/>
+                completeMethod={searchMethodOrigins} itemTemplate={templateOptionLedgerAccount} selectedItemTemplate={templateOptionLedgerAccount} onChange={onChangeOrigin}  disabled={disabled}/>
                 <label htmlFor="account">Cuenta Contable (Número - Código Abr - Nombre)</label>
             </FloatLabel>
             {getFormErrorMessage("account")}
@@ -580,7 +582,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         <ContainerInput>
             <FloatLabel>
                 <AutoComplete dropdown id="beneficiary" value={FormMovimiento.values.beneficiary} suggestions={FilteredBeneficiaries} forceSelection
-                completeMethod={searchMethodBeneficiaries} itemTemplate={templateOptionBeneficiary} selectedItemTemplate={templateOptionBeneficiary} onChange={onChangeBeneficiary}/>
+                completeMethod={searchMethodBeneficiaries} itemTemplate={templateOptionBeneficiary} selectedItemTemplate={templateOptionBeneficiary} onChange={onChangeBeneficiary} disabled={disabled}/>
                 <label htmlFor="beneficiary">Beneficiario a cobrar (Número - Código - Nombre)</label>
             </FloatLabel>
             {getFormErrorMessage("beneficiary")}
@@ -590,7 +592,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
             <ContainerInput>
                 <FloatLabel>
                     <AutoComplete dropdown forceSelection id="paymentType" value={FormMovimiento.values.paymentType} field="type" suggestions={FilteredPaymentTypes}
-                    completeMethod={searchMethodPaymentTypes}  onChange={onChangePaymentType} itemTemplate={templateOptionPaymentTypes}/>
+                    completeMethod={searchMethodPaymentTypes}  onChange={onChangePaymentType} itemTemplate={templateOptionPaymentTypes} disabled={disabled}/>
                     <label htmlFor="paymentType">Metodo de Pago</label>
                 </FloatLabel>
                 {getFormErrorMessage("paymentType")}
@@ -598,7 +600,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
             <ContainerInput>
                 <FloatLabel>
                     <AutoComplete emptyMessage="El beneficiario no tiene bancos" dropdown id="bankAccount" value={FormMovimiento.values.bankAccount} onBlur={onLeaveBank}
-                    suggestions={FilteredOriginBanks} completeMethod={searchMethodBankAccount} itemTemplate={templateOptionOriginBank} selectedItemTemplate={templateOptionOriginBank}  onChange={onChangeOriginBank}/>
+                    suggestions={FilteredOriginBanks} completeMethod={searchMethodBankAccount} itemTemplate={templateOptionOriginBank} selectedItemTemplate={templateOptionOriginBank}  onChange={onChangeOriginBank} disabled={disabled}/>
                     <label htmlFor="bankAccount">Banco (CBU de beneficiario y banco)</label>
                 </FloatLabel>
                 {getFormErrorMessage("bankAccount")}
@@ -614,7 +616,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
             </ContainerInput>
             <ContainerInput>
                 <FloatLabel>
-                    <InputText id="operation" value={FormMovimiento.values.operation} onChange={e => FormMovimiento.setFieldValue("operation",e.target.value)}/>
+                    <InputText id="operation" value={FormMovimiento.values.operation} onChange={e => FormMovimiento.setFieldValue("operation",e.target.value)} disabled={disabled}/>
                     <label htmlFor="operation">Operación</label>
                 </FloatLabel>
             </ContainerInput>
@@ -624,7 +626,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
             <ContainerInput>
                 <FloatLabel>
                     <AutoComplete id="sectional" value={FormMovimiento.values.sectional} dropdown suggestions={FilteredSectionals} forceSelection  completeMethod={searchMethodSectionals} 
-                    itemTemplate={templateOptionSectionals} selectedItemTemplate={templateOptionSectionals} onChange={onChangeSectional}/>
+                    itemTemplate={templateOptionSectionals} selectedItemTemplate={templateOptionSectionals} onChange={onChangeSectional} disabled={disabled}/>
                     <label htmlFor="sectional">Seccional (Número - Código - Nombre)</label>
                 </FloatLabel>
                 {getFormErrorMessage("sectional")}
@@ -642,7 +644,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
             <ContainerInput>
                 <FloatLabel>
                     <AutoComplete id="concept" value={FormMovimiento.values.concept} dropdown suggestions={FilteredConcepts} forceSelection
-                    completeMethod={searchMethodConcepts} itemTemplate={templateOptionConcepts} selectedItemTemplate={templateOptionConcepts} onChange={onChangeConcept}/>
+                    completeMethod={searchMethodConcepts} itemTemplate={templateOptionConcepts} selectedItemTemplate={templateOptionConcepts} onChange={onChangeConcept} disabled={disabled}/>
                     <label htmlFor="concept">Concepto (Número - Código - Nombre)</label>
                 </FloatLabel>
                 {getFormErrorMessage("concept")}
@@ -650,20 +652,22 @@ const CreateOrUpdateMovimiento = (props: Props) =>
            
             <ContainerInput>
                 <FloatLabel>
-                    <InputTextarea id="details"  rows={3} value={FormMovimiento.values.details} onChange={e => FormMovimiento.setFieldValue("details",e.target.value)}/>
+                    <InputTextarea id="details"  rows={3} value={FormMovimiento.values.details} onChange={e => FormMovimiento.setFieldValue("details",e.target.value)} disabled={disabled}/>
                     <label htmlFor="details">Detalles</label>
                 </FloatLabel>
                 {getFormErrorMessage("details")}
             </ContainerInput> 
         </SecondRow>
 
-        <Dropzone  multiple id="imageUpload" onDrop={onDrop}  type="file" onChange={onSelectFile} value={""}  accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf,image/jpeg,image/png,image/jpg"></Dropzone>
-        <AttachmentsContainer>
-            {AttachmentsSorted.map((attachment:AttachmentType | string,index: number) => <Attachment attachment={attachment} attachmentIndex={index} key={attachment.toString()} removeFile={removeFile}/>)}
-        </AttachmentsContainer>
+        {!disabled && <>
+            <Dropzone  multiple id="imageUpload" onDrop={onDrop}  type="file" onChange={onSelectFile} value={""}  accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf,image/jpeg,image/png,image/jpg"></Dropzone>
+            <AttachmentsContainer>
+                {AttachmentsSorted.map((attachment:AttachmentType | string,index: number) => <Attachment attachment={attachment} attachmentIndex={index} key={attachment.toString()} removeFile={removeFile}/>)}
+            </AttachmentsContainer>
+        </>}
         <div>
-            <Button label={props.defaultValue === null ? 'Agregar' : 'Actualizar' } type="submit" id="button_add"/>
-            <Button label="Limpiar" type="button" text onClick={cleanForm}/>
+            <Button label={props.defaultValue === null ? 'Agregar' : 'Actualizar' } disabled={disabled}  type="submit" id="button_add"/>
+            <Button label="Limpiar" disabled={disabled} type="button" text onClick={cleanForm}/>
         </div>
     </Form>
 }
