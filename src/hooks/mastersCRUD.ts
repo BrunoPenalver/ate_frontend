@@ -10,9 +10,9 @@ export const useMastersCRUD = (title= "") =>
 { 
   const BeneficiarySchema: MasterCRUD = 
   {
-      title: "Beneficiarios",
-      singular: "Beneficiario",
-      plural: "Beneficiarios",
+      title: "Proovedores",
+      singular: "Proovedor",
+      plural: "Proovedores",
       ObjectKeys: [
         {
           key: "id",
@@ -46,7 +46,7 @@ export const useMastersCRUD = (title= "") =>
         {
           key:"cuit",
           label:"CUIT",
-          field:{type:"input", rules:["required", "validCuit"]},
+          field:{type:"input", rules:["required", "validCuit","existingCuit"]},
           showInTable:true,
           showInForm:true,
         },
@@ -62,14 +62,14 @@ export const useMastersCRUD = (title= "") =>
           key: "province",
           label: "Provincia",
           field: { type: "select", rules: ["required"], getOptionsFrom: "provinces/options"},
-          showInTable: true,
+          showInTable: false,
           showInForm: true,
         },
         {
           key: "city",
           label: "Localidad",
           field: { type: "select", rules: ["required"], getOptionsFrom: "cities/options"},
-          showInTable: true,
+          showInTable: false,
           showInForm: true,
         },
         {
@@ -83,14 +83,14 @@ export const useMastersCRUD = (title= "") =>
           key:"phone"
           ,label:"Teléfono",
           field:{type:"input", rules:[]},
-          showInTable:true,
+          showInTable:false,
           showInForm:true,
         },
         {
           key:"email"
           ,label:"Email",
           field:{type:"input", rules:[]},
-          showInTable:false,
+          showInTable:true,
           showInForm:true,
         },
         {
@@ -203,7 +203,7 @@ export const useMastersCRUD = (title= "") =>
         },
         {
           key: "CBU",
-          label: "CBU",
+          label: "CBU/CVU",
           field: { type: "input", rules: [] , as:"mask" },
           dependsOn: "registryType",
           showInTable: true,
@@ -274,11 +274,78 @@ export const useMastersCRUD = (title= "") =>
         delete: "accounts/:id",
       },
     }
+
+    const AccountsSchema: MasterCRUD = {
+      title: "Plan de cuentas",
+      singular: "Cuenta contable",
+      plural: "Cuentas contables",
+      ObjectKeys: [
+        {
+          key: "id",
+          label: "ID",
+          field: { type: "readonly", rules: ["required"] },
+          isID: true,
+          showInTable: true,
+          showInForm: true,
+        },
+        {
+          key: "mainId",
+          label: "Id cuenta principal",
+          field: { type: "readonly", rules: ["required"] },
+          isID: true,
+          showInTable: true,
+          showInForm: true,
+        },
+        {
+          key: "code",
+          label: "Código de cuenta",
+          field: { type: "input", rules: ["required"] },
+          showInTable: true,
+          showInForm: true,
+        },
+        {
+          key:"account",
+          label:"Denominación",
+          field:{type:"input", rules:["required"]},
+          showInTable:true,
+          showInForm:true,
+        },
+        {
+          key:"shortCode",
+          label:"Cod. abr.",
+          field:{type:"input", rules:["required"]},
+          showInTable:true,
+          showInForm:true,
+        },
+        {
+          key: "balance",
+          label: "Saldo",
+          field: { type: "input", rules: ["required"] },
+          showInTable: true,
+          showInForm: true,
+        },
+        {
+          key: "subAccount",
+          label: "Subcuenta",
+          field: { type: "input", rules: ["required"] },
+          showInTable: true,
+          showInForm: true,
+        },
+      ],
+      API: {
+        get: "accountsplan",
+        post: "accountsplan",
+        put: "accountsplan/:id",
+        patch: "accountsplan/:id",
+        delete: "accountsplan/:id",
+      },
+    }
     
   const MastersTab: MasterCRUD[] = [
     BeneficiarySchema,
     ConceptSchema,
-    LedgerAccountSchema
+    LedgerAccountSchema,
+    AccountsSchema
   ].sort((a, b) => a.plural.localeCompare(b.title));
 
   if(title.length > 0)

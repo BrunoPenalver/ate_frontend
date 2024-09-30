@@ -12,4 +12,6 @@ export default interface BankAccount
     createdAt: string;
     updatedAt: string;
     active?: boolean;
+    cuit: string;
+    credicoop: boolean;
 }

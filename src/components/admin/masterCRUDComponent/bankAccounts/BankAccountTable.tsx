@@ -7,7 +7,7 @@ import { StyledCell } from "./styles";
 import { DeactivateBankAccountDialog } from "./DeactivateBankAccountDialog";
 import { DeleteDialog } from "./DeleteBankAccountDialog";
 import BankAccount from "../../../../interfaces/orders/bankAccount";
-import { formatCBU } from '../../../../utils/models';
+import { formatCBU, formatCuit } from '../../../../utils/models';
 import socket from "../../../../utils/socket";
 
 interface DialogProps {
@@ -156,7 +156,7 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
             header="ID"
             sortable
             body={(rowData) => (
-              <StyledCell $active={rowData?.active}>{rowData.id}</StyledCell>
+              <StyledCell $active={rowData?.active}>{rowData.id ? rowData.id : "---"}</StyledCell>
             )}
           />
           <Column
@@ -164,15 +164,23 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
             header="Banco"
             sortable
             body={(rowData) => (
-              <StyledCell $active={rowData?.active}>{rowData.bank}</StyledCell>
+              <StyledCell $active={rowData?.active}>{rowData.bank ? rowData.bank : "---"}</StyledCell>
+            )}
+          />
+          <Column
+            field="credicoop"
+            header="Tipo de Banco"
+            sortable
+            body={(rowData) => (
+              <StyledCell $active={rowData?.active}>{rowData.credicoop ? "Credicoop" : "Otro"}</StyledCell>
             )}
           />
           <Column
             field="CBU"
-            header="CBU"
+            header="CBU/CVU"
             sortable
             body={(rowData) => (
-              <StyledCell $active={rowData?.active}>{formatCBU(rowData.CBU)}</StyledCell>
+              <StyledCell $active={rowData?.active}>{rowData.CBU ? formatCBU(rowData.CBU) : "---"}</StyledCell>
             )}
           />
           <Column
@@ -180,7 +188,7 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
             header="Alias"
             sortable
             body={(rowData) => (
-              <StyledCell $active={rowData?.active}>{rowData.alias}</StyledCell>
+              <StyledCell $active={rowData?.active}>{rowData.alias ? rowData.alias : "---"}</StyledCell>
             )}
           />
           <Column
@@ -188,7 +196,15 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
             header="Titular"
             sortable
             body={(rowData) => (
-              <StyledCell $active={rowData?.active}>{rowData.holder}</StyledCell>
+              <StyledCell $active={rowData?.active}>{rowData.holder ? rowData.holder : "---"}</StyledCell>
+            )}
+          />
+          <Column
+            field="cuit"
+            header="Cuit"
+            sortable
+            body={(rowData) => (
+              <StyledCell $active={rowData?.active}>{rowData.cuit ? formatCuit(rowData.cuit) : "---"}</StyledCell>
             )}
           />
           <Column
@@ -196,7 +212,7 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
             header="Numero"
             sortable
             body={(rowData) => (
-              <StyledCell $active={rowData?.active}>{rowData.number}</StyledCell>
+              <StyledCell $active={rowData?.active}>{rowData.number ? rowData.number : "---"}</StyledCell>
             )}
           />
           <Column
@@ -204,7 +220,7 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
             header="Tipo"
             sortable
             body={(rowData) => (
-              <StyledCell $active={rowData?.active}>{rowData.type}</StyledCell>
+              <StyledCell $active={rowData?.active}>{rowData.type ? rowData.type : "---"}</StyledCell>
             )}
           />
           <Column

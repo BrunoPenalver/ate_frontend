@@ -29,7 +29,7 @@ export const validateCBU = (cbu: string): boolean => {
     const calculoDigito2 = 10 - (suma2 % 10);
     const resultado2 = (calculoDigito2 === 10 ? 0 : calculoDigito2) === digitoVerificador2;
 
-    console.log(resultado1 && resultado2);
+  
     return resultado1 && resultado2;
 };
 
@@ -83,5 +83,6 @@ export const validateCUIT = (cuit: string): boolean => {
     const digitoVerificadorReal = parseInt(sanitizedCUIT[10]);
 
     // Verificar si el dígito verificador calculado coincide con el dígito verificador real
+    console.log(digitoVerificadorCalculado === digitoVerificadorReal);
     return digitoVerificadorCalculado === digitoVerificadorReal;
 };
