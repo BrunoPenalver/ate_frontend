@@ -1,0 +1,70 @@
+name: CI/CD para Docker Swarm (Local Registry con Compose y .env?)
+
+on:
+  push:
+    branches:
+      - qa  # Ejecutar el workflow cuando haya un push a la rama qa
+  pull_request:
+    branches:
+      - qa  # También para pull requests a la rama qa
+
+jobs:
+  build:
+    runs-on: qa-runner  # Ejecutar en el runner auto-hospedado
+    env:
+      REGISTRY_URL: 192.168.200.12:4000
+      IMAGE_NAME: ${{ github.repository }}  # Nombre del repositorio como nombre de la imagen
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Set up IMAGE_NAME variable
+        run: echo "IMAGE_NAME=${{ github.repository }}" | sed 's/\//_/g' >> $GITHUB_ENV
+
+      - name: Set up Docker Buildx
+        run: |
+          # Crear instancia de Buildx con buildkitd.toml personalizado
+          docker buildx inspect mybuilder || docker buildx create --name mybuilder --config $GITHUB_WORKSPACE/.github/workflows/buildkitd.toml --use
+
+          # Inspeccionar para confirmar que la instancia de buildx esté lista
+          docker buildx inspect --bootstrap
+
+      - name: Build, Tag, and Push Docker Image
+        run: |
+          # Construir la imagen utilizando la instancia de buildx con la configuración de registry insegura
+          docker buildx build --platform linux/amd64 -t $REGISTRY_URL/${{ env.IMAGE_NAME }}:${{ github.sha }} -f Dockerfile . --push
+
+          # Etiquetar la imagen
+          #docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} $REGISTRY_URL/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+          # Empujar la imagen a la registry local
+          #docker push $REGISTRY_URL/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+      - name: Remove Buildx instance
+        run: |
+          # Eliminar la instancia de buildx una vez que se ha completado el proceso
+          docker buildx rm mybuilder
+
+  deploy:
+    needs: build  # Desplegar después de que el trabajo 'build' termine exitosamente
+    runs-on: qa-runner
+    env:
+      REGISTRY_URL: 192.168.200.12:4000
+      IMAGE_NAME: ${{ github.repository }}  # Nombre del repositorio como nombre de la imagen
+    steps:
+      - name: Set up IMAGE_NAME variable
+        run: echo "IMAGE_NAME=${{ github.repository }}" | sed 's/\//_/g' >> $GITHUB_ENV
+
+      - name: Deploy to Docker Swarm with docker-compose.yml
+        run: |
+          # Export variables from .env
+          # export $(cat .env | xargs)
+
+          # Actualizar la imagen en el docker-compose.yml
+          sed -i "/image: $REGISTRY_URL/s|image:.*|image: $REGISTRY_URL/${{ env.IMAGE_NAME }}:${{ github.sha }}|g" $GITHUB_WORKSPACE/docker-compose.yaml
+          
+
+
+          # Desplegar el servicio usando Docker Compose en Docker Swarm
+          docker stack deploy --compose-file $GITHUB_WORKSPACE/docker-compose.yaml ${{ env.IMAGE_NAME }}
+
