@@ -7,7 +7,7 @@ import { StyledCell } from "./styles";
 import { DeactivateBankAccountDialog } from "./DeactivateBankAccountDialog";
 import { DeleteDialog } from "./DeleteBankAccountDialog";
 import BankAccount from "../../../../interfaces/orders/bankAccount";
-import { formatCBU, formatCuit } from '../../../../utils/models';
+import { FieldValidation, formatCBU, formatCuit, individualTableisDataComplete } from '../../../../utils/models';
 import socket from "../../../../utils/socket";
 
 interface DialogProps {
@@ -223,6 +223,41 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
               <StyledCell $active={rowData?.active}>{rowData.type ? rowData.type : "---"}</StyledCell>
             )}
           />
+          <Column
+            header="Datos completos"
+            body={(rowData) => {
+              console.log("rowData", rowData);
+              // Generar el array de campos con nombre y valor
+              const fieldsToValidate: FieldValidation[] = [
+                { name: 'cuit', value: rowData.cuit },
+                { name: 'CBU', value: rowData.CBU },
+                { name: 'alias', value: rowData.alias },
+                { name: 'holder', value: rowData.holder },
+                {name: 'bank', value: rowData.bank},
+                {name: 'credicoop', value: rowData.credicoop},
+                {name: 'number', value: rowData.number},
+                {name: 'type', value: rowData.type}
+                
+              ];
+              console.log(fieldsToValidate, "Campos a validar")
+
+              return individualTableisDataComplete(fieldsToValidate) ? (
+                <i
+                  className="pi pi-check"
+                  style={{ color: "green", fontSize: "1.5em" }}
+                  aria-label="Datos completos"
+                ></i>
+              ) : (
+                <i
+                  className="pi pi-times"
+                  style={{ color: "red", fontSize: "1.5em" }}
+                  aria-label="Datos incompletos"
+                ></i>
+              );
+            }}
+            style={{ textAlign: 'center', width: '150px' }}
+          />
+          
           <Column
             header="Acciones"
             body={(row) => {
