@@ -226,7 +226,7 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
           <Column
             header="Datos completos"
             body={(rowData) => {
-              console.log("rowData", rowData);
+              
               // Generar el array de campos con nombre y valor
               const fieldsToValidate: FieldValidation[] = [
                 { name: 'cuit', value: rowData.cuit },
@@ -237,9 +237,9 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
                 {name: 'credicoop', value: rowData.credicoop},
                 {name: 'number', value: rowData.number},
                 {name: 'type', value: rowData.type}
-                
+
               ];
-              console.log(fieldsToValidate, "Campos a validar")
+              
 
               return individualTableisDataComplete(fieldsToValidate) ? (
                 <i

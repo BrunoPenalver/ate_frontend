@@ -4,7 +4,7 @@ import { Toast } from "primereact/toast";
 import { getTranslate } from "../utils/translates";
 import api from "../utils/api";
 import { MasterCRUD } from "../models/mastersModel";
-import { validateCBU, validateCUIT } from "../utils/models";
+import { formatCuit, validateCBU, validateCUIT } from "../utils/models";
 
 
 
@@ -89,12 +89,11 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
               // Prepara los parámetros para la solicitud
               const params = { cuit: sanitizedCUIT , code: beneficiaryCode };
             
-              console.log(params)
               const { data } = await api.get(`/beneficiaries/check-cuit`, { params });
-              console.log(data)
               if(data.exists)
               {
-                errors[key] = "El Cuit ingresado ya existe";
+                
+                errors[key] = `El Cuit ${formatCuit(sanitizedCUIT)} ya está registrado para el beneficiario con código ${data.existingCode}`;
                 break;
               }
             }
