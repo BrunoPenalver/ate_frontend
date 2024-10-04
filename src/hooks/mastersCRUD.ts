@@ -13,6 +13,9 @@ export const useMastersCRUD = (title= "") =>
       title: "Proovedores",
       singular: "Proovedor",
       plural: "Proovedores",
+      tooltip: [
+        "Código", "Tipo de beneficiario", "Razón social", "CUIT", "Email"
+      ],
       ObjectKeys: [
         {
           key: "id",

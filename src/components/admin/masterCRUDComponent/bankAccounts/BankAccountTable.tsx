@@ -7,8 +7,9 @@ import { StyledCell } from "./styles";
 import { DeactivateBankAccountDialog } from "./DeactivateBankAccountDialog";
 import { DeleteDialog } from "./DeleteBankAccountDialog";
 import BankAccount from "../../../../interfaces/orders/bankAccount";
-import { formatCBU, formatCuit } from '../../../../utils/models';
+import { FieldValidation, formatCBU, formatCuit, individualTableisDataComplete } from '../../../../utils/models';
 import socket from "../../../../utils/socket";
+import { Tooltip } from "primereact/tooltip";
 
 interface DialogProps {
   bankAccounts: BankAccount[];
@@ -17,6 +18,7 @@ interface DialogProps {
 
 export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps) => 
 {
+  const tooltip = ["Banco", "Tipo de Banco","CBU(Si no es Credicoop)","Alias", "Titular", "CUIT", "Nº Cuenta(Si es Credicoop)", "Tipo de cuenta" ];
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [isDeleteDialogVisible, setIsDeleteDialogVisible] = useState(false);
   const [isDeactivateDialogVisible, setIsDeactivateDialogVisible] =useState(false);
@@ -209,7 +211,7 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
           />
           <Column
             field="number"
-            header="Numero"
+            header="Nº de cuenta"
             sortable
             body={(rowData) => (
               <StyledCell $active={rowData?.active}>{rowData.number ? rowData.number : "---"}</StyledCell>
@@ -217,12 +219,81 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
           />
           <Column
             field="type"
-            header="Tipo"
+            header="Tipo de cuenta"
             sortable
             body={(rowData) => (
               <StyledCell $active={rowData?.active}>{rowData.type ? rowData.type : "---"}</StyledCell>
             )}
           />
+          <Column
+             header={
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <span>Datos correctos</span>
+                <i
+                  className="pi pi-info-circle"
+                  style={{ marginLeft: "8px", cursor: "pointer" }}
+                  id="datos-correctos-tooltip"
+                  aria-label="Información sobre campos validados"
+                ></i>
+                <Tooltip
+                  target="#datos-correctos-tooltip"
+                  position="bottom"
+                  className="custom-tooltip"
+                >
+                  <>
+                    {" "}
+                    <div>
+                      <strong>Campos validados:</strong>
+                      <ul style={{ marginTop: "8px"}}>
+                        {tooltip &&
+                          tooltip.map((item, index) => (
+                            <li style={{listStylePosition:"inside"}}  key={index}>{item}</li>
+                          ))}
+                      </ul>
+                    </div>{" "}
+                  </>
+                </Tooltip>
+              </div>
+            }
+            body={(rowData) => {
+              
+              // Generar el array de campos con nombre y valor
+              const fieldsToValidate: FieldValidation[] = [
+                { name: 'cuit', value: rowData.cuit },
+                { name: 'CBU', value: rowData.CBU },
+                { name: 'alias', value: rowData.alias },
+                { name: 'holder', value: rowData.holder },
+                {name: 'bank', value: rowData.bank},
+                {name: 'credicoop', value: rowData.credicoop},
+                {name: 'number', value: rowData.number},
+                {name: 'type', value: rowData.type}
+
+              ];
+              
+
+              return individualTableisDataComplete(fieldsToValidate) ? (
+                <i
+                  className="pi pi-check"
+                  style={{ color: "green", fontSize: "1.5em" }}
+                  aria-label="Datos completos"
+                ></i>
+              ) : (
+                <i
+                  className="pi pi-times"
+                  style={{ color: "red", fontSize: "1.5em" }}
+                  aria-label="Datos incompletos"
+                ></i>
+              );
+            }}
+            style={{ textAlign: 'center', width: '150px' }}
+          />
+          
           <Column
             header="Acciones"
             body={(row) => {

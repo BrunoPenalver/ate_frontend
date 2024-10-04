@@ -4,14 +4,14 @@ import { Toast } from "primereact/toast";
 import { getTranslate } from "../utils/translates";
 import api from "../utils/api";
 import { MasterCRUD } from "../models/mastersModel";
-import { validateCBU, validateCUIT } from "../utils/models";
+import { formatCuit, validateCBU, validateCUIT } from "../utils/models";
 
 
 
 
 export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
   /*######################### Obtener los datos de cada CRUD INDIVIDUAL ####################################*/
-  const { singular, plural, API, ObjectKeys } = item;
+  const { singular, plural, API, ObjectKeys,tooltip } = item;
 
   /*######################### Obtener valores iniciales como string vacío ####################################*/
   const getInitialValues = (ObjectKeys: any) => {
@@ -89,12 +89,11 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
               // Prepara los parámetros para la solicitud
               const params = { cuit: sanitizedCUIT , code: beneficiaryCode };
             
-              console.log(params)
               const { data } = await api.get(`/beneficiaries/check-cuit`, { params });
-              console.log(data)
               if(data.exists)
               {
-                errors[key] = "El Cuit ingresado ya existe";
+                
+                errors[key] = `El Cuit ${formatCuit(sanitizedCUIT)} ya está registrado para el beneficiario con código ${data.existingCode}`;
                 break;
               }
             }
@@ -442,7 +441,7 @@ const [loadingDelete, setLoadingDelete] = useState<boolean>(false);
     setLoadingDelete,
     switchStateModalDelete,
     setItemSwitchedStateAndSwitchModalDelete,
-
+    tooltip
 
 
   };
