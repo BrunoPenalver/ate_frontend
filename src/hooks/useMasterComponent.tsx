@@ -11,7 +11,7 @@ import { formatCuit, validateCBU, validateCUIT } from "../utils/models";
 
 export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
   /*######################### Obtener los datos de cada CRUD INDIVIDUAL ####################################*/
-  const { singular, plural, API, ObjectKeys } = item;
+  const { singular, plural, API, ObjectKeys,tooltip } = item;
 
   /*######################### Obtener valores iniciales como string vacío ####################################*/
   const getInitialValues = (ObjectKeys: any) => {
@@ -441,7 +441,7 @@ const [loadingDelete, setLoadingDelete] = useState<boolean>(false);
     setLoadingDelete,
     switchStateModalDelete,
     setItemSwitchedStateAndSwitchModalDelete,
-
+    tooltip
 
 
   };

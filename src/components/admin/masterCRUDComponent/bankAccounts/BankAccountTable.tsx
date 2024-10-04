@@ -9,6 +9,7 @@ import { DeleteDialog } from "./DeleteBankAccountDialog";
 import BankAccount from "../../../../interfaces/orders/bankAccount";
 import { FieldValidation, formatCBU, formatCuit, individualTableisDataComplete } from '../../../../utils/models';
 import socket from "../../../../utils/socket";
+import { Tooltip } from "primereact/tooltip";
 
 interface DialogProps {
   bankAccounts: BankAccount[];
@@ -17,6 +18,7 @@ interface DialogProps {
 
 export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps) => 
 {
+  const tooltip = ["Banco", "Tipo de Banco","CBU(Si no es Credicoop)","Alias", "Titular", "CUIT", "Nº Cuenta(Si es Credicoop)", "Tipo de cuenta" ];
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [isDeleteDialogVisible, setIsDeleteDialogVisible] = useState(false);
   const [isDeactivateDialogVisible, setIsDeactivateDialogVisible] =useState(false);
@@ -209,7 +211,7 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
           />
           <Column
             field="number"
-            header="Numero"
+            header="Nº de cuenta"
             sortable
             body={(rowData) => (
               <StyledCell $active={rowData?.active}>{rowData.number ? rowData.number : "---"}</StyledCell>
@@ -217,14 +219,48 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
           />
           <Column
             field="type"
-            header="Tipo"
+            header="Tipo de cuenta"
             sortable
             body={(rowData) => (
               <StyledCell $active={rowData?.active}>{rowData.type ? rowData.type : "---"}</StyledCell>
             )}
           />
           <Column
-            header="Datos completos"
+             header={
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <span>Datos correctos</span>
+                <i
+                  className="pi pi-info-circle"
+                  style={{ marginLeft: "8px", cursor: "pointer" }}
+                  id="datos-correctos-tooltip"
+                  aria-label="Información sobre campos validados"
+                ></i>
+                <Tooltip
+                  target="#datos-correctos-tooltip"
+                  position="bottom"
+                  className="custom-tooltip"
+                >
+                  <>
+                    {" "}
+                    <div>
+                      <strong>Campos validados:</strong>
+                      <ul style={{ marginTop: "8px"}}>
+                        {tooltip &&
+                          tooltip.map((item, index) => (
+                            <li style={{listStylePosition:"inside"}}  key={index}>{item}</li>
+                          ))}
+                      </ul>
+                    </div>{" "}
+                  </>
+                </Tooltip>
+              </div>
+            }
             body={(rowData) => {
               
               // Generar el array de campos con nombre y valor

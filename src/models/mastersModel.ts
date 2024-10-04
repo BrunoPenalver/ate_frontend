@@ -1,3 +1,5 @@
+
+
 export interface Option {
     label: string;
     value: any;
@@ -35,6 +37,7 @@ export interface Option {
     singular: string;
     plural: string;
     ObjectKeys: MasterCRUDColumnObjectKeys[];
+    tooltip?: string[];
     API: {
       get: string;
       post: string;

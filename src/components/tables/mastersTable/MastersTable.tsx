@@ -16,6 +16,7 @@ import {
 import { BankAccountsDialog } from "../../admin/masterCRUDComponent/bankAccounts/BankAccountsDialog";
 import { DetailDialog } from "../../admin/masterCRUDComponent/beneficiaries/DetailDialog";
 import { isDataComplete } from "../../../utils/models";
+import { Tooltip } from "primereact/tooltip";
 
 interface StyledTableProps {
   items: any[];
@@ -31,12 +32,14 @@ interface StyledTableProps {
   errorOnLoad: boolean;
   OptionsForms: Option[];
   input: ReactElement;
+  tooltip?: string[];
 }
 
 export const StyledMastersTable = (props: StyledTableProps) => {
   const {
     items,
     ObjectKeys,
+    tooltip,
     plural,
     fn1,
     fn2,
@@ -46,7 +49,6 @@ export const StyledMastersTable = (props: StyledTableProps) => {
     errorOnLoad,
     input,
   } = props;
-
 
   const [isBankAccountsVisible, setIsBankAccountsVisible] = useState(false);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState<any>(null);
@@ -120,25 +122,59 @@ export const StyledMastersTable = (props: StyledTableProps) => {
             return null; // Añadido retorno para evitar undefined
           })}
 
-          { plural !== "Cuentas contables" &&
-          <Column
-            header="Datos correctos"
-            body={(rowData) => {
-              return isDataComplete(rowData, ObjectKeys) ? (
-                <i
-                  className="pi pi-check"
-                  style={{ color: "green", fontSize: "1.5em" }}
-                ></i>
-              ) : (
-                <i
-                  className="pi pi-times"
-                  style={{ color: "red", fontSize: "1.5em" }}
-                ></i>
-              );
-            }}
-            style={{ textAlign: "center", width: "150px" }}
-          />
-}
+          {plural !== "Cuentas contables" && (
+            <Column
+              header={
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <span>Datos correctos</span>
+                  <i
+                    className="pi pi-info-circle"
+                    style={{ marginLeft: "8px", cursor: "pointer" }}
+                    id="datos-correctos-tooltip"
+                    aria-label="Información sobre campos validados"
+                  ></i>
+                  <Tooltip
+                    target="#datos-correctos-tooltip"
+                    position="bottom"
+                    className="custom-tooltip"
+                  >
+                    <>
+                      {" "}
+                      <div>
+                        <strong>Campos validados:</strong>
+                        <ul style={{ marginTop: "8px"}}>
+                          {tooltip &&
+                            tooltip.map((item, index) => (
+                              <li style={{listStylePosition:"inside"}}   key={index}>{item}</li>
+                            ))}
+                        </ul>
+                      </div>{" "}
+                    </>
+                  </Tooltip>
+                </div>
+              }
+              body={(rowData) => {
+                return isDataComplete(rowData, ObjectKeys) ? (
+                  <i
+                    className="pi pi-check"
+                    style={{ color: "green", fontSize: "1.5em" }}
+                  ></i>
+                ) : (
+                  <i
+                    className="pi pi-times"
+                    style={{ color: "red", fontSize: "1.5em" }}
+                  ></i>
+                );
+              }}
+              style={{ textAlign: "center", width: "150px" }}
+            />
+          )}
           {plural === "Proovedores" && (
             <Column
               header="Cuentas bancarias"
