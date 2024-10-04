@@ -19,6 +19,7 @@ import { InputText } from "primereact/inputtext";
 import Order from "../../../interfaces/orders/order";
 import { DataTableDataSelectableEvent } from "primereact/datatable";
 import { getExportacion } from "../../../utils/exactas";
+import { getPDF } from "../../../utils/ordenes";
 
 interface Props
 {
@@ -192,6 +193,18 @@ export const StyledTable = (props:Props) =>
     }
   }
 
+  const onClickPDF = async (id: number) =>
+  {
+    try 
+    {
+      await getPDF(id);
+    } 
+    catch (error) 
+    {
+      dispatch(createAlert({severity: "error", detail: "Error al descargar el archivo",summary: "Error"}));
+    }
+  }
+
   const onClickExport = () =>
   {
     const ordersIds = selectedProducts.map(order => order.id);
@@ -248,8 +261,9 @@ export const StyledTable = (props:Props) =>
           const { id , state, exportedAt } = row as Order;
 
           return <div style={{display:"flex",justifyContent:"flex-end"}}>
-            {(useActiveOrders &&  state === "Abierta"  )&& <Link style={{textDecoration:"none"}} to={`/admin/ordenes/${id}`}> <i className="pi pi-pen-to-square" style={{marginRight: "10px", color: "var(--cyan-500)"}}/> </Link>}
-            {(useActiveOrders &&  state === "Cerrada"  )&& <Link style={{textDecoration:"none"}} to={`/admin/ordenes/${id}`}> <i className="pi pi-eye" style={{marginRight: "10px", color: "var(--cyan-500)"}}/> </Link>}
+            {(state === "Cerrada" && <i className="pi pi-file-pdf" style={{marginRight: "10px", color: "red", cursor: "pointer"}} onClick={() => onClickPDF(id)}  />)}
+            {(useActiveOrders &&  state !== "Abierta"  )&& <Link style={{textDecoration:"none"}} to={`/admin/ordenes/${id}`}> <i className="pi pi-pen-to-square" style={{marginRight: "10px", color: "var(--cyan-500)"}}/> </Link>}
+            {(useActiveOrders &&  state === "Abierta"  )&& <Link style={{textDecoration:"none"}} to={`/admin/ordenes/${id}`}> <i className="pi pi-eye" style={{marginRight: "10px", color: "var(--cyan-500)"}}/> </Link>}
             {!useActiveOrders &&  <i className="pi pi-undo" style={{marginRight: "10px", color: "var(--cyan-500)", cursor: "pointer"}} onClick={() => onClickUndo(id)}  />}
             { (state === "Cerrada" && exportedAt === null) && <i className="pi pi-lock-open" style={{marginRight: "10px", color: "var(--cyan-500)", cursor: "pointer"}} onClick={() => onClickRevertClosed(id)}  />}
             <i className="pi pi-trash" style={{color: "var(--red-600)", cursor: "pointer"}} onClick={() => onClickDelete(id)}/>  

@@ -89,7 +89,6 @@ const Order = (props: Props) =>
             if(prevData)
             {
                 const prevDataParsed = JSON.parse(prevData);
-
                 return { ...prevDataParsed, date: new Date(prevDataParsed.date) };
             }
         }
@@ -125,9 +124,8 @@ const Order = (props: Props) =>
                 Payload.append(`movements[${index}][type]`, movimiento.type);
                 Payload.append(`movements[${index}][description]`, movimiento.description);
                 Payload.append(`movements[${index}][amount]`, movimiento.amount.toString());
-                Payload.append(`movements[${index}][conceptId]`, movimiento.concept.id.toString());
                 Payload.append(`movements[${index}][sectionalId]`, movimiento.sectional.id.toString());
-                Payload.append(`movements[${index}][accountId]`, movimiento.account.id.toString());
+                Payload.append(`movements[${index}][accountPlanId]`, movimiento.accountPlan.id.toString());
                 Payload.append(`movements[${index}][beneficiaryId]`, movimiento.beneficiary.id.toString());
                 Payload.append(`movements[${index}][bankAccountId]`, movimiento.bankAccount.id.toString());
                 Payload.append(`movements[${index}][paymentTypeId]`, movimiento.paymentType.id.toString());
@@ -175,9 +173,8 @@ const Order = (props: Props) =>
                 Payload.append(`movements[${index}][type]`, movimiento.type);
                 Payload.append(`movements[${index}][description]`, movimiento.description);
                 Payload.append(`movements[${index}][amount]`, movimiento.amount.toString());
-                Payload.append(`movements[${index}][conceptId]`, movimiento.concept.id.toString());
+                Payload.append(`movements[${index}][accountPlanId]`, movimiento.accountPlan.id.toString());
                 Payload.append(`movements[${index}][sectionalId]`, movimiento.sectional.id.toString());
-                Payload.append(`movements[${index}][accountId]`, movimiento.account.id.toString());
                 Payload.append(`movements[${index}][beneficiaryId]`, movimiento.beneficiary.id.toString());
                 Payload.append(`movements[${index}][bankAccountId]`, movimiento.bankAccount.id.toString());
                 Payload.append(`movements[${index}][paymentTypeId]`, movimiento.paymentType.id.toString());
@@ -199,8 +196,6 @@ const Order = (props: Props) =>
             dispatch(createAlert({ severity: "success", summary: "Orden actualizada", detail: `La orden fue actualizada correctamente`}));
 
             return true;
-        
-           
         } 
         catch (error: any) 
         {
