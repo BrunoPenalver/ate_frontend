@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { AccountTypeTypes } from "../../../../models/accountType";
 import api from "../../../../utils/api";
-import BankAccount from '../../../../interfaces/orders/bankAccount';
 import { validateCBU, validateCUIT } from "../../../../utils/models";
 
 // Define las opciones para el campo de tipo utilizando los valores de AccountTypeTypes
@@ -63,7 +62,7 @@ const ErrorMessage = styled.div`
 
 interface DialogProps {
   isOpen: boolean;
-  bankAccount: BankAccount | null;
+  bankAccount: any;
   onClose: () => void;
   isEditing: boolean;
   beneficiaryId: number;

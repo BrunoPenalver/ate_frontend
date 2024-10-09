@@ -232,52 +232,52 @@ export const useMastersCRUD = (title= "") =>
         delete: "concepts/:id",
       },
     }
-    const LedgerAccountSchema: MasterCRUD = {
-      title: "Cuentas contables",
-      singular: "Cuenta contable",
-      plural: "Cuentas contables",
-      ObjectKeys: [
-        {
-          key: "id",
-          label: "ID",
-          field: { type: "readonly", rules: ["required"] },
-          isID: true,
-          showInTable: true,
-          showInForm: true,
-        },
-        {
-          key: "code",
-          label: "Código",
-          field: { type: "input", rules: ["required"] },
-          showInTable: true,
-          showInForm: true,
-        },
-        {
-          key:"number",
-          label:"Número",
-          field:{type:"input", rules:["required"]},
-          showInTable:true,
-          showInForm:true,
-        },
+    // const LedgerAccountSchema: MasterCRUD = {
+    //   title: "Cuentas contables",
+    //   singular: "Cuenta contable",
+    //   plural: "Cuentas contables",
+    //   ObjectKeys: [
+    //     {
+    //       key: "id",
+    //       label: "ID",
+    //       field: { type: "readonly", rules: ["required"] },
+    //       isID: true,
+    //       showInTable: true,
+    //       showInForm: true,
+    //     },
+    //     {
+    //       key: "code",
+    //       label: "Código",
+    //       field: { type: "input", rules: ["required"] },
+    //       showInTable: true,
+    //       showInForm: true,
+    //     },
+    //     {
+    //       key:"number",
+    //       label:"Número",
+    //       field:{type:"input", rules:["required"]},
+    //       showInTable:true,
+    //       showInForm:true,
+    //     },
         
-          {
-            key:"name",
-            label:"Descripción",
-            field:{type:"input", rules:["required"]},
-            showInTable:true,
-            showInForm:true,
-          },
+    //       {
+    //         key:"name",
+    //         label:"Descripción",
+    //         field:{type:"input", rules:["required"]},
+    //         showInTable:true,
+    //         showInForm:true,
+    //       },
         
 
-      ],
-      API: {
-        get: "accounts",
-        post: "accounts",
-        put: "accounts/:id",
-        patch: "accounts/:id",
-        delete: "accounts/:id",
-      },
-    }
+    //   ],
+    //   API: {
+    //     get: "accounts",
+    //     post: "accounts",
+    //     put: "accounts/:id",
+    //     patch: "accounts/:id",
+    //     delete: "accounts/:id",
+    //   },
+    // }
 
     const AccountsSchema: MasterCRUD = {
       title: "Plan de cuentas",

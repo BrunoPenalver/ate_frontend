@@ -1,4 +1,4 @@
-import React from 'react'
+
 import CreateOrUpdateMovimiento from './Movimiento'
 
 describe('<CreateOrUpdateMovimiento />', () => {
