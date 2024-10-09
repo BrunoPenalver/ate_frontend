@@ -14,7 +14,7 @@ export const useMastersCRUD = (title= "") =>
       singular: "Proovedor",
       plural: "Proovedores",
       tooltip: [
-        "Código", "Tipo de beneficiario", "Razón social", "CUIT", "Email"
+        "Código", "Tipo de Proveedor", "Razón social", "CUIT", "Email"
       ],
       ObjectKeys: [
         {
@@ -34,7 +34,7 @@ export const useMastersCRUD = (title= "") =>
         },
         {
           key: "beneficiaryType",
-          label: "Tipo de beneficiario",
+          label: "Tipo de Proveedor",
           field: { type: "select", rules: ["required"], getOptionsFrom: "beneficiaryTypes/options"},
           showInTable: true,
           showInForm: true,
@@ -53,6 +53,13 @@ export const useMastersCRUD = (title= "") =>
           showInTable:true,
           showInForm:true,
         },
+        {
+          key:"email"
+          ,label:"Email",
+          field:{type:"input", rules:["required"]},
+          showInTable:true,
+          showInForm:true,
+        },
 
         {
           key: "address",
@@ -64,14 +71,14 @@ export const useMastersCRUD = (title= "") =>
         {
           key: "province",
           label: "Provincia",
-          field: { type: "select", rules: ["required"], getOptionsFrom: "provinces/options"},
+          field: { type: "select", rules: [], getOptionsFrom: "provinces/options"},
           showInTable: false,
           showInForm: true,
         },
         {
           key: "city",
           label: "Localidad",
-          field: { type: "select", rules: ["required"], getOptionsFrom: "cities/options"},
+          field: { type: "select", rules: [], getOptionsFrom: "cities/options"},
           showInTable: false,
           showInForm: true,
         },
@@ -89,13 +96,7 @@ export const useMastersCRUD = (title= "") =>
           showInTable:false,
           showInForm:true,
         },
-        {
-          key:"email"
-          ,label:"Email",
-          field:{type:"input", rules:[]},
-          showInTable:true,
-          showInForm:true,
-        },
+
         {
           key:"contact",
           label:"Contacto",
@@ -347,7 +348,7 @@ export const useMastersCRUD = (title= "") =>
   const MastersTab: MasterCRUD[] = [
     BeneficiarySchema,
     ConceptSchema,
-    LedgerAccountSchema,
+    // LedgerAccountSchema,
     AccountsSchema
   ].sort((a, b) => a.plural.localeCompare(b.title));
 

@@ -116,13 +116,13 @@ export const isDataComplete = (
     businessName: (value) => !isEmptyValue(value),
     cuit: (value) => validateCUIT(value),
     email: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
-    address: (value) => !isEmptyValue(value),
-    province: (value) => !isEmptyValue(value),
-    city: (value) => !isEmptyValue(value),
-    postalCode: (value) => !isEmptyValue(value),
-    phone: (value) => !isEmptyValue(value),
-    contact: (value) => !isEmptyValue(value),
-    position: (value) => !isEmptyValue(value),
+    // address: (value) => !isEmptyValue(value),
+    // province: (value) => !isEmptyValue(value),
+    // city: (value) => !isEmptyValue(value),
+    // postalCode: (value) => !isEmptyValue(value),
+    // phone: (value) => !isEmptyValue(value),
+    // contact: (value) => !isEmptyValue(value),
+    // position: (value) => !isEmptyValue(value),
   };
 
   // Filtrar las keys que tienen una validación definida
@@ -150,6 +150,7 @@ export const individualTableisDataComplete = (fields: FieldValidation[]): boolea
     // Definir las validaciones para cada campo
     const fieldValidations: Record<string, (value: any) => boolean> = {
       cuit: (value) => !isEmptyValue(value) && validateCUIT(value),
+      cbuType: (value) => !isEmptyValue(value),
       CBU: (value) => !isEmptyValue(value) && validateCBU(value),
       alias: (value) => !isEmptyValue(value),
       holder: (value) => !isEmptyValue(value),
@@ -173,6 +174,7 @@ export const individualTableisDataComplete = (fields: FieldValidation[]): boolea
     } else if (credicoop === true) {
       // Si credicoop es true, validar 'number' y excluir 'CBU'
       fieldsToValidate = fieldsToValidate.filter(field => field.name !== 'CBU');
+      fieldsToValidate = fieldsToValidate.filter(field => field.name !== 'cbuType');
     }
   
     // Verificar que todos los campos filtrados cumplan con sus respectivas validaciones

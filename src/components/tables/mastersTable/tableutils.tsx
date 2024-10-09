@@ -59,7 +59,7 @@ export const RegularColumn = (key: any, index: number) => {
               ) : key?.label === "Localidad" ? (
                 `${rowData?.city?.name}`
                 
-              ) : key?.label === "Tipo de beneficiario" ? (
+              ) : key?.label === "Tipo de Proveedor" ? (
                 `${rowData?.beneficiaryType?.type}`
                 
               ) : key?.label === "Tipo de cuenta" ? (
