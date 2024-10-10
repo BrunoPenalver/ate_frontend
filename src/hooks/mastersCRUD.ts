@@ -140,102 +140,10 @@ export const useMastersCRUD = (title= "") =>
       },
 
     };
-    const ConceptSchema: MasterCRUD = {
-      title: "Conceptos",
-      singular: "Concepto",
-      plural: "Conceptos",
-      ObjectKeys: [
-        {
-          key: "id",
-          label: "ID",
-          field: { type: "readonly", rules: ["required"] },
-          isID: true,
-          showInTable: true,
-          showInForm: false,
-        },
-        {
-          key: "code",
-          label: "Código",
-          field: { type: "input", rules: ["required"] },
-          showInTable: true,
-          showInForm: true,
-        },
-        {
-          key: "registryType",
-          label: "Tipo de registro",
-          field: { type: "select", rules: ["required"], getOptionsFrom: "registrytypes/options"},
-          showInTable: true,
-          showInForm: true,
-        },
-        {
-          key: "description",
-          label: "Descripción",
-          field: { type: "input", rules: ["required"] },
-          showInTable: true,
-          showInForm: true,
-        },
-
-        { 
-          key: "debitAccount",
-          label: "Cuenta debe",
-          field: { type: "input", rules: ["required"]},
-          showInTable: true,
-          showInForm: true,
-        },
-        { 
-          key: "creditAccount",
-          label: "Cuenta haber",
-          field: { type: "input", rules: ["required"]},
-          showInTable: true,
-          showInForm: true,
-        },
-        {
-          key: "accountType",
-          label: "Tipo de cuenta",
-          field: { type: "select", rules: [], getOptionsFrom: "accounttypes/options"},
-          showInTable: true,
-          // dependsOn: "registryType",
-          showInForm: true,
-        },
-        {
-          key: "accountNumber",
-          label: "Nº de cuenta",
-          field: { type: "input", rules: [] },
-          // dependsOn: "registryType",
-          showInTable: true,
-          showInForm: true,
-        },
-        {
-          key: "CBU",
-          label: "CBU/CVU",
-          field: { type: "input", rules: [] , as:"mask" },
-          dependsOn: "registryType",
-          showInTable: true,
-          showInForm: true,
-        },
-        {
-          key: "alias",
-          label: "Alias",
-          field: { type: "input", rules: [] },
-          dependsOn: "registryType",
-          showInTable: true,
-          showInForm: true,
-        },
-
-        
-      ],
-      API: {
-        get: "concepts",
-        post: "concepts",
-        put: "concepts/:id",
-        patch: "concepts/:id",
-        delete: "concepts/:id",
-      },
-    }
-    // const LedgerAccountSchema: MasterCRUD = {
-    //   title: "Cuentas contables",
-    //   singular: "Cuenta contable",
-    //   plural: "Cuentas contables",
+    // const ConceptSchema: MasterCRUD = {
+    //   title: "Conceptos",
+    //   singular: "Concepto",
+    //   plural: "Conceptos",
     //   ObjectKeys: [
     //     {
     //       key: "id",
@@ -243,7 +151,7 @@ export const useMastersCRUD = (title= "") =>
     //       field: { type: "readonly", rules: ["required"] },
     //       isID: true,
     //       showInTable: true,
-    //       showInForm: true,
+    //       showInForm: false,
     //     },
     //     {
     //       key: "code",
@@ -253,31 +161,123 @@ export const useMastersCRUD = (title= "") =>
     //       showInForm: true,
     //     },
     //     {
-    //       key:"number",
-    //       label:"Número",
-    //       field:{type:"input", rules:["required"]},
-    //       showInTable:true,
-    //       showInForm:true,
+    //       key: "registryType",
+    //       label: "Tipo de registro",
+    //       field: { type: "select", rules: ["required"], getOptionsFrom: "registrytypes/options"},
+    //       showInTable: true,
+    //       showInForm: true,
     //     },
-        
-    //       {
-    //         key:"name",
-    //         label:"Descripción",
-    //         field:{type:"input", rules:["required"]},
-    //         showInTable:true,
-    //         showInForm:true,
-    //       },
-        
+    //     {
+    //       key: "description",
+    //       label: "Descripción",
+    //       field: { type: "input", rules: ["required"] },
+    //       showInTable: true,
+    //       showInForm: true,
+    //     },
 
+    //     { 
+    //       key: "debitAccount",
+    //       label: "Cuenta debe",
+    //       field: { type: "input", rules: ["required"]},
+    //       showInTable: true,
+    //       showInForm: true,
+    //     },
+    //     { 
+    //       key: "creditAccount",
+    //       label: "Cuenta haber",
+    //       field: { type: "input", rules: ["required"]},
+    //       showInTable: true,
+    //       showInForm: true,
+    //     },
+    //     {
+    //       key: "accountType",
+    //       label: "Tipo de cuenta",
+    //       field: { type: "select", rules: [], getOptionsFrom: "accounttypes/options"},
+    //       showInTable: true,
+    //       // dependsOn: "registryType",
+    //       showInForm: true,
+    //     },
+    //     {
+    //       key: "accountNumber",
+    //       label: "Nº de cuenta",
+    //       field: { type: "input", rules: [] },
+    //       // dependsOn: "registryType",
+    //       showInTable: true,
+    //       showInForm: true,
+    //     },
+    //     {
+    //       key: "CBU",
+    //       label: "CBU/CVU",
+    //       field: { type: "input", rules: [] , as:"mask" },
+    //       dependsOn: "registryType",
+    //       showInTable: true,
+    //       showInForm: true,
+    //     },
+    //     {
+    //       key: "alias",
+    //       label: "Alias",
+    //       field: { type: "input", rules: [] },
+    //       dependsOn: "registryType",
+    //       showInTable: true,
+    //       showInForm: true,
+    //     },
+
+        
     //   ],
     //   API: {
-    //     get: "accounts",
-    //     post: "accounts",
-    //     put: "accounts/:id",
-    //     patch: "accounts/:id",
-    //     delete: "accounts/:id",
+    //     get: "concepts",
+    //     post: "concepts",
+    //     put: "concepts/:id",
+    //     patch: "concepts/:id",
+    //     delete: "concepts/:id",
     //   },
     // }
+    // // const LedgerAccountSchema: MasterCRUD = {
+    // //   title: "Cuentas contables",
+    // //   singular: "Cuenta contable",
+    // //   plural: "Cuentas contables",
+    // //   ObjectKeys: [
+    // //     {
+    // //       key: "id",
+    // //       label: "ID",
+    // //       field: { type: "readonly", rules: ["required"] },
+    // //       isID: true,
+    // //       showInTable: true,
+    // //       showInForm: true,
+    // //     },
+    // //     {
+    // //       key: "code",
+    // //       label: "Código",
+    // //       field: { type: "input", rules: ["required"] },
+    // //       showInTable: true,
+    // //       showInForm: true,
+    // //     },
+    // //     {
+    // //       key:"number",
+    // //       label:"Número",
+    // //       field:{type:"input", rules:["required"]},
+    // //       showInTable:true,
+    // //       showInForm:true,
+    // //     },
+        
+    // //       {
+    // //         key:"name",
+    // //         label:"Descripción",
+    // //         field:{type:"input", rules:["required"]},
+    // //         showInTable:true,
+    // //         showInForm:true,
+    // //       },
+        
+
+    // //   ],
+    // //   API: {
+    // //     get: "accounts",
+    // //     post: "accounts",
+    // //     put: "accounts/:id",
+    // //     patch: "accounts/:id",
+    // //     delete: "accounts/:id",
+    // //   },
+    // // }
 
     const AccountsSchema: MasterCRUD = {
       title: "Plan de cuentas",
@@ -347,7 +347,7 @@ export const useMastersCRUD = (title= "") =>
     
   const MastersTab: MasterCRUD[] = [
     BeneficiarySchema,
-    ConceptSchema,
+    // ConceptSchema,
     // LedgerAccountSchema,
     AccountsSchema
   ].sort((a, b) => a.plural.localeCompare(b.title));
