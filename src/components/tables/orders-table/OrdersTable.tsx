@@ -235,12 +235,14 @@ export const StyledTable = (props:Props) =>
     <TableContainer>
       <TitleGroup>
         <InputText placeholder="Buscar..." value={globalFilter} onChange={(e) => setGlobalFilter(e.target.value)}/>
-        <Link to="/admin/ordenes/agregar"> <Button label="Agregar Orden"  color="#1da750"/>  </Link>
+        <div>
+          <Link to="/admin/ordenes/agregar" style={{textDecoration:"none"}}> <Button label="Agregar Orden"  color="#1da750"/>  </Link>
+          <Button label="Exportar a Exactas" visible={showExport}  onClick={onClickExport}  color="#1da750"/>
+        </div>
       </TitleGroup>
 
 
       <StyledDataTable value={OrdersFiltereds} paginator rows={10} rowsPerPageOptions={[1, 2, 5, 10]} stripedRows size="small" removableSort emptyMessage="No hay órdenes"  selectionMode={true ? null : 'checkbox'} selection={selectedProducts} onSelectionChange={onChangeSelection}  isDataSelectable={isRowSelectable}>
-        <Column selectionMode="multiple"/>
         <Column sortable filter filterPlaceholder="Filtrar..." field="id" header="Número de Orden"/>
         <Column filterPlaceholder="Filtrar..." field="date" header="Fecha" body={row => formatDate(row.date)}/>
         <Column sortable filter filterPlaceholder="Filtrar..." field="description" header="Descripción"/>
@@ -270,9 +272,9 @@ export const StyledTable = (props:Props) =>
           </div>
         }}/>
 
+    <Column selectionMode="multiple" header="Exportar"/>
+       
       </StyledDataTable>
-
-     <Button icon="pi pi-file-export" rounded aria-label="Filter" visible={showExport} onClick={onClickExport} style={{position: 'fixed', bottom: '20px', right: '20px'}}/>
-    </TableContainer>
+     </TableContainer>
   );
 };

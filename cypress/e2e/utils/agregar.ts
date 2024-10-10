@@ -1,17 +1,14 @@
 
-export const openAndFillMovimientoForm = (isHaber:boolean) => 
+export const openAndFillMovimientoForm = (isHaber:boolean,amount:number) => 
 {
     cy.get("#add-text").click();
-
-    const rangeAmount = [100, 99999];
-    const amount = Math.floor(Math.random() * (rangeAmount[1] - rangeAmount[0] + 1)) + rangeAmount[0];
-
     cy.get("#amount").type(amount.toString());
 
     if(isHaber)
         cy.get(`#select-type > div:nth-child(2) > span`).click();
 
-    cy.get("#accountPlan").type("Rendiciones ");
+    cy.get("#accountPlan").type("RENDICIONES");
+    cy.wait(500);
     cy.get(".p-autocomplete-item").first().click();
     
     cy.intercept("GET","**/beneficiaries?search=*").as("searchBeneficiaries");
