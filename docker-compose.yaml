@@ -1,12 +1,13 @@
 version: "3"
 services:
   nginx:
-    build: 
-      context: .
-      dockerfile: dockerfile
+    image: 192.168.200.12:4000/ate_frontend:qa       
+          #build: 
+          #context: .
+          #dockerfile: dockerfile
     ports:
-      - ${FRONTEND_PORT:-3000}:80
+      - ${FRONTEND_PORT:-3001}:80
     environment:
-      VITE_BACKEND_URL: ${VITE_BACKEND_URL:-http://localhost:5000}:5000
-    volumes:
-    - ./app:/app
+      VITE_BACKEND_URL: ${VITE_BACKEND_URL:-http://192.168.200.12:5001}
+      #   volumes:
+            #- ./app:/app
