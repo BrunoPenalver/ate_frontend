@@ -37,7 +37,7 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
   
     for (const key of keys) {
       const { field } = ObjectKeys.find((column: any) => column.key === key);
-    
+      
       const { rules } = field;
   
       if (!rules) continue;
@@ -79,10 +79,11 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
                 errors[key] = "El Cuit ingresado no es válido";
                 break; // Salir del bucle si se encuentra un error de CBU
               }
+              
             }
             if(rule === "existingCuit")
             { 
-              console.log(values)
+              
               const sanitizedCUIT = values[key].replace(/-/g, '');
               const beneficiaryCode = values?.code; // Asegúrate de que 'code' esté presente en 'values'
   

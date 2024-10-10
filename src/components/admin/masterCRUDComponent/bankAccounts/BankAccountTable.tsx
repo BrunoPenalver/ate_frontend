@@ -18,7 +18,7 @@ interface DialogProps {
 
 export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps) => 
 {
-  const tooltip = ["Banco", "Tipo de Banco","CBU(Si no es Credicoop)","Alias", "Titular", "CUIT", "Nº Cuenta(Si es Credicoop)", "Tipo de cuenta" ];
+  const tooltip = ["Código","Banco", "Tipo de Banco","Tipo de clave única (Si no es Credicoop)","Clave única (Si no es Credicoop)","Alias", "Titular", "CUIT", "Nº Cuenta(Si es Credicoop)", "Tipo de cuenta" ];
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [isDeleteDialogVisible, setIsDeleteDialogVisible] = useState(false);
   const [isDeactivateDialogVisible, setIsDeactivateDialogVisible] =useState(false);
@@ -162,6 +162,14 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
             )}
           />
           <Column
+            field="code"
+            header="Código"
+            sortable
+            body={(rowData) => (
+              <StyledCell $active={rowData?.active}>{rowData.code ? rowData.code : "---"}</StyledCell>
+            )}
+          />
+          <Column
             field="bank"
             header="Banco"
             sortable
@@ -178,9 +186,18 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
             )}
           />
           <Column
-            field="CBU"
-            header="CBU/CVU"
+            field="cbuType"
+            header="Tipo de clave"
             sortable
+            body={(rowData) => (
+              <StyledCell $active={rowData?.active}>{rowData.cbuType ? rowData.cbuType : "---"}</StyledCell>
+            )}
+          />
+          <Column
+            field="CBU"
+            header="Nº Clave única"
+            sortable
+            style={{ minWidth: "150px" }}
             body={(rowData) => (
               <StyledCell $active={rowData?.active}>{rowData.CBU ? formatCBU(rowData.CBU) : "---"}</StyledCell>
             )}
@@ -205,6 +222,7 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
             field="cuit"
             header="Cuit"
             sortable
+            style={{ minWidth: "150px" }}
             body={(rowData) => (
               <StyledCell $active={rowData?.active}>{rowData.cuit ? formatCuit(rowData.cuit) : "---"}</StyledCell>
             )}
@@ -232,6 +250,7 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
+                  
                 }}
               >
                 <span>Datos correctos</span>
@@ -265,7 +284,9 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
               
               // Generar el array de campos con nombre y valor
               const fieldsToValidate: FieldValidation[] = [
+                {name: 'code', value: rowData.code},
                 { name: 'cuit', value: rowData.cuit },
+                { name: 'cbuType', value: rowData.cbuType },
                 { name: 'CBU', value: rowData.CBU },
                 { name: 'alias', value: rowData.alias },
                 { name: 'holder', value: rowData.holder },

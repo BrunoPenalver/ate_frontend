@@ -8,12 +8,12 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { AccountTypeTypes } from "../../../../models/accountType";
 import api from "../../../../utils/api";
-import BankAccount from '../../../../interfaces/orders/bankAccount';
 import { validateCBU, validateCUIT } from "../../../../utils/models";
 
 // Define las opciones para el campo de tipo utilizando los valores de AccountTypeTypes
 const bankTypes = Object.values(AccountTypeTypes).map(type => ({ label: type, value: type }));
 const boolTypes = [{ label: "Sí", value: true }, { label: "No", value: false }];
+const cbuTypes = [{ label: "CBU", value: "CBU" }, { label: "CVU", value: "CVU" }];
 
 const StyledForm = styled.form`
   display: flex;
@@ -62,7 +62,7 @@ const ErrorMessage = styled.div`
 
 interface DialogProps {
   isOpen: boolean;
-  bankAccount: BankAccount | null;
+  bankAccount: any;
   onClose: () => void;
   isEditing: boolean;
   beneficiaryId: number;
@@ -81,6 +81,7 @@ export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing
       code: "",
       credicoop: false,
       bank: "",
+      cbuType: "",
       CBU: "",
       alias: "",
       holder: "",
@@ -96,7 +97,7 @@ export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing
       if (!values.code) {
         errors.code = "Campo requerido";
       }
-    
+
       // Validación del campo 'credicoop'
       if (values.credicoop === null || values.credicoop === undefined) {
         errors.credicoop = "Campo requerido";
@@ -107,9 +108,18 @@ export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing
         errors.bank = "Campo requerido";
       }
     
+      // Validación del campo cbuType
+      if (!values.credicoop && !values.cbuType) {
+        errors.cbuType = "Campo requerido";
+      } else if (values.credicoop && values.cbuType && !values.CBU) {
+        errors.CBU = "Ingrese el nº de clave única";
+      }
       // Validación del campo 'CBU'
       if (!values.credicoop && !values.CBU) {
+       
         errors.CBU = "Campo requerido";
+      } else if (values.credicoop && values.CBU && !values.cbuType) {
+        errors.cbuType = "Seleccione un tipo de clave única";
       } else if (
         (!values.credicoop && !validateCBU(values.CBU.replace(/-/g, ''))) ||
         (values.credicoop && values.CBU !== "" && !validateCBU(values.CBU.replace(/-/g, '')))
@@ -150,10 +160,12 @@ export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing
       try {
         if (isEditing) {
           await api.put(`/bankaccounts/${bankAccount?.id}`, { ...values, beneficiaryId });
+         
         } else {
           await api.post("/bankaccounts", { ...values, beneficiaryId });
-          formik.resetForm();
+         
         }
+        formik.resetForm();
         onClose(); // Cerrar el diálogo al finalizar
       } catch (error) {
         console.error("Error al guardar la cuenta bancaria:", error);
@@ -242,6 +254,19 @@ export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing
             placeholder="Banco"
           />
           {showError("bank") && <ErrorMessage>{formik.errors.bank}</ErrorMessage>}
+        </FieldContainer>
+        <FieldContainer>
+          <StyledLabel htmlFor="cbuType">Tipo de clave</StyledLabel>
+          <StyledDropdown
+            id="cbuType"
+            name="cbuType"
+            value={formik.values.cbuType}
+            options={cbuTypes}
+            onChange={(e) => formik.setFieldValue("cbuType", e.value)}
+            onBlur={formik.handleBlur}
+            placeholder={formik.values.cbuType ? formik.values.cbuType : "Seleccionar tipo de clave única"}
+          />
+          {showError("cbuType") && <ErrorMessage>{formik.errors.cbuType}</ErrorMessage>}
         </FieldContainer>
         <FieldContainer>
           <StyledLabel htmlFor="CBU">CBU</StyledLabel>

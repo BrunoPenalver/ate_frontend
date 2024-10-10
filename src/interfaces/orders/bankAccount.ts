@@ -7,6 +7,7 @@ export default interface BankAccount
     number: string;
     type: string;
     CBU: string;
+    cbuType?: string;
     alias: string;
     beneficiaryId: number;
     createdAt: string;
