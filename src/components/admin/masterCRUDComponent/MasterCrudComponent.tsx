@@ -60,6 +60,7 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) =>
     setItemSwitchedStateAndSwitchModalDelete,
     showModalDelete,
     loadingDelete,
+    tooltip
   } = useMasterComponent({ item });
 
   const FormAdd : any = useFormik({
@@ -111,7 +112,12 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) =>
     return <Loader text={`Cargando ${plural.toLowerCase()}`} />;
 
   const handleSearch = (newValue: string) => setSearchText(newValue);
-  const onLeave = () => setRefetchTrigger(prev => prev + 1);
+
+  const onLeaveInput = () => 
+  {
+    setCurrentPage(0);
+    setRefetchTrigger(prev => prev + 1);
+  }
   
   const onPageChange = (event: { first: number; rows: number }) =>
   {
@@ -130,7 +136,7 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) =>
   return (
     <>
       <StyledMastersTable
-        input={<InputText placeholder="Buscar" value={SearchText} onChange={e => handleSearch(e.target.value)} onBlur={onLeave} onKeyDown={e => e.key === "Enter" && onLeave()}/>}
+        input={<InputText placeholder="Buscar" value={SearchText} onChange={e => handleSearch(e.target.value)} onBlur={onLeaveInput} onKeyDown={e => e.key === "Enter" && onLeaveInput()}/>}
         items={Items}
         ObjectKeys={ObjectKeys}
         errorOnLoad={errorOnLoad}
@@ -141,6 +147,7 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) =>
         fn4={setItemSwitchedStateAndSwitchModalDelete}
         plural={plural}
         label={labelAgregar}
+        tooltip={tooltip}
       />
       
       <Paginator first={first} rows={rows} totalRecords={TotalResult} rowsPerPageOptions={[10, 20, 30]} onPageChange={onPageChange} />

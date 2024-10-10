@@ -6,7 +6,8 @@ import { Group } from "../../Group";
 export const StyledDataTable = styled(DataTable)`
   
 
-
+  width: min(100%, 1500px);
+  max-width: 1920px;
   .p-column-header-content {
     display: flex;
     justify-content: center;
@@ -91,7 +92,7 @@ export const TableTitle = styled.h2`
 `;
 
 export const TitleGroup = styled(Group)`
-  width: 90%;
+  width: 100%;
   max-width: 1920px;
   justify-content: space-between;
   flex-direction: row;

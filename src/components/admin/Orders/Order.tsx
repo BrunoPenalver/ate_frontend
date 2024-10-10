@@ -18,6 +18,7 @@ import { createAlert } from "../../../stores/alerts.slicer";
 import { ContainerInput } from "../../../styles/admin/ordenes/movimiento/crear";
 import { AddText, ContainerButtons, ContainerInfo, ContainerTables, Panel, PanelContent, PanelHeader } from "../../../styles/admin/ordenes";
 import "../../../styles/admin/ordenes/movimiento/createUpdate.scoped.css"
+import { confirmDialog } from "primereact/confirmdialog";
 interface Props
 {
     type: "add" | "edit";
@@ -76,10 +77,8 @@ const Order = (props: Props) =>
 {
     const { pathname } = location;
 
-
     const [isLoading, setIsLoading] = useState(false);
     const [havePrevData, setHavePrevData] = useState(localStorage.getItem(pathname) ? true : false);
-    
 
     const generateInitialValues = (): FormikValues =>
     {
@@ -90,7 +89,6 @@ const Order = (props: Props) =>
             if(prevData)
             {
                 const prevDataParsed = JSON.parse(prevData);
-
                 return { ...prevDataParsed, date: new Date(prevDataParsed.date) };
             }
         }
@@ -126,9 +124,8 @@ const Order = (props: Props) =>
                 Payload.append(`movements[${index}][type]`, movimiento.type);
                 Payload.append(`movements[${index}][description]`, movimiento.description);
                 Payload.append(`movements[${index}][amount]`, movimiento.amount.toString());
-                Payload.append(`movements[${index}][conceptId]`, movimiento.concept.id.toString());
                 Payload.append(`movements[${index}][sectionalId]`, movimiento.sectional.id.toString());
-                Payload.append(`movements[${index}][accountId]`, movimiento.account.id.toString());
+                Payload.append(`movements[${index}][accountPlanId]`, movimiento.accountPlan.id.toString());
                 Payload.append(`movements[${index}][beneficiaryId]`, movimiento.beneficiary.id.toString());
                 Payload.append(`movements[${index}][bankAccountId]`, movimiento.bankAccount.id.toString());
                 Payload.append(`movements[${index}][paymentTypeId]`, movimiento.paymentType.id.toString());
@@ -176,9 +173,8 @@ const Order = (props: Props) =>
                 Payload.append(`movements[${index}][type]`, movimiento.type);
                 Payload.append(`movements[${index}][description]`, movimiento.description);
                 Payload.append(`movements[${index}][amount]`, movimiento.amount.toString());
-                Payload.append(`movements[${index}][conceptId]`, movimiento.concept.id.toString());
+                Payload.append(`movements[${index}][accountPlanId]`, movimiento.accountPlan.id.toString());
                 Payload.append(`movements[${index}][sectionalId]`, movimiento.sectional.id.toString());
-                Payload.append(`movements[${index}][accountId]`, movimiento.account.id.toString());
                 Payload.append(`movements[${index}][beneficiaryId]`, movimiento.beneficiary.id.toString());
                 Payload.append(`movements[${index}][bankAccountId]`, movimiento.bankAccount.id.toString());
                 Payload.append(`movements[${index}][paymentTypeId]`, movimiento.paymentType.id.toString());
@@ -200,8 +196,6 @@ const Order = (props: Props) =>
             dispatch(createAlert({ severity: "success", summary: "Orden actualizada", detail: `La orden fue actualizada correctamente`}));
 
             return true;
-        
-           
         } 
         catch (error: any) 
         {
@@ -212,26 +206,39 @@ const Order = (props: Props) =>
 
     const onSubmit = async (values: any) => 
     {
-        setIsLoading(true);
-
         const isValidTotals = TotalDebe === TotalHaber;
 
-        if(!isValidTotals && values.state === "Cerrada")
+        if(!isValidTotals && values.state !== "Borrador")
         {
             dispatch(createAlert({ severity: "error", summary: "Error al guardar la orden", detail: "Los totales de los movimientos no coinciden" }));
             setIsLoading(false);
             return;
         }
 
-        const saved = props.type === "add" ? await create(values) : await update(values);
-
-        if(saved)
+        const save = async () =>
         {
-            localStorage.removeItem(pathname);
-            setTimeout(() => navigate("/admin/ordenes"), 250);
+            setIsLoading(true);
+            const saved = props.type === "add" ? await create(values) : await update(values);
+
+            if(saved)
+            {
+                localStorage.removeItem(pathname);
+                setTimeout(() => navigate("/admin/ordenes"), 250);
+            }
+            
+            setIsLoading(false);
         }
-        
-        setIsLoading(false);
+
+        if(values.state === "Cerrada")
+            confirmDialog({
+                accept: () => save(),
+                acceptLabel: props.type === "add" ? "Guardar" : "Actualizar",
+                rejectLabel: "Cancelar",
+                header: "Confirmación",
+                message: `¿Está seguro que desea ${props.type === "add" ? 'guardar' : 'actualizar'} la orden con estado cerrada?`,
+            })
+        else
+            save();
     };
 
     const Form = useFormik<FormikValues>({
@@ -270,7 +277,6 @@ const Order = (props: Props) =>
     const TypesDebe =  useMemo(() => Movimientos.filter(movimiento => movimiento.type === "Debe"   ), [ Movimientos ] );
     const TypesHaber = useMemo(() => Movimientos.filter(movimiento => movimiento.type === "Haber" ),  [ Movimientos ] );
 
-
     const getFormErrorMessage = (key: string) => 
     {
         const findError = (obj: any, keys: string[]) =>
@@ -304,8 +310,6 @@ const Order = (props: Props) =>
 
 
         dispatch(createAlert({ severity: "info", summary: "Movimiento copiado", detail: "Se ha copiado el movimiento" }));
-
-
     }
 
     const rotateMovement = (toRotate: Movement) =>
@@ -315,6 +319,14 @@ const Order = (props: Props) =>
         setMovimientos(old => old.filter(movimiento => movimiento.id !== toRotate.id));
         dispatch(createAlert({ severity: "info", summary: "Movimiento rotado", detail: "Se ha rotado el movimiento" }));
     }
+
+    const DisableEdit = useMemo(() =>
+    {
+        if(props.type === "edit" && props.values)
+            return props.values.state === "Cerrada";
+        return false;
+        
+    }, [ props.values?.state ]);
 
     /* Totalizadores */
 
@@ -367,21 +379,21 @@ const Order = (props: Props) =>
             <PanelContent>
                 <ContainerInput>
                     <FloatLabel>  
-                        <Calendar id="date" dateFormat="dd/mm/yy" locale="es" value={Form.values.date} onChange={e => Form.setFieldValue("date",e.value)} />
+                        <Calendar id="date" dateFormat="dd/mm/yy" locale="es" value={Form.values.date} onChange={e => Form.setFieldValue("date",e.value)} disabled={DisableEdit}/>
                         <label htmlFor="date">Fecha</label>    
                     </FloatLabel>  
                     {getFormErrorMessage("date")}
                 </ContainerInput>
                 <ContainerInput>
                     <FloatLabel>  
-                        <InputText id="description" value={Form.values.description} onChange={e => Form.setFieldValue("description",e.target.value)}/>
+                        <InputText id="description" value={Form.values.description} onChange={e => Form.setFieldValue("description",e.target.value)} disabled={DisableEdit}/>
                         <label htmlFor="description">Descripción</label>    
                     </FloatLabel>  
                     {getFormErrorMessage("description")}
                 </ContainerInput>
                 <ContainerInput>
                     <FloatLabel>  
-                        <Dropdown id="state" options={options_state} value={Form.values.state} onChange={e => Form.setFieldValue("state",e.target.value)}/>
+                        <Dropdown id="state" options={options_state} value={Form.values.state} onChange={e => Form.setFieldValue("state",e.target.value)}  disabled={DisableEdit}/>
                         <label htmlFor="state">Estado</label>    
                     </FloatLabel>  
                     {getFormErrorMessage("state")}
@@ -389,16 +401,16 @@ const Order = (props: Props) =>
             </PanelContent>
         </PanelHeader>
 
-        <AddText id="add-text" onClick={switchShowAdd}>Ingresar movimiento</AddText>
+        <AddText id="add-text" onClick={switchShowAdd} enable={!DisableEdit}>Ingresar movimiento</AddText>
 
         <Dialog onHide={switchShowAdd} header="Agregar movimiento" visible={ShowAdd} style={{maxWidth: "80vw",padding: '0 !imporant;'}}>
-            <CreateOrUpdateMovimiento callBackDialogAdd={callBackDialogAdd} defaultValue={null} callBackUpdate={callBackDialogUpdate}/>
+            <CreateOrUpdateMovimiento disabled={DisableEdit} callBackDialogAdd={callBackDialogAdd} defaultValue={null} callBackUpdate={callBackDialogUpdate}/>
         </Dialog>
 
         <Panel header={ Movimientos.length === 1 ? '1 Movimiento' : `${Movimientos.length} Movimientos`} toggleable>
             <ContainerTables>
-                <TableMovimientos movimientos={TypesDebe}  title="Debe"  onDelete={movementId => deleteMovement(movementId)} onUpdate={toUpdate => updateMovement(toUpdate)} onClone={toClone => cloneMovement(toClone)} onRotate={toClone => rotateMovement(toClone)}/>
-                <TableMovimientos movimientos={TypesHaber} title="Haber" onDelete={movementId => deleteMovement(movementId)} onUpdate={toUpdate => updateMovement(toUpdate)} onClone={toClone => cloneMovement(toClone)} onRotate={toClone => rotateMovement(toClone)}/>
+                <TableMovimientos disableEdit={DisableEdit} movimientos={TypesDebe}  title="Debe"  onDelete={movementId => deleteMovement(movementId)} onUpdate={toUpdate => updateMovement(toUpdate)} onClone={toClone => cloneMovement(toClone)} onRotate={toClone => rotateMovement(toClone)}/>
+                <TableMovimientos disableEdit={DisableEdit} movimientos={TypesHaber} title="Haber" onDelete={movementId => deleteMovement(movementId)} onUpdate={toUpdate => updateMovement(toUpdate)} onClone={toClone => cloneMovement(toClone)} onRotate={toClone => rotateMovement(toClone)}/>
             </ContainerTables>
         </Panel>
 
@@ -411,18 +423,18 @@ const Order = (props: Props) =>
         </Panel>}
 
         <Dialog visible={ShowUpdate} header="Actualizar movimiento" onHide={switchShowUpdate} style={{maxWidth: "80vw"}}>
-            <Movimiento callBackDialogAdd={callBackDialogAdd} defaultValue={SelectedToUpdate} callBackUpdate={callBackDialogUpdate}/>
+            <Movimiento disabled={DisableEdit} callBackDialogAdd={callBackDialogAdd} defaultValue={SelectedToUpdate} callBackUpdate={callBackDialogUpdate}/>
         </Dialog>
 
 
         <ContainerButtons>
             <div>
-                <Button label="Pre-guardar" type="button" id="presave" onClick={preSave}/>
+                <Button disabled={DisableEdit} label="Pre-guardar" type="button" id="presave" onClick={preSave}/>
                 {havePrevData && <Button label="Eliminar información previa" type="button" id="presave" className="p-button-danger" onClick={deletePrevData}/>}
             </div>
 
-            {props.type === "add"  && <Button disabled={isLoading} label="Guardar"    id="save-order" className="p-button-success" type="submit"/>}
-            {props.type === "edit" && <Button disabled={isLoading} label="Actualizar" id="edit-order" className="p-button-success" type="submit"/>}
+            {props.type === "add"  && <Button disabled={isLoading || DisableEdit} label="Guardar"    id="save-order" className="p-button-success" type="submit"/>}
+            {props.type === "edit" && <Button disabled={isLoading || DisableEdit} label="Actualizar" id="edit-order" className="p-button-success" type="submit"/>}
         </ContainerButtons>
     </form>
 }

@@ -29,7 +29,7 @@ export const DateColumn = (key: any, index: number) => {
 
 
 export const RegularColumn = (key: any, index: number) => {
-  console.log("key",key)
+
   return (
     <Column
       sortable
@@ -38,7 +38,7 @@ export const RegularColumn = (key: any, index: number) => {
       key={index}
       style={key?.key === "cuit" ? { width: "150px", padding: "0px 10px", minWidth: "150px" } : {}}
       body={(rowData) => {
-        
+   
         return (
           <span
             style={{
@@ -59,7 +59,7 @@ export const RegularColumn = (key: any, index: number) => {
               ) : key?.label === "Localidad" ? (
                 `${rowData?.city?.name}`
                 
-              ) : key?.label === "Tipo de beneficiario" ? (
+              ) : key?.label === "Tipo de Proveedor" ? (
                 `${rowData?.beneficiaryType?.type}`
                 
               ) : key?.label === "Tipo de cuenta" ? (

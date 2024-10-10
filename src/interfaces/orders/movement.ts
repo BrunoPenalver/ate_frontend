@@ -1,7 +1,6 @@
-import Account from "./account"
+import AccountPlan from "./accountPlan";
 import BankAccount from "./bankAccount";
 import Beneficiary from "./beneficiary";
-import Concept from "./concept";
 import Sectional from "./sectional";
 
 export interface Attachment
@@ -19,11 +18,10 @@ export default interface Movement
     paymentType: any;
     operation: string;
     holder: string;
-    concept: Concept;
     beneficiary: Beneficiary;
     bankAccount: BankAccount
     sectional: Sectional;
-    account: Account;
+    accountPlan: AccountPlan;
     details: string;
     attachments: Attachment[];
 

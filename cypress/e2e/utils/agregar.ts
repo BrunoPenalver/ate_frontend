@@ -1,35 +1,35 @@
 
-export const openAndFillMovimientoForm = (isHaber:boolean) => 
+export const openAndFillMovimientoForm = (isHaber:boolean,amount:number) => 
 {
     cy.get("#add-text").click();
-
-    const rangeAmount = [100, 99999];
-    const amount = Math.floor(Math.random() * (rangeAmount[1] - rangeAmount[0] + 1)) + rangeAmount[0];
-
     cy.get("#amount").type(amount.toString());
 
     if(isHaber)
         cy.get(`#select-type > div:nth-child(2) > span`).click();
 
-    cy.get("#origin").type("Rendiciones ");
-    cy.get("#origin_list > li").first().click();
+    cy.get("#accountPlan").type("RENDICIONES");
+    cy.wait(500);
+    cy.get(".p-autocomplete-item").first().click();
     
-    cy.get("#beneficiary").type("2 DE OCTUBRE SO");
-    cy.get("#beneficiary_list > li").first().click();
+    cy.intercept("GET","**/beneficiaries?search=*").as("searchBeneficiaries");
+    cy.get("#beneficiary").type("Glady");
+    cy.wait("@searchBeneficiaries")
+    cy.get(".p-autocomplete-item").should("be.visible").first().click();
+
+    cy.get("#bankAccount > button").click();
+    cy.get("#bankAccount_list > li").should("be.visible").first().click();
 
     cy.get("#paymentType").type("Efectivo");
     cy.get("#paymentType_list > li").first().click();
 
-    cy.get("#bankAccount").type("Banco nación");
-    cy.get("#bankAccount_list > li").first().click();
-
-    cy.get("#sectional").type("CDP JUJUY");
+    cy.intercept("GET","**/sectionalnames?search=*").as("searchSectional");
+    cy.get("#sectional").type("Lanus");
+    cy.wait("@searchSectional")
     cy.get("#sectional_list > li").first().click();
     
-    cy.get("#concept").type("3 -");
-    cy.get("#concept_list > li").first().click();
 
-    cy.get("#details").type("Detalles \nde la \norden");
+    cy.get("#details").type("Detalle\nde la\nde prueba");
+    cy.get("#operation").type("Operación test");
 
     cy.get("#imageUpload").selectFile("cypress/fixtures/test.png");
 

@@ -8,11 +8,12 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { AccountTypeTypes } from "../../../../models/accountType";
 import api from "../../../../utils/api";
-import BankAccount from '../../../../interfaces/orders/bankAccount';
-import { validateCBU } from "../../../../utils/models";
+import { validateCBU, validateCUIT } from "../../../../utils/models";
 
 // Define las opciones para el campo de tipo utilizando los valores de AccountTypeTypes
 const bankTypes = Object.values(AccountTypeTypes).map(type => ({ label: type, value: type }));
+const boolTypes = [{ label: "Sí", value: true }, { label: "No", value: false }];
+const cbuTypes = [{ label: "CBU", value: "CBU" }, { label: "CVU", value: "CVU" }];
 
 const StyledForm = styled.form`
   display: flex;
@@ -61,7 +62,7 @@ const ErrorMessage = styled.div`
 
 interface DialogProps {
   isOpen: boolean;
-  bankAccount: BankAccount | null;
+  bankAccount: any;
   onClose: () => void;
   isEditing: boolean;
   beneficiaryId: number;
@@ -70,46 +71,122 @@ interface DialogProps {
 export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing, beneficiaryId }: DialogProps) => {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
+  const handleClose = () => {
+    formik.resetForm(); // Resetea el formulario, limpiando valores y errores
+    onClose(); // Llama a la función pasada como prop para cerrar el diálogo
+  };
+
   const formik = useFormik({
     initialValues: {
       code: "",
+      credicoop: false,
       bank: "",
+      cbuType: "",
       CBU: "",
       alias: "",
       holder: "",
+      cuit:"",
       number: "",
       type: "",
     },
+    validateOnChange: true,
     enableReinitialize: true,
     validate: (values) => {
       const errors: any = {};
-      if (!values.code) errors.code = "Campo requerido";
-      if (!values.bank) errors.bank = "Campo requerido";
-      if (!values.CBU) {
+
+      if (!values.code) {
+        errors.code = "Campo requerido";
+      }
+
+      // Validación del campo 'credicoop'
+      if (values.credicoop === null || values.credicoop === undefined) {
+        errors.credicoop = "Campo requerido";
+      }
+    
+      // Validación del campo 'bank'
+      if (!values.bank) {
+        errors.bank = "Campo requerido";
+      }
+    
+      // Validación del campo cbuType
+      if (!values.credicoop && !values.cbuType) {
+        errors.cbuType = "Campo requerido";
+      } else if (values.credicoop && values.cbuType && !values.CBU) {
+        errors.CBU = "Ingrese el nº de clave única";
+      }
+      // Validación del campo 'CBU'
+      if (!values.credicoop && !values.CBU) {
+       
         errors.CBU = "Campo requerido";
-      } else if (!validateCBU(values.CBU.replace(/-/g, ''))) {  // Validación adicional para CBU sin guiones
+      } else if (values.credicoop && values.CBU && !values.cbuType) {
+        errors.cbuType = "Seleccione un tipo de clave única";
+      } else if (
+        (!values.credicoop && !validateCBU(values.CBU.replace(/-/g, ''))) ||
+        (values.credicoop && values.CBU !== "" && !validateCBU(values.CBU.replace(/-/g, '')))
+      ) {
         errors.CBU = "El CBU ingresado no es válido";
       }
-      if (!values.alias) errors.alias = "Campo requerido";
-      if (!values.holder) errors.holder = "Campo requerido";
-      if (!values.number) errors.number = "Campo requerido";
-      if (!values.type) errors.type = "Campo requerido";
+    
+      // Validación del campo 'number' cuando 'credicoop' es true
+      if (values.credicoop && !values.number) {
+        errors.number = "Campo requerido";
+      }
+    
+      // Validación del campo 'alias'
+      if (!values.alias) {
+        errors.alias = "Campo requerido";
+      }
+    
+      // Validación del campo 'holder'
+      if (!values.holder) {
+        errors.holder = "Campo requerido";
+      }
+    
+      // Validación del campo 'cuit'
+      if (!values.cuit) {
+        errors.cuit = "Campo requerido";
+      } else if (!validateCUIT(values.cuit.replace(/-/g, ''))) {
+        errors.cuit = "El CUIT ingresado no es válido";
+      }
+    
+      // Validación del campo 'type'
+      if (!values.type) {
+        errors.type = "Campo requerido";
+      }
+    
       return errors;
     },
     onSubmit: async (values) => {
       try {
         if (isEditing) {
           await api.put(`/bankaccounts/${bankAccount?.id}`, { ...values, beneficiaryId });
+         
         } else {
           await api.post("/bankaccounts", { ...values, beneficiaryId });
-          formik.resetForm();
+         
         }
+        formik.resetForm();
         onClose(); // Cerrar el diálogo al finalizar
       } catch (error) {
         console.error("Error al guardar la cuenta bancaria:", error);
       }
     },
   });
+
+  const handleCredicoopChange = (e: { value: boolean | { value: boolean } }) => {
+    // Extraer el valor booleano de 'credicoop'
+    const credicoopValue = typeof e.value === 'object' && e.value !== null
+      ? e.value.value
+      : e.value;
+  
+    // Establecer 'credicoop' como booleano en Formik
+    formik.setFieldValue("credicoop", credicoopValue);
+    formik.setFieldTouched("credicoop", true);
+    formik.validateForm();
+   
+  
+  };
+  
 
   useEffect(() => {
     if (bankAccount) {
@@ -118,9 +195,12 @@ export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing
       formik.resetForm();
     }
   }, [bankAccount]);
-
+  useEffect(() => {
+    console.log("Form values changed:", formik.values);
+  }, [formik.values]);
   // Manejador de eventos para el submit
   const handleSubmit = (event:any) => {
+  
     setIsSubmitted(true);
     formik.handleSubmit(event);
   };
@@ -135,7 +215,7 @@ export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing
       header={isEditing ? "Editar Cuenta Bancaria" : "Agregar Cuenta Bancaria"}
       visible={isOpen}
       style={{ width: "30%" }}
-      onHide={onClose}
+      onHide={handleClose}
     >
       <StyledForm onSubmit={handleSubmit}>
         <FieldContainer>
@@ -151,6 +231,19 @@ export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing
           {showError("code") && <ErrorMessage>{formik.errors.code}</ErrorMessage>}
         </FieldContainer>
         <FieldContainer>
+          <StyledLabel htmlFor="credicoop">¿Es banco Credicoop?</StyledLabel>
+          <StyledDropdown
+            id="credicoop"
+            name="credicoop"
+            value={formik.values.credicoop || false}
+            options={boolTypes}
+            onChange={handleCredicoopChange}
+            onBlur={formik.handleBlur}
+            placeholder={formik.values.credicoop ? "Sí" : !formik.values.credicoop ? "No" : "Seleccionar opción"}
+          />
+          {showError("credicoop") && <ErrorMessage>{formik.errors.credicoop}</ErrorMessage>}
+        </FieldContainer>
+        <FieldContainer>
           <StyledLabel htmlFor="bank">Banco</StyledLabel>
           <StyledInputText
             id="bank"
@@ -161,6 +254,19 @@ export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing
             placeholder="Banco"
           />
           {showError("bank") && <ErrorMessage>{formik.errors.bank}</ErrorMessage>}
+        </FieldContainer>
+        <FieldContainer>
+          <StyledLabel htmlFor="cbuType">Tipo de clave</StyledLabel>
+          <StyledDropdown
+            id="cbuType"
+            name="cbuType"
+            value={formik.values.cbuType}
+            options={cbuTypes}
+            onChange={(e) => formik.setFieldValue("cbuType", e.value)}
+            onBlur={formik.handleBlur}
+            placeholder={formik.values.cbuType ? formik.values.cbuType : "Seleccionar tipo de clave única"}
+          />
+          {showError("cbuType") && <ErrorMessage>{formik.errors.cbuType}</ErrorMessage>}
         </FieldContainer>
         <FieldContainer>
           <StyledLabel htmlFor="CBU">CBU</StyledLabel>
@@ -198,6 +304,19 @@ export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing
             placeholder="Titular"
           />
           {showError("holder") && <ErrorMessage>{formik.errors.holder}</ErrorMessage>}
+        </FieldContainer>
+        <FieldContainer>
+          <StyledLabel htmlFor="cuit">CUIT</StyledLabel>
+          <StyledInputMask
+            id="cuit"
+            name="cuit"
+            mask="99-99999999-9" // Máscara para el CBU con guiones
+            value={formik.values.cuit}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            placeholder="Cuit"
+          />
+          {showError("cuit") && <ErrorMessage>{formik.errors.cuit}</ErrorMessage>}
         </FieldContainer>
         <FieldContainer>
           <StyledLabel htmlFor="number">Número</StyledLabel>

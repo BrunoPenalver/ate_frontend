@@ -37,6 +37,7 @@ const HeaderComp = () =>
         { label: "Listado" , command: () => navigate("/admin/ordenes"), },
         { label: "Agregar orden" , command: () => navigate("/admin/ordenes/agregar"), },
         { label: "Eliminadas" , command: () => navigate("/admin/ordenes/eliminadas"), },
+        { label: "Exportaciones" , command: () => navigate("/admin/ordenes/exportaciones"), },
       ], 
     },
     {

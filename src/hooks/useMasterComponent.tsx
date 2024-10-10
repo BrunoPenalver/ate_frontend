@@ -4,14 +4,14 @@ import { Toast } from "primereact/toast";
 import { getTranslate } from "../utils/translates";
 import api from "../utils/api";
 import { MasterCRUD } from "../models/mastersModel";
-import { validateCBU, validateCUIT } from "../utils/models";
+import { formatCuit, validateCBU, validateCUIT } from "../utils/models";
 
 
 
 
 export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
   /*######################### Obtener los datos de cada CRUD INDIVIDUAL ####################################*/
-  const { singular, plural, API, ObjectKeys } = item;
+  const { singular, plural, API, ObjectKeys,tooltip } = item;
 
   /*######################### Obtener valores iniciales como string vacío ####################################*/
   const getInitialValues = (ObjectKeys: any) => {
@@ -30,14 +30,14 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
   };
 
   /*######################### Obtener los errores del form ####################################*/
-  const getErrors = (values: any, ObjectKeys: any) => {
+  const getErrors = async (values: any, ObjectKeys: any) => {
     var errors: any = {};
   
     const keys = Object.keys(values);
   
     for (const key of keys) {
       const { field } = ObjectKeys.find((column: any) => column.key === key);
-    
+      
       const { rules } = field;
   
       if (!rules) continue;
@@ -75,9 +75,27 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
             }
             if (rule === "validCuit") {  // Nueva regla de validación para CBU
               if (!validateCUIT(values[key])) {
-                console.log(values[key])
+                
                 errors[key] = "El Cuit ingresado no es válido";
                 break; // Salir del bucle si se encuentra un error de CBU
+              }
+              
+            }
+            if(rule === "existingCuit")
+            { 
+              
+              const sanitizedCUIT = values[key].replace(/-/g, '');
+              const beneficiaryCode = values?.code; // Asegúrate de que 'code' esté presente en 'values'
+  
+              // Prepara los parámetros para la solicitud
+              const params = { cuit: sanitizedCUIT , code: beneficiaryCode };
+            
+              const { data } = await api.get(`/beneficiaries/check-cuit`, { params });
+              if(data.exists)
+              {
+                
+                errors[key] = `El Cuit ${formatCuit(sanitizedCUIT)} ya está registrado para el beneficiario con código ${data.existingCode}`;
+                break;
               }
             }
           }
@@ -424,7 +442,7 @@ const [loadingDelete, setLoadingDelete] = useState<boolean>(false);
     setLoadingDelete,
     switchStateModalDelete,
     setItemSwitchedStateAndSwitchModalDelete,
-
+    tooltip
 
 
   };

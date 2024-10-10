@@ -7,9 +7,12 @@ export default interface BankAccount
     number: string;
     type: string;
     CBU: string;
+    cbuType?: string;
     alias: string;
     beneficiaryId: number;
     createdAt: string;
     updatedAt: string;
     active?: boolean;
+    cuit: string;
+    credicoop: boolean;
 }

@@ -1,11 +1,22 @@
 import { Column } from "primereact/column";
 import { ReactElement, useState } from "react";
-import { StyledTableButton, TableContainer, StyledDataTable, TableTitle, TitleGroup } from "./styles";
+import {
+  StyledTableButton,
+  TableContainer,
+  StyledDataTable,
+  TableTitle,
+  TitleGroup,
+} from "./styles";
 import { Group } from "../../group/styles";
 import { DateColumn, RegularColumn } from "./tableutils";
-import { MasterCRUDColumnObjectKeys, Option } from "../../../models/mastersModel";
+import {
+  MasterCRUDColumnObjectKeys,
+  Option,
+} from "../../../models/mastersModel";
 import { BankAccountsDialog } from "../../admin/masterCRUDComponent/bankAccounts/BankAccountsDialog";
 import { DetailDialog } from "../../admin/masterCRUDComponent/beneficiaries/DetailDialog";
+import { isDataComplete } from "../../../utils/models";
+import { Tooltip } from "primereact/tooltip";
 
 interface StyledTableProps {
   items: any[];
@@ -21,40 +32,63 @@ interface StyledTableProps {
   errorOnLoad: boolean;
   OptionsForms: Option[];
   input: ReactElement;
+  tooltip?: string[];
 }
 
-export const StyledMastersTable = (props: StyledTableProps) => 
-{
-  const { items, ObjectKeys, plural, fn1, fn2, label, fn3, fn4, errorOnLoad, input  } = props;
+export const StyledMastersTable = (props: StyledTableProps) => {
+  const {
+    items,
+    ObjectKeys,
+    tooltip,
+    plural,
+    fn1,
+    fn2,
+    label,
+    fn3,
+    fn4,
+    errorOnLoad,
+    input,
+  } = props;
 
   const [isBankAccountsVisible, setIsBankAccountsVisible] = useState(false);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState<any>(null);
   const [isDetailDialogVisible, setIsDetailDialogVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
 
-  const openDetailDialog = (item: any) => 
-  {
+  const openDetailDialog = (item: any) => {
     setSelectedItem(item);
     setIsDetailDialogVisible(true);
-  }
+  };
 
-  const openBankAccounts = (beneficiary: any) => 
-  {
+  const openBankAccounts = (beneficiary: any) => {
     setSelectedBeneficiary(beneficiary);
     setIsBankAccountsVisible(!isBankAccountsVisible);
-  }
+  };
 
-  if (errorOnLoad) 
-  {
-    return <TableContainer>
-      <TitleGroup>
-        <TableTitle>{plural}</TableTitle>{" "}
-        <StyledTableButton label={label} className="p-button-primary" onClick={fn3}/>
-      </TitleGroup>
-      <p style={{ fontSize: "18px", marginTop: "30px", fontFamily: "var(--bs-body-font-family)" }}>
-        {typeof errorOnLoad === "string" ? errorOnLoad: `Error al cargar ${plural.toLowerCase()}`}
-      </p>
-    </TableContainer>
+  if (errorOnLoad) {
+    return (
+      <TableContainer>
+        <TitleGroup>
+          <TableTitle>{plural}</TableTitle>{" "}
+          <StyledTableButton
+            label={label}
+            className="p-button-primary"
+            onClick={fn3}
+          />
+        </TitleGroup>
+        <p
+          style={{
+            fontSize: "18px",
+            marginTop: "30px",
+            fontFamily: "var(--bs-body-font-family)",
+          }}
+        >
+          {typeof errorOnLoad === "string"
+            ? errorOnLoad
+            : `Error al cargar ${plural.toLowerCase()}`}
+        </p>
+      </TableContainer>
+    );
   }
 
   return (
@@ -62,13 +96,15 @@ export const StyledMastersTable = (props: StyledTableProps) =>
       <TableContainer>
         <TitleGroup>
           <Group>
-            {input}
+            <TableTitle>{plural}</TableTitle> {input}
           </Group>
-          <StyledTableButton
-            label={label}
-            className="p-button-primary"
-            onClick={fn3}
-          />
+          {plural !== "Cuentas contables" && (
+            <StyledTableButton
+              label={label}
+              className="p-button-primary"
+              onClick={fn3}
+            />
+          )}
         </TitleGroup>
         <StyledDataTable
           value={items.sort((a, b) => a.id + b.id)}
@@ -78,13 +114,68 @@ export const StyledMastersTable = (props: StyledTableProps) =>
           removableSort
         >
           {ObjectKeys?.map((key, index) => {
-
             if (key?.showInTable && key?.field.as === "date")
               return DateColumn(key, index);
 
             if (key?.showInTable) return RegularColumn(key, index);
+
+            return null; // Añadido retorno para evitar undefined
           })}
-          {plural === "Beneficiarios" && (
+
+          {plural !== "Cuentas contables" && (
+            <Column
+              header={
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <span>Datos correctos</span>
+                  <i
+                    className="pi pi-info-circle"
+                    style={{ marginLeft: "8px", cursor: "pointer" }}
+                    id="datos-correctos-tooltip"
+                    aria-label="Información sobre campos validados"
+                  ></i>
+                  <Tooltip
+                    target="#datos-correctos-tooltip"
+                    position="bottom"
+                    className="custom-tooltip"
+                  >
+                    <>
+                      {" "}
+                      <div>
+                        <strong>Campos validados:</strong>
+                        <ul style={{ marginTop: "8px"}}>
+                          {tooltip &&
+                            tooltip.map((item, index) => (
+                              <li style={{listStylePosition:"inside"}}   key={index}>{item}</li>
+                            ))}
+                        </ul>
+                      </div>{" "}
+                    </>
+                  </Tooltip>
+                </div>
+              }
+              body={(rowData) => {
+                return isDataComplete(rowData, ObjectKeys) ? (
+                  <i
+                    className="pi pi-check"
+                    style={{ color: "green", fontSize: "1.5em" }}
+                  ></i>
+                ) : (
+                  <i
+                    className="pi pi-times"
+                    style={{ color: "red", fontSize: "1.5em" }}
+                  ></i>
+                );
+              }}
+              style={{ textAlign: "center", width: "150px" }}
+            />
+          )}
+          {plural === "Proovedores" && (
             <Column
               header="Cuentas bancarias"
               body={(row) => {
@@ -115,61 +206,62 @@ export const StyledMastersTable = (props: StyledTableProps) =>
               }}
             />
           )}
-          <Column
-            header="Acciones"
-            body={(row) => {
-              return (
-                <div
-                  style={{
-                    display: "flex",
-                    padding: "0 10px",
-                    gap: "10px",
-                    justifyContent: "center",
-                    textDecoration: "none",
-                    alignItems: "center",
-                  }}
-                >
-                  <i
-                    className="pi pi-search"
+          {plural !== "Cuentas contables" && (
+            <Column
+              header="Acciones"
+              body={(row) => {
+                return (
+                  <div
                     style={{
-                      color: "#10b981",
-                      cursor: "pointer",
+                      display: "flex",
+                      padding: "0 10px",
+                      gap: "10px",
+                      justifyContent: "center",
+                      textDecoration: "none",
+                      alignItems: "center",
                     }}
-                    onClick={() => openDetailDialog(row)}
-                  ></i>
-                  <i
-                    className="pi pi-pencil"
-                    style={{
-                      color: "#10b981",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => fn1(row)}
-                  ></i>
-                  <i
-                    className={row?.active ? "pi pi-eye-slash" : "pi pi-eye"}
-                    style={{
-                      color: row?.active ? "var(--gray-500)" : "#10b981",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => fn2(row)}
-                  />
-                  <i
-                    className="pi pi-trash"
-                    style={{ color: "var(--red-600)", cursor: "pointer" }}
-                    onClick={() => fn4(row)}
-                  />
-                </div>
-              );
-            }}
-          />
+                  >
+                    <i
+                      className="pi pi-search"
+                      style={{
+                        color: "#10b981",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => openDetailDialog(row)}
+                    ></i>
+                    <i
+                      className="pi pi-pencil"
+                      style={{
+                        color: "#10b981",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => fn1(row)}
+                    ></i>
+                    <i
+                      className={row?.active ? "pi pi-eye-slash" : "pi pi-eye"}
+                      style={{
+                        color: row?.active ? "var(--gray-500)" : "#10b981",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => fn2(row)}
+                    />
+                    <i
+                      className="pi pi-trash"
+                      style={{ color: "var(--red-600)", cursor: "pointer" }}
+                      onClick={() => fn4(row)}
+                    />
+                  </div>
+                );
+              }}
+            />
+          )}
         </StyledDataTable>
       </TableContainer>
-      {plural === "Beneficiarios" && (
+      {plural === "Proovedores" && (
         <BankAccountsDialog
           isOpen={isBankAccountsVisible}
           beneficiary={selectedBeneficiary}
           setIsOpen={() => openBankAccounts(null)}
-         
         />
       )}
       <DetailDialog

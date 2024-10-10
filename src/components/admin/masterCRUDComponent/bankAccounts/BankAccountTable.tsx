@@ -7,8 +7,9 @@ import { StyledCell } from "./styles";
 import { DeactivateBankAccountDialog } from "./DeactivateBankAccountDialog";
 import { DeleteDialog } from "./DeleteBankAccountDialog";
 import BankAccount from "../../../../interfaces/orders/bankAccount";
-import { formatCBU } from '../../../../utils/models';
+import { FieldValidation, formatCBU, formatCuit, individualTableisDataComplete } from '../../../../utils/models';
 import socket from "../../../../utils/socket";
+import { Tooltip } from "primereact/tooltip";
 
 interface DialogProps {
   bankAccounts: BankAccount[];
@@ -17,6 +18,7 @@ interface DialogProps {
 
 export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps) => 
 {
+  const tooltip = ["Código","Banco", "Tipo de Banco","Tipo de clave única (Si no es Credicoop)","Clave única (Si no es Credicoop)","Alias", "Titular", "CUIT", "Nº Cuenta(Si es Credicoop)", "Tipo de cuenta" ];
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [isDeleteDialogVisible, setIsDeleteDialogVisible] = useState(false);
   const [isDeactivateDialogVisible, setIsDeactivateDialogVisible] =useState(false);
@@ -156,7 +158,15 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
             header="ID"
             sortable
             body={(rowData) => (
-              <StyledCell $active={rowData?.active}>{rowData.id}</StyledCell>
+              <StyledCell $active={rowData?.active}>{rowData.id ? rowData.id : "---"}</StyledCell>
+            )}
+          />
+          <Column
+            field="code"
+            header="Código"
+            sortable
+            body={(rowData) => (
+              <StyledCell $active={rowData?.active}>{rowData.code ? rowData.code : "---"}</StyledCell>
             )}
           />
           <Column
@@ -164,15 +174,32 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
             header="Banco"
             sortable
             body={(rowData) => (
-              <StyledCell $active={rowData?.active}>{rowData.bank}</StyledCell>
+              <StyledCell $active={rowData?.active}>{rowData.bank ? rowData.bank : "---"}</StyledCell>
+            )}
+          />
+          <Column
+            field="credicoop"
+            header="Tipo de Banco"
+            sortable
+            body={(rowData) => (
+              <StyledCell $active={rowData?.active}>{rowData.credicoop ? "Credicoop" : "Otro"}</StyledCell>
+            )}
+          />
+          <Column
+            field="cbuType"
+            header="Tipo de clave"
+            sortable
+            body={(rowData) => (
+              <StyledCell $active={rowData?.active}>{rowData.cbuType ? rowData.cbuType : "---"}</StyledCell>
             )}
           />
           <Column
             field="CBU"
-            header="CBU"
+            header="Nº Clave única"
             sortable
+            style={{ minWidth: "150px" }}
             body={(rowData) => (
-              <StyledCell $active={rowData?.active}>{formatCBU(rowData.CBU)}</StyledCell>
+              <StyledCell $active={rowData?.active}>{rowData.CBU ? formatCBU(rowData.CBU) : "---"}</StyledCell>
             )}
           />
           <Column
@@ -180,7 +207,7 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
             header="Alias"
             sortable
             body={(rowData) => (
-              <StyledCell $active={rowData?.active}>{rowData.alias}</StyledCell>
+              <StyledCell $active={rowData?.active}>{rowData.alias ? rowData.alias : "---"}</StyledCell>
             )}
           />
           <Column
@@ -188,25 +215,106 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
             header="Titular"
             sortable
             body={(rowData) => (
-              <StyledCell $active={rowData?.active}>{rowData.holder}</StyledCell>
+              <StyledCell $active={rowData?.active}>{rowData.holder ? rowData.holder : "---"}</StyledCell>
+            )}
+          />
+          <Column
+            field="cuit"
+            header="Cuit"
+            sortable
+            style={{ minWidth: "150px" }}
+            body={(rowData) => (
+              <StyledCell $active={rowData?.active}>{rowData.cuit ? formatCuit(rowData.cuit) : "---"}</StyledCell>
             )}
           />
           <Column
             field="number"
-            header="Numero"
+            header="Nº de cuenta"
             sortable
             body={(rowData) => (
-              <StyledCell $active={rowData?.active}>{rowData.number}</StyledCell>
+              <StyledCell $active={rowData?.active}>{rowData.number ? rowData.number : "---"}</StyledCell>
             )}
           />
           <Column
             field="type"
-            header="Tipo"
+            header="Tipo de cuenta"
             sortable
             body={(rowData) => (
-              <StyledCell $active={rowData?.active}>{rowData.type}</StyledCell>
+              <StyledCell $active={rowData?.active}>{rowData.type ? rowData.type : "---"}</StyledCell>
             )}
           />
+          <Column
+             header={
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  
+                }}
+              >
+                <span>Datos correctos</span>
+                <i
+                  className="pi pi-info-circle"
+                  style={{ marginLeft: "8px", cursor: "pointer" }}
+                  id="datos-correctos-tooltip"
+                  aria-label="Información sobre campos validados"
+                ></i>
+                <Tooltip
+                  target="#datos-correctos-tooltip"
+                  position="bottom"
+                  className="custom-tooltip"
+                >
+                  <>
+                    {" "}
+                    <div>
+                      <strong>Campos validados:</strong>
+                      <ul style={{ marginTop: "8px"}}>
+                        {tooltip &&
+                          tooltip.map((item, index) => (
+                            <li style={{listStylePosition:"inside"}}  key={index}>{item}</li>
+                          ))}
+                      </ul>
+                    </div>{" "}
+                  </>
+                </Tooltip>
+              </div>
+            }
+            body={(rowData) => {
+              
+              // Generar el array de campos con nombre y valor
+              const fieldsToValidate: FieldValidation[] = [
+                {name: 'code', value: rowData.code},
+                { name: 'cuit', value: rowData.cuit },
+                { name: 'cbuType', value: rowData.cbuType },
+                { name: 'CBU', value: rowData.CBU },
+                { name: 'alias', value: rowData.alias },
+                { name: 'holder', value: rowData.holder },
+                {name: 'bank', value: rowData.bank},
+                {name: 'credicoop', value: rowData.credicoop},
+                {name: 'number', value: rowData.number},
+                {name: 'type', value: rowData.type}
+
+              ];
+              
+
+              return individualTableisDataComplete(fieldsToValidate) ? (
+                <i
+                  className="pi pi-check"
+                  style={{ color: "green", fontSize: "1.5em" }}
+                  aria-label="Datos completos"
+                ></i>
+              ) : (
+                <i
+                  className="pi pi-times"
+                  style={{ color: "red", fontSize: "1.5em" }}
+                  aria-label="Datos incompletos"
+                ></i>
+              );
+            }}
+            style={{ textAlign: 'center', width: '150px' }}
+          />
+          
           <Column
             header="Acciones"
             body={(row) => {

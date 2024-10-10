@@ -5,7 +5,7 @@ export default interface Order
     id: number;
     date: string;
     description: string;
-    state: string;
+    state: "Abierta" | "Cerrada" | "Borrador"; 
     createdAt: string;
     updatedAt: string;
     paymentDate: string;

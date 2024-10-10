@@ -1,11 +1,18 @@
 import styled from "styled-components";
 import { Panel as PanelNoStyled } from "primereact/panel";
 
-export const AddText = styled.p`
-margin: 20px 0;
-cursor: pointer;
-font-weight: bold;
-text-decoration: underline;`;
+interface AddTextProps {
+    enable: boolean;
+}
+
+export const AddText = styled.p<AddTextProps>`
+    margin: 20px 0;
+    cursor: pointer;
+    font-weight: bold;
+    color: ${({ enable }) => (enable ? 'inherit' : 'gray')};
+    text-decoration: ${({ enable }) => (enable ? 'underline' : 'inherit')};
+    pointer-events: ${({ enable }) => (enable ? 'auto' : 'none')};
+`;
 
 export const ContainerTables = styled.div`
 display: grid;
