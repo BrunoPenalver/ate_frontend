@@ -28,9 +28,9 @@ describe('Crear Orden', () =>
         cy.get(".p-datepicker-today").click();
         cy.get("#description").type("Descripción de prueba");
 
-        openAndFillMovimientoForm(false);
-        openAndFillMovimientoForm(true);
-        openAndFillMovimientoForm(true);
+        openAndFillMovimientoForm(false,100);
+        openAndFillMovimientoForm(true,50);
+        openAndFillMovimientoForm(true,50);
 
         cy.get("#save-order").click();
 

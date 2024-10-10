@@ -1,5 +1,5 @@
 
 
-cy.on("uncaught:exception", (err, runnable) => {
+cy.on("uncaught:exception", (_, __) => {
     return false;
 });
