@@ -7,6 +7,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { Fragment, useEffect, useState } from "react";
 import { MasterCRUDColumnObjectKeys as Column } from "../../../models/mastersModel";
 import { InputMask } from "primereact/inputmask";
+import { Asterisk } from "../../Asterisk/Asterisk";
 
 
 
@@ -106,7 +107,7 @@ const handleClose = () => {
       <div className="container-modal">
         <form onSubmit={FormUpdate.handleSubmit}>
           {ObjectKeys.map((column: Column) => {
-            const { key, label, field, dependsOn } = column;
+            const { key, label, field, dependsOn, obligatoryField } = column;
             const {
               type,
               emptyOptions,
@@ -124,7 +125,7 @@ const handleClose = () => {
             if (type === "input" && !asField) {
               TypeComp = (
                 <>
-                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}{obligatoryField && <Asterisk />}</label>
                   <InputText
                     id={label.replace(/\s+/g, '').toLowerCase()}
                     placeholder={label}
@@ -140,7 +141,7 @@ const handleClose = () => {
             if (type === "input" && asField === "number") {
               TypeComp = (
                 <>
-                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}{obligatoryField && <Asterisk />}</label>
                   <InputNumber
                     id={label.replace(/\s+/g, '').toLowerCase()}
                     placeholder={label}
@@ -160,7 +161,7 @@ const handleClose = () => {
          
               TypeComp = (
                 <>
-                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}{obligatoryField && <Asterisk />}</label>
                   <Dropdown
                     id={label.replace(/\s+/g, '').toLowerCase()}
                     key={key}
@@ -193,7 +194,7 @@ const handleClose = () => {
             if (type === "select" && title && value && !dependsOn) {
               TypeComp = (
                 <>
-                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}{obligatoryField && <Asterisk />}</label>
                   <Dropdown
                     id={label.replace(/\s+/g, '').toLowerCase()}
                     key={key}
@@ -221,7 +222,7 @@ const handleClose = () => {
     
               TypeComp = (
                 <>
-                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}{obligatoryField && <Asterisk />}</label>
                   <Dropdown
                     id={label.replace(/\s+/g, '').toLowerCase()}
                     disabled
@@ -246,7 +247,7 @@ const handleClose = () => {
            
             TypeComp = (
               <>
-                <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
+                <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}{obligatoryField && <Asterisk />}</label>
                 <Dropdown
                   id={label.replace(/\s+/g, '').toLowerCase()}
                   key={key}
@@ -269,7 +270,7 @@ const handleClose = () => {
       
             TypeComp = (
               <>
-                <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
+                <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}{obligatoryField && <Asterisk />}</label>
                 <InputText
                   disabled = {registryTypeDisabled}
                   id={label.replace(/\s+/g, '').toLowerCase()}
@@ -285,7 +286,7 @@ const handleClose = () => {
 
               TypeComp = (
                 <>
-                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}{obligatoryField && <Asterisk />}</label>
                   <Dropdown
                     id={label.replace(/\s+/g, '').toLowerCase()}
                     key={key}
@@ -306,7 +307,7 @@ const handleClose = () => {
             if (type === "select" && key === "city") {
               TypeComp = (
                 <>
-                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}{obligatoryField && <Asterisk />}</label>
                   <Dropdown
                     id={label.replace(/\s+/g, '').toLowerCase()}
                     key={key}
@@ -328,7 +329,7 @@ const handleClose = () => {
     
               TypeComp = (
                 <>
-                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}{obligatoryField && <Asterisk />}</label>
                   <InputMask
                     id={label.replace(/\s+/g, '').toLowerCase()}
                     mask="99999999-99999999999999"  // Máscara para el CBU (22 dígitos con un guion en el medio)
@@ -345,7 +346,7 @@ const handleClose = () => {
     
               TypeComp = (
                 <>
-                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}{obligatoryField && <Asterisk />}</label>
                   <InputMask
                     id={label.replace(/\s+/g, '').toLowerCase()}
                     mask="99-99999999-9"  
@@ -361,7 +362,7 @@ const handleClose = () => {
             if (type === "textarea") {
               TypeComp = (
                 <>
-                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}{obligatoryField && <Asterisk />}</label>
                   <InputTextarea
                     id={label.replace(/\s+/g, '').toLowerCase()}
                     placeholder={label}
@@ -379,7 +380,7 @@ const handleClose = () => {
             if (type === "number") {
               TypeComp = (
                 <>
-                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}{obligatoryField && <Asterisk />}</label>
                   <InputNumber
                   id={label.replace(/\s+/g, '').toLowerCase()}
                     useGrouping={false}

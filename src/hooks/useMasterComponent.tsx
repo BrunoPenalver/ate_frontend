@@ -9,6 +9,7 @@ import { formatCuit, validateCBU, validateCUIT } from "../utils/models";
 
 
 
+
 export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
   /*######################### Obtener los datos de cada CRUD INDIVIDUAL ####################################*/
   const { singular, plural, API, ObjectKeys,tooltip } = item;
@@ -351,6 +352,7 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
   const labelAgregar = `Agregar ${singular.toLowerCase()}`;
   const labelActualizar = `Actualizar ${singular.toLowerCase()}`;
   const switchStateModalAdd = () => {
+    
     setShowModalAdd(!showModalAdd);
   };
   /* ######### Actualizar ######### */

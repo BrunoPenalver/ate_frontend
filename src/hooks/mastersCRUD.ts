@@ -31,6 +31,7 @@ export const useMastersCRUD = (title= "") =>
           field: { type: "input", rules: ["required"] },
           showInTable: true,
           showInForm: true,
+          obligatoryField: true,
         },
         {
           key: "beneficiaryType",
@@ -38,6 +39,7 @@ export const useMastersCRUD = (title= "") =>
           field: { type: "select", rules: ["required"], getOptionsFrom: "beneficiaryTypes/options"},
           showInTable: true,
           showInForm: true,
+          obligatoryField: true,
         },
         {
           key: "businessName",
@@ -45,6 +47,7 @@ export const useMastersCRUD = (title= "") =>
           field: { type: "input", rules: ["required"] },
           showInTable: true,
           showInForm: true,
+          obligatoryField: true,
         },
         {
           key:"cuit",
@@ -52,6 +55,7 @@ export const useMastersCRUD = (title= "") =>
           field:{type:"input", rules:["required", "validCuit","existingCuit"]},
           showInTable:true,
           showInForm:true,
+          obligatoryField: true,
         },
         {
           key:"email"
@@ -59,6 +63,7 @@ export const useMastersCRUD = (title= "") =>
           field:{type:"input", rules:["required"]},
           showInTable:true,
           showInForm:true,
+          obligatoryField: true,
         },
 
         {
