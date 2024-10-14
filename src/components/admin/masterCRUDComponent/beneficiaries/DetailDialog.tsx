@@ -45,8 +45,9 @@ export const DetailDialog = (props: DetailDialogProps) => {
   return (
     <Dialog
       header={title}
+      id="details-dialog"
       visible={isOpen}
-      style={{ width: "40vw" }}
+      style={{ width: "min(700px,90%)" }}
       onHide={onHide}
       footer={<Button label="Cerrar" icon="pi pi-times" onClick={onHide} />}
     >

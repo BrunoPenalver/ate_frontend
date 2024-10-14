@@ -130,9 +130,9 @@ export const NormalAddDialog = (props: Props) => {
             if (type === "input" && !asField)
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <InputText
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     placeholder={label}
                     value={FormAdd.values[key]}
                     onChange={(e) => FormAdd.setFieldValue(key, e.target.value)}
@@ -143,9 +143,9 @@ export const NormalAddDialog = (props: Props) => {
             if (type === "input" && asField === "number")
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <InputNumber
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     placeholder={label}
                     value={FormAdd.values[key]}
                     onValueChange={(e) => FormAdd.setFieldValue(key, e.value)}
@@ -157,9 +157,9 @@ export const NormalAddDialog = (props: Props) => {
             if (type === "input" && asField === "password")
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <InputText
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     placeholder={label}
                     value={FormAdd.values[key]}
                     onChange={(e) => FormAdd.setFieldValue(key, e.target.value)}
@@ -171,9 +171,9 @@ export const NormalAddDialog = (props: Props) => {
             if (type === "input" && asField === "date")
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <Calendar
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     placeholder={label}
                     value={FormAdd.values[key]}
                     onChange={(e) => FormAdd.setFieldValue(key, e.value)}
@@ -186,9 +186,9 @@ export const NormalAddDialog = (props: Props) => {
             if (type === "select" && !title && !value) {
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <Dropdown
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     key={key}
                     emptyMessage={emptyOptions}
                     placeholder={
@@ -215,9 +215,9 @@ export const NormalAddDialog = (props: Props) => {
             if (type === "select" && title && value) {
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <Dropdown
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     key={key}
                     emptyMessage={emptyOptions}
                     placeholder={
@@ -244,9 +244,9 @@ export const NormalAddDialog = (props: Props) => {
             if (type === "select" && key === "province") {
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <Dropdown
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     key={key}
                     emptyMessage={emptyOptions}
                     placeholder={
@@ -267,9 +267,9 @@ export const NormalAddDialog = (props: Props) => {
             if (type === "select" && key === "city") {
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <Dropdown
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     key={key}
                     disabled={isCityDisabled}
                     emptyMessage="No hay opciones disponibles"
@@ -291,9 +291,9 @@ export const NormalAddDialog = (props: Props) => {
             if (type === "select" && key === "registryType") {
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <Dropdown
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     key={key}
                     emptyMessage={emptyOptions}
                     placeholder={
@@ -314,9 +314,9 @@ export const NormalAddDialog = (props: Props) => {
             if (type === "select" && dependsOn === "registryType") {
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <Dropdown
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     key={key}
                     disabled={registryTypeDisabled}
                     emptyMessage={emptyOptions}
@@ -339,10 +339,10 @@ export const NormalAddDialog = (props: Props) => {
 
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <InputText
                     disabled = {registryTypeDisabled}
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     placeholder={label}
                     value={FormAdd.values[key]}
                     onChange={(e) => FormAdd.setFieldValue(key, e.target.value)}
@@ -354,9 +354,9 @@ export const NormalAddDialog = (props: Props) => {
     
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <InputMask
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     mask="99999999-99999999999999"  // Máscara para el CBU (22 dígitos con un guion en el medio)
                     placeholder="CBU"
                     value={FormAdd.values[key]}
@@ -371,9 +371,9 @@ export const NormalAddDialog = (props: Props) => {
     
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <InputMask
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     mask="99-99999999-9"  
                     placeholder="Cuit"
                     value={FormAdd.values[key]}
@@ -389,8 +389,9 @@ export const NormalAddDialog = (props: Props) => {
             if (type === "textarea")
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <InputTextarea
+                  id={label.replace(/\s+/g, '').toLowerCase()}
                     placeholder={label}
                     value={FormAdd.values[key]}
                     onChange={(e) => FormAdd.setFieldValue(key, e.target.value)}
@@ -403,8 +404,9 @@ export const NormalAddDialog = (props: Props) => {
             if (type === "number") {
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <InputNumber
+                  id={label.replace(/\s+/g, '').toLowerCase()}
                     useGrouping={false}
                     placeholder={label}
                     min={min}

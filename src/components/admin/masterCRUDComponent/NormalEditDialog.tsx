@@ -124,9 +124,9 @@ const handleClose = () => {
             if (type === "input" && !asField) {
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <InputText
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     placeholder={label}
                     value={FormUpdate.values[key]}
                     onChange={(e) =>
@@ -140,9 +140,9 @@ const handleClose = () => {
             if (type === "input" && asField === "number") {
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <InputNumber
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     placeholder={label}
                     value={FormUpdate.values[key]}
                     onValueChange={(e) =>
@@ -160,9 +160,9 @@ const handleClose = () => {
          
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <Dropdown
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     key={key}
                     emptyMessage={emptyOptions}
                     placeholder={
@@ -193,9 +193,9 @@ const handleClose = () => {
             if (type === "select" && title && value && !dependsOn) {
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <Dropdown
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     key={key}
                     emptyMessage={emptyOptions}
                     placeholder={
@@ -221,9 +221,9 @@ const handleClose = () => {
     
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <Dropdown
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     disabled
                     key={key}
                     emptyMessage={emptyOptions}
@@ -246,9 +246,9 @@ const handleClose = () => {
            
             TypeComp = (
               <>
-                <label htmlFor={label}>{label}</label>
+                <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                 <Dropdown
-                  id={label}
+                  id={label.replace(/\s+/g, '').toLowerCase()}
                   key={key}
                   disabled = {registryTypeDisabled}
                   emptyMessage={emptyOptions}
@@ -269,10 +269,10 @@ const handleClose = () => {
       
             TypeComp = (
               <>
-                <label htmlFor={label}>{label}</label>
+                <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                 <InputText
                   disabled = {registryTypeDisabled}
-                  id={label}
+                  id={label.replace(/\s+/g, '').toLowerCase()}
                   placeholder={label}
                   value={FormUpdate.values[key]}
                   onChange={(e) => FormUpdate.setFieldValue(key, e.target.value)}
@@ -285,9 +285,9 @@ const handleClose = () => {
 
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <Dropdown
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     key={key}
                     emptyMessage={emptyOptions}
                     placeholder={FormUpdate.values[key]?.name || label}
@@ -306,9 +306,9 @@ const handleClose = () => {
             if (type === "select" && key === "city") {
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <Dropdown
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     key={key}
                     emptyMessage="No hay opciones disponibles"
                     placeholder={FormUpdate?.values[key]?.name || label}
@@ -328,9 +328,9 @@ const handleClose = () => {
     
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <InputMask
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     mask="99999999-99999999999999"  // Máscara para el CBU (22 dígitos con un guion en el medio)
                     placeholder="CBU"
                     value={FormUpdate.values[key]}
@@ -345,9 +345,9 @@ const handleClose = () => {
     
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <InputMask
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     mask="99-99999999-9"  
                     placeholder="Cuit"
                     value={FormUpdate.values[key]}
@@ -361,9 +361,9 @@ const handleClose = () => {
             if (type === "textarea") {
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <InputTextarea
-                    id={label}
+                    id={label.replace(/\s+/g, '').toLowerCase()}
                     placeholder={label}
                     value={FormUpdate.values[key]}
                     onChange={(e) =>
@@ -379,8 +379,9 @@ const handleClose = () => {
             if (type === "number") {
               TypeComp = (
                 <>
-                  <label htmlFor={label}>{label}</label>
+                  <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}>{label}</label>
                   <InputNumber
+                  id={label.replace(/\s+/g, '').toLowerCase()}
                     useGrouping={false}
                     placeholder={label}
                     min={min}

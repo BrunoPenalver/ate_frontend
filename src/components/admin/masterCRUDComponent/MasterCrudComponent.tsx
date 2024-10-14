@@ -65,6 +65,7 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) =>
 
   const FormAdd : any = useFormik({
     initialValues: getInitialValues(ObjectKeys),
+    validateOnChange: false,
     validate: (values) => getErrors(values, ObjectKeys),
     onSubmit: async (values) => handleAdd(values, FormAdd),
   });
@@ -72,6 +73,7 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) =>
   const FormUpdate = useFormik({
     initialValues: getInitialValues(ObjectKeys),
     validate: (values) => getErrors(values, ObjectKeys),
+    validateOnChange: false,
     onSubmit: async (values) => handleUpdate(values),
   });
 
