@@ -1,13 +1,9 @@
-import { useRef, useState } from "react";
-
+import {  useRef, useState } from "react";
 import { Toast } from "primereact/toast";
 import { getTranslate } from "../utils/translates";
 import api from "../utils/api";
 import { MasterCRUD } from "../models/mastersModel";
 import { formatCuit, validateCBU, validateCUIT } from "../utils/models";
-
-
-
 
 export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
   /*######################### Obtener los datos de cada CRUD INDIVIDUAL ####################################*/
@@ -274,23 +270,24 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
       });
     } finally {
       setLoadingUpdate(false);
-      await getData("");
+      await getData();
     }
   };
 
-  const getData = async (searchText: string) => 
+  const getData = async () => 
   {
     setLoading(true);
 
     try 
     {
-      const { data: Response } = await api.get(`${API.get}?search=${searchText}&page=${CurrentPage}&limit=${ItemsPerPage}`);
+      const { data: Response } = await api.get(`${API.get}?search=${SearchText}&page=${CurrentPage}&limit=${ItemsPerPage}`);
 
-      const {rows, count} = Response;
+      const { currentPage ,data , total, totalPages} = Response;
 
+      console.log(Response);
 
-      setItems(rows);
-      setTotalResult(count);
+      setItems(data);
+      setTotalResult(total);
       setErrorOnLoad(false);
     } catch (error: any) 
     {
@@ -331,6 +328,7 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
   }
 
 
+  const [SearchText, setSearchText] = useState<string>("");
   const [refetch, setRefetch] = useState(false);
   const [Loading, setLoading] = useState<boolean>(true);
   const Errors = useRef<Toast>(null);
@@ -344,6 +342,8 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
   const [OptionsForms, setOptionsForms] = useState<any>({});
   const labelAgregar = `Agregar ${singular.toLowerCase()}`;
   const labelActualizar = `Actualizar ${singular.toLowerCase()}`;
+
+
   const switchStateModalAdd = () => {
     setShowModalAdd(!showModalAdd);
   };
@@ -412,6 +412,7 @@ const [loadingDelete, setLoadingDelete] = useState<boolean>(false);
     switchStateModalAdd,
     showModalUpdate,
     setShowModalUpdate,
+
     LoadingUpdate,
     setLoadingUpdate,
     itemSwitchedState,
@@ -442,8 +443,8 @@ const [loadingDelete, setLoadingDelete] = useState<boolean>(false);
     setLoadingDelete,
     switchStateModalDelete,
     setItemSwitchedStateAndSwitchModalDelete,
-    tooltip
-
-
+    tooltip,
+    setSearchText,
+    SearchText
   };
 };

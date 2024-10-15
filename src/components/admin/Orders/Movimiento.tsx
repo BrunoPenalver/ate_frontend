@@ -494,7 +494,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
             <ContainerInput>
                 <FloatLabel>
                     <InputNumber id="amount" locale="de-DE" minFractionDigits={2} maxFractionDigits={2} value={FormMovimiento.values.amount} onChange={e => FormMovimiento.setFieldValue("amount",e.value)} disabled={disabled}/>
-                    <label htmlFor="amount">Importe</label>    
+                    <label htmlFor="amount">Importe *</label>    
                 </FloatLabel>  
                 {getFormErrorMessage("amount")}
             </ContainerInput>
@@ -513,7 +513,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
             <FloatLabel>
                 <AutoComplete dropdown id="accountPlan" value={FormMovimiento.values.accountPlan} suggestions={FilteredAccountPlans} forceSelection completeMethod={searchMethodAccountPlans}  
                 onChange={onChangeAccountPlan} itemTemplate={templateOptionAccountPlan} selectedItemTemplate={templateOptionAccountPlan} optionGroupTemplate={templateOptionAccountPlan} disabled={disabled}/>
-               <label htmlFor="accountPlan">Plan de cuentas ( Número - Código - Código corto - Cuenta)</label>
+               <label htmlFor="accountPlan">Plan de cuentas ( Número - Código - Código corto - Cuenta) *</label>
             </FloatLabel>
             {getFormErrorMessage("accountPlan")}
         </ContainerInput>
@@ -522,7 +522,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
             <FloatLabel>
                 <AutoComplete dropdown id="beneficiary" value={FormMovimiento.values.beneficiary} suggestions={FilteredBeneficiaries} forceSelection
                 completeMethod={searchMethodBeneficiaries} itemTemplate={templateOptionBeneficiary} selectedItemTemplate={templateOptionBeneficiary} onChange={onChangeBeneficiary} disabled={disabled}/>
-                <label htmlFor="beneficiary">Beneficiario a cobrar (Número - Código - Nombre - CUIT)</label>
+                <label htmlFor="beneficiary">Beneficiario a cobrar (Número - Código - Nombre - CUIT) *</label>
             </FloatLabel>
             {getFormErrorMessage("beneficiary")}
         </ContainerInput>
@@ -531,7 +531,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
             <FloatLabel>
                 <AutoComplete emptyMessage="El beneficiario no tiene bancos" dropdown id="bankAccount" value={FormMovimiento.values.bankAccount} onBlur={onLeaveBank}
                 suggestions={FilteredOriginBanks} completeMethod={searchMethodBankAccount} itemTemplate={templateOptionOriginBank} selectedItemTemplate={templateOptionOriginBank}  onChange={onChangeOriginBank} disabled={disabled}/>
-                <label htmlFor="bankAccount">Banco (CBU - Banco - Titular)</label>
+                <label htmlFor="bankAccount">Banco (CBU - Banco - Titular) *</label>
             </FloatLabel>
             {getFormErrorMessage("bankAccount")}
         </ContainerInput>
@@ -541,7 +541,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
                 <FloatLabel>
                     <AutoComplete dropdown forceSelection id="paymentType" value={FormMovimiento.values.paymentType} field="type" suggestions={FilteredPaymentTypes}
                     completeMethod={searchMethodPaymentTypes}  onChange={onChangePaymentType} itemTemplate={templateOptionPaymentTypes} disabled={disabled}/>
-                    <label htmlFor="paymentType">Metodo de Pago</label>
+                    <label htmlFor="paymentType">Metodo de Pago *</label>
                 </FloatLabel>
                 {getFormErrorMessage("paymentType")}
             </ContainerInput>
@@ -558,7 +558,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
                 <FloatLabel>
                     <AutoComplete id="sectional" value={FormMovimiento.values.sectional} dropdown suggestions={FilteredSectionals} forceSelection  completeMethod={searchMethodSectionals} 
                     itemTemplate={templateOptionSectionals} selectedItemTemplate={templateOptionSectionals} onChange={onChangeSectional} disabled={disabled}/>
-                    <label htmlFor="sectional">Seccional (Número - Código - Nombre)</label>
+                    <label htmlFor="sectional">Seccional (Número - Código - Nombre) *</label>
                 </FloatLabel>
                 {getFormErrorMessage("sectional")}
             </ContainerInput>
