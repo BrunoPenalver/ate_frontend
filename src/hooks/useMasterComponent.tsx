@@ -288,7 +288,7 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
     {
       const { data: Response } = await api.get(`${API.get}?search=${SearchText}&page=${CurrentPage}&limit=${ItemsPerPage}`);
 
-      const { currentPage ,data , total, totalPages} = Response;
+      const { data , total} = Response;
 
       console.log(Response);
 
