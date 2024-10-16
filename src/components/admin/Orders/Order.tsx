@@ -80,6 +80,19 @@ const Order = (props: Props) =>
     const [isLoading, setIsLoading] = useState(false);
     const [havePrevData, setHavePrevData] = useState(localStorage.getItem(pathname) ? true : false);
 
+    const [MinDate, _] = useState(() => {
+        const date = new Date();
+        date.setFullYear(date.getFullYear() - 5);
+        return date;
+    });
+
+    const [MaxDate, __] = useState(() => {
+        const date = new Date();
+        date.setDate(date.getDate() + 1);
+        return date;
+    });
+
+
     const generateInitialValues = (): FormikValues =>
     {
         if(havePrevData)
@@ -379,7 +392,7 @@ const Order = (props: Props) =>
             <PanelContent>
                 <ContainerInput>
                     <FloatLabel>  
-                        <Calendar id="date" dateFormat="dd/mm/yy" locale="es" value={Form.values.date} onChange={e => Form.setFieldValue("date",e.value)} disabled={DisableEdit}/>
+                        <Calendar id="date" dateFormat="dd/mm/yy" locale="es" minDate={MinDate} maxDate={MaxDate} value={Form.values.date} onChange={e => Form.setFieldValue("date",e.value)} disabled={DisableEdit}/>
                         <label htmlFor="date">Fecha</label>    
                     </FloatLabel>  
                     {getFormErrorMessage("date")}
@@ -387,7 +400,7 @@ const Order = (props: Props) =>
                 <ContainerInput>
                     <FloatLabel>  
                         <InputText id="description" value={Form.values.description} onChange={e => Form.setFieldValue("description",e.target.value)} disabled={DisableEdit}/>
-                        <label htmlFor="description">Descripción</label>    
+                        <label htmlFor="description">Descripción *</label>    
                     </FloatLabel>  
                     {getFormErrorMessage("description")}
                 </ContainerInput>

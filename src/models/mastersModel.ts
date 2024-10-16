@@ -30,6 +30,7 @@ export interface Option {
     showInForm: boolean;
     showInUpdate?: boolean;
     dependsOn?: string;
+    obligatoryField?: boolean;
   }
   
   export interface MasterCRUD {

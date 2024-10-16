@@ -106,6 +106,7 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
           <TitleGroup>
             <TableTitle>Listado de cuentas bancarias</TableTitle>{" "}
             <StyledTableButton
+            id="addBank"
               label="Agregar cuenta"
               className="p-button-primary"
               onClick={openAddBankAccountDialog}
@@ -139,12 +140,14 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
             <TableTitle>Listado de cuentas bancarias</TableTitle>
           </Group>
           <StyledTableButton
+          id="addBank"
             label="Agregar cuenta"
             className="p-button-primary"
             onClick={openAddBankAccountDialog}
           />
         </TitleGroup>
         <StyledDataTable
+          id="banktable"
           value={localBankAccounts.sort((a, b) => a.id - b.id)}
           paginator
           rows={10}
@@ -330,6 +333,7 @@ export const BankAccountsTable = ({ bankAccounts, beneficiaryId } : DialogProps)
                   }}
                 >
                   <i
+                  id="editbankicon"
                     className="pi pi-pencil"
                     style={{
                       color: "#10b981",

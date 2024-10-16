@@ -1,3 +1,31 @@
+:root {
+  --bs-body-bg: #f8f8f8; /* Cambia este valor al color que desees */
+}
+
+body {
+  background-color: var(--bs-body-bg);
+}
+
+.p-paginator, .p-dropdown, .p-inputwrapper, .p-inputwrapper-filled,.p-dropdown-items,.p-dropdown-items-wrapper, footer, .p-dialog , .p-dialog-default, .p-ripple-disabled, .p-dialog-enter-done, .p-dialog-header, .p-dialog-content, input, .p-dropdown-header,.p-menubar,.p-menubar-button,.p-submenu-list,.p-panel-content, .p-panel ,.p-panel-header{
+  background-color: var(--bs-body-bg) !important;
+}
+
+.p-menuitem-link{
+  height:100%;
+}
+
+.p-datatable-thead th{
+  background-color: #10b981 !important;
+  color: white !important;
+}
+
+
+
+/* .p-dropdown .p-inputwrapper .p-inputwrapper-filled{
+
+} */
+
+
 input
 {
   display: block;
@@ -37,4 +65,5 @@ input
 {
   margin-bottom: 5px;
 }
+
 

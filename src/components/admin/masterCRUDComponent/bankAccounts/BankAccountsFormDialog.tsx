@@ -9,6 +9,7 @@ import styled from "styled-components";
 import { AccountTypeTypes } from "../../../../models/accountType";
 import api from "../../../../utils/api";
 import { validateCBU, validateCUIT } from "../../../../utils/models";
+import { Asterisk } from "../../../Asterisk/Asterisk";
 
 // Define las opciones para el campo de tipo utilizando los valores de AccountTypeTypes
 const bankTypes = Object.values(AccountTypeTypes).map(type => ({ label: type, value: type }));
@@ -219,7 +220,7 @@ export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing
     >
       <StyledForm onSubmit={handleSubmit}>
         <FieldContainer>
-          <StyledLabel htmlFor="code">Código</StyledLabel>
+          <StyledLabel htmlFor="code">Código<Asterisk/></StyledLabel>
           <StyledInputText
             id="code"
             name="code"
@@ -231,7 +232,7 @@ export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing
           {showError("code") && <ErrorMessage>{formik.errors.code}</ErrorMessage>}
         </FieldContainer>
         <FieldContainer>
-          <StyledLabel htmlFor="credicoop">¿Es banco Credicoop?</StyledLabel>
+          <StyledLabel htmlFor="credicoop">¿Es banco Credicoop?<Asterisk/></StyledLabel>
           <StyledDropdown
             id="credicoop"
             name="credicoop"
@@ -244,7 +245,7 @@ export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing
           {showError("credicoop") && <ErrorMessage>{formik.errors.credicoop}</ErrorMessage>}
         </FieldContainer>
         <FieldContainer>
-          <StyledLabel htmlFor="bank">Banco</StyledLabel>
+          <StyledLabel htmlFor="bank">Banco<Asterisk/></StyledLabel>
           <StyledInputText
             id="bank"
             name="bank"
@@ -256,7 +257,7 @@ export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing
           {showError("bank") && <ErrorMessage>{formik.errors.bank}</ErrorMessage>}
         </FieldContainer>
         <FieldContainer>
-          <StyledLabel htmlFor="cbuType">Tipo de clave</StyledLabel>
+          <StyledLabel htmlFor="cbuType">Tipo de clave{ !formik.values.credicoop && <Asterisk/>}</StyledLabel>
           <StyledDropdown
             id="cbuType"
             name="cbuType"
@@ -269,7 +270,7 @@ export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing
           {showError("cbuType") && <ErrorMessage>{formik.errors.cbuType}</ErrorMessage>}
         </FieldContainer>
         <FieldContainer>
-          <StyledLabel htmlFor="CBU">CBU</StyledLabel>
+          <StyledLabel htmlFor="CBU">CBU{ !formik.values.credicoop && <Asterisk/>}</StyledLabel>
           <StyledInputMask
             id="CBU"
             name="CBU"
@@ -282,7 +283,7 @@ export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing
           {showError("CBU") && <ErrorMessage>{formik.errors.CBU}</ErrorMessage>}
         </FieldContainer>
         <FieldContainer>
-          <StyledLabel htmlFor="alias">Alias</StyledLabel>
+          <StyledLabel htmlFor="alias">Alias<Asterisk/></StyledLabel>
           <StyledInputText
             id="alias"
             name="alias"
@@ -294,7 +295,7 @@ export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing
           {showError("alias") && <ErrorMessage>{formik.errors.alias}</ErrorMessage>}
         </FieldContainer>
         <FieldContainer>
-          <StyledLabel htmlFor="holder">Titular</StyledLabel>
+          <StyledLabel htmlFor="holder">Titular<Asterisk/></StyledLabel>
           <StyledInputText
             id="holder"
             name="holder"
@@ -306,7 +307,7 @@ export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing
           {showError("holder") && <ErrorMessage>{formik.errors.holder}</ErrorMessage>}
         </FieldContainer>
         <FieldContainer>
-          <StyledLabel htmlFor="cuit">CUIT</StyledLabel>
+          <StyledLabel htmlFor="cuit">CUIT<Asterisk/></StyledLabel>
           <StyledInputMask
             id="cuit"
             name="cuit"
@@ -319,7 +320,7 @@ export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing
           {showError("cuit") && <ErrorMessage>{formik.errors.cuit}</ErrorMessage>}
         </FieldContainer>
         <FieldContainer>
-          <StyledLabel htmlFor="number">Número</StyledLabel>
+          <StyledLabel htmlFor="number">Número{formik.values.credicoop && <Asterisk/>}</StyledLabel>
           <StyledInputText
             id="number"
             name="number"
@@ -331,7 +332,7 @@ export const BankAccountsFormDialog = ({ isOpen, bankAccount, onClose, isEditing
           {showError("number") && <ErrorMessage>{formik.errors.number}</ErrorMessage>}
         </FieldContainer>
         <FieldContainer>
-          <StyledLabel htmlFor="type">Tipo</StyledLabel>
+          <StyledLabel htmlFor="type">Tipo<Asterisk/></StyledLabel>
           <StyledDropdown
             id="type"
             name="type"

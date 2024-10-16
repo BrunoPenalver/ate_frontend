@@ -18,6 +18,9 @@ import { DetailDialog } from "../../admin/masterCRUDComponent/beneficiaries/Deta
 import { isDataComplete } from "../../../utils/models";
 import { Tooltip } from "primereact/tooltip";
 
+
+//Necesito extender ColumnProps
+
 interface StyledTableProps {
   items: any[];
   ObjectKeys: MasterCRUDColumnObjectKeys[];
@@ -71,6 +74,7 @@ export const StyledMastersTable = (props: StyledTableProps) => {
         <TitleGroup>
           <TableTitle>{plural}</TableTitle>{" "}
           <StyledTableButton
+          id={`add-${plural}`}
             label={label}
             className="p-button-primary"
             onClick={fn3}
@@ -100,6 +104,7 @@ export const StyledMastersTable = (props: StyledTableProps) => {
           </Group>
           {plural !== "Cuentas contables" && (
             <StyledTableButton
+              id={`add-${plural}`}
               label={label}
               className="p-button-primary"
               onClick={fn3}
@@ -124,8 +129,11 @@ export const StyledMastersTable = (props: StyledTableProps) => {
 
           {plural !== "Cuentas contables" && (
             <Column
+              
               header={
+                
                 <div
+                
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -178,9 +186,11 @@ export const StyledMastersTable = (props: StyledTableProps) => {
           {plural === "Proovedores" && (
             <Column
               header="Cuentas bancarias"
+              
               body={(row) => {
                 return (
                   <div
+                  id="accountsButton"
                     style={{
                       display: "flex",
                       padding: "0 10px",
@@ -223,6 +233,7 @@ export const StyledMastersTable = (props: StyledTableProps) => {
                   >
                     <i
                       className="pi pi-search"
+                      id="detailsicon"
                       style={{
                         color: "#10b981",
                         cursor: "pointer",
@@ -231,7 +242,9 @@ export const StyledMastersTable = (props: StyledTableProps) => {
                     ></i>
                     <i
                       className="pi pi-pencil"
+                      id="editicon"
                       style={{
+                        
                         color: "#10b981",
                         cursor: "pointer",
                       }}

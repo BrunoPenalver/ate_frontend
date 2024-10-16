@@ -9,7 +9,7 @@ import { NormalEditDialog } from "./NormalEditDialog";
 import { NormalAddDialog } from "./NormalAddDialog";
 import { MasterCRUD } from "../../../models/mastersModel";
 import { StyledMastersTable } from "../../tables/mastersTable/MastersTable";
-import socket from "../../../utils/socket"; // Asegúrate de importar el socket
+import socket from "../../../utils/socket";
 import { InputText } from "primereact/inputtext";
 import { Paginator } from 'primereact/paginator';
 import { useParams } from "react-router-dom";
@@ -19,7 +19,6 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) =>
   const { title } = useParams();
   const [refetchTrigger, setRefetchTrigger] = useState(0); 
 
-  const [SearchText, setSearchText] = useState("");
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(10);
 
@@ -29,8 +28,7 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) =>
     showModalAdd,
     LoadingAdd,
     errorOnLoad,
-    Items,
-    TotalResult,
+    Items,TotalResult,
     OptionsForms,
     labelAgregar,
     labelActualizar,
@@ -51,8 +49,10 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) =>
     handleDesactivate,
     handleDelete,
     handleUpdate,
-    getData,
     getDataOptions,
+    getData,
+    setSearchText,
+    SearchText,
     setCurrentPage,
     setItemsPerPage,
     switchStateModalUpdate,
@@ -65,6 +65,7 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) =>
 
   const FormAdd : any = useFormik({
     initialValues: getInitialValues(ObjectKeys),
+    validateOnChange: false,
     validate: (values) => getErrors(values, ObjectKeys),
     onSubmit: async (values) => handleAdd(values, FormAdd),
   });
@@ -72,6 +73,7 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) =>
   const FormUpdate = useFormik({
     initialValues: getInitialValues(ObjectKeys),
     validate: (values) => getErrors(values, ObjectKeys),
+    validateOnChange: false,
     onSubmit: async (values) => handleUpdate(values),
   });
 
@@ -90,16 +92,21 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) =>
   useEffect(() => 
   {
     getDataOptions();
-  },[title]);
+    getData();
+  }, [refetchTrigger, item]);  
 
   useEffect(() => 
   {
-    getData(SearchText);
-  }, [refetchTrigger,item]);  
+    setSearchText("");
+    setCurrentPage(0);
+    setItemsPerPage(10);
+    setFirst(0);
+    setRows(10);
+    setRefetchTrigger(prev => prev + 1);
+  }, [title]);
 
   useEffect(() => {
-    socket.on("updated-entities", () => {1
-     
+    socket.on("updated-entities", () => {
       setRefetchTrigger(prev => prev + 1);  
     });
 
@@ -111,18 +118,17 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) =>
   if (Loading) 
     return <Loader text={`Cargando ${plural.toLowerCase()}`} />;
 
-  const handleSearch = (newValue: string) => setSearchText(newValue);
-
   const onLeaveInput = () => 
   {
     setCurrentPage(0);
+    setFirst(0);
     setRefetchTrigger(prev => prev + 1);
   }
   
   const onPageChange = (event: { first: number; rows: number }) =>
   {
     const { first, rows } = event;
-    const page = Math.ceil(first / rows)
+    const page = Math.floor(first / rows);
 
     setFirst(first);
     setRows(rows);
@@ -136,7 +142,7 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) =>
   return (
     <>
       <StyledMastersTable
-        input={<InputText placeholder="Buscar" value={SearchText} onChange={e => handleSearch(e.target.value)} onBlur={onLeaveInput} onKeyDown={e => e.key === "Enter" && onLeaveInput()}/>}
+        input={<InputText placeholder="Buscar" value={SearchText} onChange={e => setSearchText(e.target.value)} onBlur={onLeaveInput} onKeyDown={e => e.key === "Enter" && onLeaveInput()}/>}
         items={Items}
         ObjectKeys={ObjectKeys}
         errorOnLoad={errorOnLoad}
@@ -150,8 +156,14 @@ const MasterCRUDComp = ({ item }: { item: MasterCRUD }) =>
         tooltip={tooltip}
       />
       
-      <Paginator first={first} rows={rows} totalRecords={TotalResult} rowsPerPageOptions={[10, 20, 30]} onPageChange={onPageChange} />
-
+      <Paginator 
+        first={first} 
+        rows={rows} 
+        totalRecords={TotalResult} 
+        rowsPerPageOptions={[10, 20, 30]} 
+        onPageChange={onPageChange}
+        template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+      />
 
       <NormalAddDialog
         labelAgregar={labelAgregar}

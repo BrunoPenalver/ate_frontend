@@ -13,6 +13,7 @@ const translates: Translations =
         deleteOrder: "Eliminó una orden",
         deleteForce: "Eliminó permanentemente una orden",
         undoOrder: "Restauró una orden",
+        updateOrder: "Actualizó una orden",
         "The Cbu entered is not valid": "El CBU ingresado no es válido",
     },
 };
@@ -21,7 +22,7 @@ export const getTranslate = (palabra: string): string =>
 {
     if (!translates["es"].hasOwnProperty(palabra))
     {
-        console.log("No se encontró la traducción para la palabra: ", palabra)
+        alert("No se encontró la traducción para la palabra: " + palabra);
         return "unknown";
     }
     

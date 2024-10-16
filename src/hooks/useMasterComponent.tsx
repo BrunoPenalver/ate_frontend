@@ -1,13 +1,9 @@
-import { useRef, useState } from "react";
-
+import {  useRef, useState } from "react";
 import { Toast } from "primereact/toast";
 import { getTranslate } from "../utils/translates";
 import api from "../utils/api";
 import { MasterCRUD } from "../models/mastersModel";
 import { formatCuit, validateCBU, validateCUIT } from "../utils/models";
-
-
-
 
 export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
   /*######################### Obtener los datos de cada CRUD INDIVIDUAL ####################################*/
@@ -32,6 +28,8 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
   /*######################### Obtener los errores del form ####################################*/
   const getErrors = async (values: any, ObjectKeys: any) => {
     var errors: any = {};
+
+  
   
     const keys = Object.keys(values);
   
@@ -83,25 +81,29 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
             }
             if(rule === "existingCuit")
             { 
-              
+
               const sanitizedCUIT = values[key].replace(/-/g, '');
               const beneficiaryCode = values?.code; // Asegúrate de que 'code' esté presente en 'values'
   
               // Prepara los parámetros para la solicitud
               const params = { cuit: sanitizedCUIT , code: beneficiaryCode };
-            
-              const { data } = await api.get(`/beneficiaries/check-cuit`, { params });
-              if(data.exists)
-              {
-                
-                errors[key] = `El Cuit ${formatCuit(sanitizedCUIT)} ya está registrado para el beneficiario con código ${data.existingCode}`;
-                break;
+              
+                const { data } = await api.get(`/beneficiaries/check-cuit`, { params });
+                if(data.exists)
+                  {
+                    
+                    errors[key] = `El Cuit ${formatCuit(sanitizedCUIT)} ya está registrado para el beneficiario con código ${data.existingCode}`;
+                    break;
+                  }
+        
               }
+
+
             }
           }
         }
       }
-    }
+    
     return errors;
   };
   
@@ -274,23 +276,24 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
       });
     } finally {
       setLoadingUpdate(false);
-      await getData("");
+      await getData();
     }
   };
 
-  const getData = async (searchText: string) => 
+  const getData = async () => 
   {
     setLoading(true);
 
     try 
     {
-      const { data: Response } = await api.get(`${API.get}?search=${searchText}&page=${CurrentPage}&limit=${ItemsPerPage}`);
+      const { data: Response } = await api.get(`${API.get}?search=${SearchText}&page=${CurrentPage}&limit=${ItemsPerPage}`);
 
-      const {rows, count} = Response;
+      const { data , total} = Response;
 
+      console.log(Response);
 
-      setItems(rows);
-      setTotalResult(count);
+      setItems(data);
+      setTotalResult(total);
       setErrorOnLoad(false);
     } catch (error: any) 
     {
@@ -331,6 +334,7 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
   }
 
 
+  const [SearchText, setSearchText] = useState<string>("");
   const [refetch, setRefetch] = useState(false);
   const [Loading, setLoading] = useState<boolean>(true);
   const Errors = useRef<Toast>(null);
@@ -344,7 +348,10 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
   const [OptionsForms, setOptionsForms] = useState<any>({});
   const labelAgregar = `Agregar ${singular.toLowerCase()}`;
   const labelActualizar = `Actualizar ${singular.toLowerCase()}`;
+
+
   const switchStateModalAdd = () => {
+    
     setShowModalAdd(!showModalAdd);
   };
   /* ######### Actualizar ######### */
@@ -412,6 +419,7 @@ const [loadingDelete, setLoadingDelete] = useState<boolean>(false);
     switchStateModalAdd,
     showModalUpdate,
     setShowModalUpdate,
+
     LoadingUpdate,
     setLoadingUpdate,
     itemSwitchedState,
@@ -442,8 +450,8 @@ const [loadingDelete, setLoadingDelete] = useState<boolean>(false);
     setLoadingDelete,
     switchStateModalDelete,
     setItemSwitchedStateAndSwitchModalDelete,
-    tooltip
-
-
+    tooltip,
+    setSearchText,
+    SearchText
   };
 };

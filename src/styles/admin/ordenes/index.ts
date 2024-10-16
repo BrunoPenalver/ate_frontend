@@ -9,6 +9,7 @@ export const AddText = styled.p<AddTextProps>`
     margin: 20px 0;
     cursor: pointer;
     font-weight: bold;
+    width: fit-content;
     color: ${({ enable }) => (enable ? 'inherit' : 'gray')};
     text-decoration: ${({ enable }) => (enable ? 'underline' : 'inherit')};
     pointer-events: ${({ enable }) => (enable ? 'auto' : 'none')};
