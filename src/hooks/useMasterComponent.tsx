@@ -28,6 +28,8 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
   /*######################### Obtener los errores del form ####################################*/
   const getErrors = async (values: any, ObjectKeys: any) => {
     var errors: any = {};
+
+  
   
     const keys = Object.keys(values);
   
@@ -79,25 +81,29 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
             }
             if(rule === "existingCuit")
             { 
-              
+
               const sanitizedCUIT = values[key].replace(/-/g, '');
               const beneficiaryCode = values?.code; // Asegúrate de que 'code' esté presente en 'values'
   
               // Prepara los parámetros para la solicitud
               const params = { cuit: sanitizedCUIT , code: beneficiaryCode };
-            
-              const { data } = await api.get(`/beneficiaries/check-cuit`, { params });
-              if(data.exists)
-              {
-                
-                errors[key] = `El Cuit ${formatCuit(sanitizedCUIT)} ya está registrado para el beneficiario con código ${data.existingCode}`;
-                break;
+              
+                const { data } = await api.get(`/beneficiaries/check-cuit`, { params });
+                if(data.exists)
+                  {
+                    
+                    errors[key] = `El Cuit ${formatCuit(sanitizedCUIT)} ya está registrado para el beneficiario con código ${data.existingCode}`;
+                    break;
+                  }
+        
               }
+
+
             }
           }
         }
       }
-    }
+    
     return errors;
   };
   
@@ -345,6 +351,7 @@ export const useMasterComponent = ({ item }: { item: MasterCRUD }) => {
 
 
   const switchStateModalAdd = () => {
+    
     setShowModalAdd(!showModalAdd);
   };
   /* ######### Actualizar ######### */
