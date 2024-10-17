@@ -137,7 +137,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
                 const { data: accountsplan } = await api.get("/accountsplan");
                 
                 setPaymentTypes(paymenttypes); 
-                setAccountsPlan(accountsplan.rows as AccountPlan[]);
+                setAccountsPlan(accountsplan.data as AccountPlan[]);
             } 
             catch (error) 
             {
@@ -254,7 +254,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
         try 
         {
             const { data: beneficiaries } = await api.get(`/beneficiaries?search=${inputSearch}`);
-            setFilteredBeneficiaries(beneficiaries.rows as Beneficiary[]);    
+            setFilteredBeneficiaries(beneficiaries.data as Beneficiary[]);    
         } 
         catch (error) 
         {

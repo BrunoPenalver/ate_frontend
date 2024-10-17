@@ -6,7 +6,9 @@ body {
   background-color: var(--bs-body-bg);
 }
 
-.p-paginator, .p-dropdown, .p-inputwrapper, .p-inputwrapper-filled,.p-dropdown-items,.p-dropdown-items-wrapper, footer, .p-dialog , .p-dialog-default, .p-ripple-disabled, .p-dialog-enter-done, .p-dialog-header, .p-dialog-content, input, .p-dropdown-header,.p-menubar,.p-menubar-button,.p-submenu-list,.p-panel-content, .p-panel ,.p-panel-header{
+.p-dialog-footer,
+.p-paginator, .p-dropdown, .p-inputtext,.p-button .p-component,.p-inputwrapper, .p-inputwrapper-filled,.p-dropdown-items,.p-dropdown-items-wrapper, footer, .p-dialog , .p-dialog-default, .p-ripple-disabled, .p-dialog-enter-done, .p-dialog-header, .p-dialog-content, input, .p-dropdown-header,.p-menubar,.p-menubar-button,.p-submenu-list,.p-panel-content, .p-panel ,.p-panel-header
+{
   background-color: var(--bs-body-bg) !important;
 }
 
