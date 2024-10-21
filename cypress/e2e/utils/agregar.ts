@@ -7,7 +7,7 @@ export const openAndFillMovimientoForm = (isHaber:boolean,amount:number) =>
     if(isHaber)
         cy.get(`#select-type > div:nth-child(2) > span`).click();
 
-    cy.get("#accountPlan").type("RENDICIONES");
+    cy.get("#accountPlan").type("ACTIVO");
     cy.wait(500);
     cy.get(".p-autocomplete-item").first().click();
     

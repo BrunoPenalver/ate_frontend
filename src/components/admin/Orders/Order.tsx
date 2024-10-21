@@ -159,7 +159,6 @@ const Order = (props: Props) =>
         } 
         catch (error: any) 
         {
-            console.log(error);
             dispatch(createAlert({ severity: "error", summary: "Error al crear la orden", detail: error.response.data.message || "Error al crear la orden" }));
             return false;
         }
@@ -225,7 +224,7 @@ const Order = (props: Props) =>
         {
             dispatch(createAlert({ severity: "error", summary: "Error al guardar la orden", detail: "Los totales de los movimientos no coinciden" }));
             setIsLoading(false);
-            return;
+            return false;
         }
 
         const save = async () =>
@@ -244,6 +243,7 @@ const Order = (props: Props) =>
 
         if(values.state === "Cerrada")
             confirmDialog({
+                reject: () => setIsLoading(false),
                 accept: () => save(),
                 acceptLabel: props.type === "add" ? "Guardar" : "Actualizar",
                 rejectLabel: "Cancelar",
@@ -338,7 +338,6 @@ const Order = (props: Props) =>
         if(props.type === "edit" && props.values)
             return props.values.state === "Cerrada";
         return false;
-        
     }, [ props.values?.state ]);
 
     /* Totalizadores */
@@ -446,8 +445,8 @@ const Order = (props: Props) =>
                 {havePrevData && <Button label="Eliminar información previa" type="button" id="presave" className="p-button-danger" onClick={deletePrevData}/>}
             </div>
 
-            {props.type === "add"  && <Button disabled={isLoading || DisableEdit} label="Guardar"    id="save-order" className="p-button-success" type="submit"/>}
-            {props.type === "edit" && <Button disabled={isLoading || DisableEdit} label="Actualizar" id="edit-order" className="p-button-success" type="submit"/>}
+            {props.type === "add"  && <Button loading={isLoading} disabled={DisableEdit} label="Guardar"    id="save-order" className="p-button-success" type="submit"/>}
+            {props.type === "edit" && <Button loading={isLoading} disabled={DisableEdit} label="Actualizar" id="edit-order" className="p-button-success" type="submit"/>}
         </ContainerButtons>
     </form>
 }
