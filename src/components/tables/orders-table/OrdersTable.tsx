@@ -269,12 +269,12 @@ export const StyledTable = (props:Props) =>
           const { id , state, exportedAt } = row as Order;
 
           return <div style={{display:"flex",justifyContent:"flex-end"}}>
-            {(state === "Cerrada" && <i className="pi pi-file-pdf" style={{marginRight: "10px", color: "red", cursor: "pointer"}} onClick={(e) => onClickPDF(id,e)}  />)}
-            {(useActiveOrders &&  state !== "Abierta"  )&& <Link style={{textDecoration:"none"}} to={`/admin/ordenes/${id}`}> <i className="pi pi-pen-to-square" style={{marginRight: "10px", color: "var(--cyan-500)"}}/> </Link>}
-            {(useActiveOrders &&  state === "Abierta"  )&& <Link style={{textDecoration:"none"}} to={`/admin/ordenes/${id}`}> <i className="pi pi-eye" style={{marginRight: "10px", color: "var(--cyan-500)"}}/> </Link>}
+            <i className="pi pi-file-pdf" style={{marginRight: "10px", color: "red", cursor: "pointer"}} onClick={(e) => onClickPDF(id,e)}/>
+            { useActiveOrders && <Link style={{textDecoration:"none"}} to={`/admin/ordenes/${id}`}> <i className={state !== "Cerrada" ? "pi pi-pen-to-square": "pi pi-eye" } style={{marginRight: "10px", color: "var(--cyan-500)"}}/> </Link> }
+
             {!useActiveOrders &&  <i className="pi pi-undo" style={{marginRight: "10px", color: "var(--cyan-500)", cursor: "pointer"}} onClick={(e) => onClickUndo(id,e)}  />}
             { (state === "Cerrada" && exportedAt === null) && <i className="pi pi-lock-open" style={{marginRight: "10px", color: "var(--cyan-500)", cursor: "pointer"}} onClick={(e) => onClickRevertClosed(id,e)}  />}
-            <i className="pi pi-trash" style={{color: "var(--red-600)", cursor: "pointer"}} onClick={(e) => onClickDelete(id,e)}/>  
+            <i className="pi pi-trash" style={{color: "var(--red-600)", cursor: "pointer"}} onClick={(e) => onClickDelete(id,e)}/>   
           </div>
         }}/>
 

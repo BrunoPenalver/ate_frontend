@@ -11,10 +11,12 @@ export const getPDF = async (id: number) =>
 
     const URL = window.URL.createObjectURL(Blob);
 
-    const Link = document.createElement("a");
+    window.open(URL, '_blank');
 
-    Link.href = URL;
-    Link.download = `Orden ${id}.pdf`;
-    Link.click();
-    Link.remove();
+    // const Link = document.createElement("a");
+
+    // Link.href = URL;
+    // Link.download = `Orden ${id}.pdf`;
+    // Link.click();
+    // Link.remove();
 }
