@@ -134,7 +134,7 @@ const CreateOrUpdateMovimiento = (props: Props) =>
             try 
             {
                 const { data: paymenttypes } = await api.get<PaymentType[]>("/paymenttypes");
-                const { data: accountsplan } = await api.get("/accountsplan");
+                const { data: accountsplan } = await api.get("/accountsplan?limit=0");
                 
                 setPaymentTypes(paymenttypes); 
                 setAccountsPlan(accountsplan.data as AccountPlan[]);
